@@ -4,7 +4,7 @@
 
     <groupId>com.wadpam.guja</groupId>
     <artifactId>guja</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -65,8 +65,10 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.2.2</version>
                 <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
                     <mavenExecutorId>forked-path</mavenExecutorId>
                     <preparationGoals>clean install</preparationGoals>
+                    <pushChanges>true</pushChanges>
                 </configuration>
             </plugin>
         </plugins>
