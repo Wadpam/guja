@@ -1,0 +1,14 @@
+package feeder;
+
+option java_package = "com.wadpam.guja.proto";
+option java_outer_classname = "DiagnosticsProtos";
+
+message Diagnostics {
+
+  optional string id = 1;
+  optional int64 timestamp = 2;
+  optional int32 severity = 3;
+  optional string tag = 4;
+  optional string info = 5;
+
+}

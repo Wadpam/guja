@@ -1,0 +1,10 @@
+package feeder;
+
+option java_package = "com.wadpam.guja.proto";
+option java_outer_classname = "ResponseCodeProtos";
+
+message ResponseCode {
+
+  optional int32 response_code = 1;
+
+ }
