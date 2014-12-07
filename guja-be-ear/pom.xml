@@ -1,16 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>feeder-be</artifactId>
-        <groupId>com.afconsult.feeder</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <artifactId>guja</artifactId>
+        <groupId>com.wadpam.guja</groupId>
+        <version>0.0.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.wadpam.guja</groupId>
     <artifactId>guja-be-ear</artifactId>
     <packaging>ear</packaging>
-    <version>1.0-SNAPSHOT</version>
 
     <build>
         <plugins>
@@ -36,7 +34,7 @@
         <dependency>
             <groupId>com.wadpam.guja</groupId>
             <artifactId>guja-be-war</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
             <type>war</type>
         </dependency>
     </dependencies>
