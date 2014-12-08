@@ -1,8 +1,11 @@
 package com.wadpam.guja.i18n;
 
 import com.google.inject.Inject;
-import com.wadpam.guja.dao.Di18nDaoBean;
+import com.google.inject.name.Named;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import java.util.Locale;
@@ -15,24 +18,40 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Request build localization provider.
  * @author mattiaslevin
  */
-public class PropertyFileLocalizationProvider implements LocalizationProvider {
+public class PropertyFileLocalizationProvider implements Provider<Localization> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFileLocalizationProvider.class);
 
-    private final Locale locale;
+
+    private ResourceBundle resourceBundle;
 
     @Inject
-    public PropertyFileLocalizationProvider(@Context HttpServletRequest request) {
-        this.locale = request.getLocale();
+    public PropertyFileLocalizationProvider(@Context HttpServletRequest request,
+                                            @Named("app.i18n.bundleName") String bundleName) {
+        this(request.getLocale(), bundleName);
     }
 
-    public Localization getLocalization(String bundleName) {
+    public PropertyFileLocalizationProvider(Locale locale, String bundleName) {
 
-        final ResourceBundle resourceBundle = ResourceBundle.getBundle(checkNotNull(bundleName),
-                checkNotNull(locale),
-                ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES));
+        try {
+            resourceBundle = ResourceBundle.getBundle(checkNotNull(bundleName),
+                    checkNotNull(locale),
+                    ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES));
+        } catch (MissingResourceException e) {
+            LOGGER.warn("Resource bundle {} not found", bundleName);
+        }
+
+    }
+
+    @Override
+    public Localization get() {
 
         return new Localization() {
             @Override
             public String getMessage(String key, String defaultMessage, Object... parameters) {
+
+                if (null == resourceBundle) {
+                    return defaultMessage;
+                }
 
                 String message;
                 try {

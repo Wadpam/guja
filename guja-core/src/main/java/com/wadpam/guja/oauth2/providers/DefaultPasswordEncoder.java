@@ -82,7 +82,7 @@ public class DefaultPasswordEncoder implements PasswordEncoder {
      * @param   correctHash     the hash of the valid password
      * @return                  true if the password is correct, false if not
      */
-    public static boolean validatePassword(char[] password, String correctHash) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private static boolean validatePassword(char[] password, String correctHash) throws NoSuchAlgorithmException, InvalidKeySpecException {
         // Decode the hash into its parameters
         String[] params = correctHash.split(":");
         int iterations = Integer.parseInt(params[ITERATION_INDEX]);

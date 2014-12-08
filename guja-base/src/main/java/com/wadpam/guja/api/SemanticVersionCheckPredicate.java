@@ -5,6 +5,7 @@ import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Optional;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.*;
 
@@ -16,9 +17,9 @@ import static com.google.common.base.Preconditions.*;
 public class SemanticVersionCheckPredicate implements VersionCheckResource.VersionCheckPredicate {
 
     // {<device>, <semanticVersionExpression>}
-    private final HashMap<String, String> platformMap;
+    private final Map<String, String> platformMap;
 
-    public SemanticVersionCheckPredicate(HashMap<String, String> platformMap) {
+    public SemanticVersionCheckPredicate(Map<String, String> platformMap) {
         this.platformMap = checkNotNull(platformMap);
     }
 

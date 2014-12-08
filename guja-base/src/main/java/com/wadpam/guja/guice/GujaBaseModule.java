@@ -29,8 +29,8 @@ public class GujaBaseModule extends AbstractModule {
                 Multibinder.newSetBinder(binder(), VersionCheckResource.VersionCheckPredicate.class);
         bind(VersionCheckResource.class);
 
-        bind(LocalizationProvider.class).annotatedWith(Dynamic.class).to(DynamicLocalizationProvider.class);
-        bind(LocalizationProvider.class).annotatedWith(PropertyFile.class).to(PropertyFileLocalizationProvider.class);
+        bind(Localization.class).annotatedWith(Dynamic.class).toProvider(DynamicLocalizationProvider.class);
+        bind(Localization.class).annotatedWith(PropertyFile.class).toProvider(PropertyFileLocalizationProvider.class);
 
         bind(ResponseCodeProtoMessageBodyWriter.class);
 
