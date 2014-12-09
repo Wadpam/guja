@@ -18,11 +18,11 @@ public class PropertyFileLocalizationProviderTest {
     public void setUp() throws Exception {
 
         localization = new PropertyFileLocalizationProvider(
+                "i18n.TestBundle",
                 new Locale.Builder()
                         .setLanguage("en")
                         .setRegion("US")
-                        .build(),
-                "i18n.TestBundle").get();
+                        .build()).get();
 
     }
 
@@ -34,13 +34,13 @@ public class PropertyFileLocalizationProviderTest {
     public void testResourceBundleMissing() {
 
         localization = new PropertyFileLocalizationProvider(
+                "i18n.MissingBundle",
                 new Locale.Builder()
                         .setLanguage("en")
                         .setRegion("US")
-                        .build(),
-                "i18n.MissingBundle").get();
+                        .build()).get();
 
-        assertTrue("default".equals(localization.getMessage("key1", "default")));
+        assertTrue("default message".equals(localization.getMessage("key1", "default message")));
 
     }
 
@@ -55,7 +55,7 @@ public class PropertyFileLocalizationProviderTest {
     @Test
     public void testGetLocalizationWithParameters() {
 
-        assertTrue("param 1 param 2".equals(localization.getMessage("key3", "default %s %s", 1, 2)));
+        assertTrue("param 1 param 2".equals(localization.getMessage("key3", "default message", 1, 2)));
 
     }
 
@@ -63,7 +63,7 @@ public class PropertyFileLocalizationProviderTest {
     @Test
     public void testMissingLocalization() {
 
-        assertTrue("default".equals(localization.getMessage("missingKey", "default")));
+        assertTrue("default message".equals(localization.getMessage("missingKey", "default message")));
 
     }
 }

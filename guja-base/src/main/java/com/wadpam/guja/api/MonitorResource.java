@@ -1,7 +1,7 @@
 package com.wadpam.guja.api;
 
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableMap;
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableMapBuilder;
+
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
@@ -15,8 +15,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -47,7 +45,8 @@ public class MonitorResource {
         return Response.ok(ImmutableMap.builder()
                 .put("name", appName)
                 .put("version", appVersion)
-                .put("date", new Date().toString()))
+                .put("date", new Date().toString())
+                .build())
                 .build();
     }
 

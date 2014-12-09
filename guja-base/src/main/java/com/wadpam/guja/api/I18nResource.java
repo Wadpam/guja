@@ -1,5 +1,6 @@
 package com.wadpam.guja.api;
 
+import com.google.inject.Singleton;
 import com.wadpam.guja.crud.CrudResource;
 import com.wadpam.guja.dao.Di18nDaoBean;
 import com.wadpam.guja.domain.Di18n;
@@ -13,6 +14,7 @@ import javax.ws.rs.Path;
  * @author mattiaslevin
  */
 @Path("api/i18n")
+@Singleton
 @RolesAllowed("{ROLE_ADMIN}")
 public class I18nResource extends CrudResource<Di18n, Long, Di18nDaoBean> {
 

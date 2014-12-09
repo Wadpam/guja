@@ -29,12 +29,12 @@ public class SemanticVersionCheckPredicateTest {
     @Test
     public void testIsVersionSupported() throws Exception {
 
-        assertTrue(predicate.isVersionSupported("ios", "1.0.0").get());
-        assertFalse(predicate.isVersionSupported("ios", "0.9.0").get());
-        assertFalse(predicate.isVersionSupported("ios", "1.0.3").get());
+        assertTrue(predicate.isVersionSupported("ios", "1.0.0"));
+        assertFalse(predicate.isVersionSupported("ios", "0.9.0"));
+        assertFalse(predicate.isVersionSupported("ios", "1.0.3"));
 
-        assertTrue(predicate.isVersionSupported("android", "1.5.1").get());
-        assertFalse(predicate.isVersionSupported("android", "1.4.0").get());
+        assertTrue(predicate.isVersionSupported("android", "1.5.1"));
+        assertFalse(predicate.isVersionSupported("android", "1.4.0"));
 
     }
 

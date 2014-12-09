@@ -2,6 +2,7 @@ package com.wadpam.guja.i18n;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.google.inject.servlet.RequestScoped;
 import com.wadpam.guja.dao.Di18nDaoBean;
 
 import javax.inject.Provider;
@@ -13,6 +14,7 @@ import java.util.Locale;
  * Request build localization provider.
  * @author mattiaslevin
  */
+@RequestScoped
 public class DynamicLocalizationProvider implements Provider<Localization> {
 
     private final Locale locale;
@@ -20,8 +22,8 @@ public class DynamicLocalizationProvider implements Provider<Localization> {
     private final Di18nDaoBean i18nDao;
 
     @Inject
-    public DynamicLocalizationProvider(@Context HttpServletRequest request,
-                                       @Named("app.i18n.bundleName") String bundleName,
+    public DynamicLocalizationProvider(@Named("app.i18n.bundleName") String bundleName,
+                                       @Context HttpServletRequest request,
                                        Di18nDaoBean i18nDao) {
         this(request.getLocale(), bundleName, i18nDao);
     }

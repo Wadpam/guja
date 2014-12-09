@@ -1,41 +1,54 @@
 package com.wadpam.guja.api;
 
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicates;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import com.google.inject.servlet.RequestScoped;
+import com.wadpam.guja.i18n.Localization;
+import com.wadpam.guja.i18n.PropertyFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
-import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import java.util.Collection;
-import java.util.Set;
+import java.util.Map;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Check if an apps version is supported or not.
  * @author mattiaslevin
  */
 @Path("api/version")
-@Singleton
+@RequestScoped
 @PermitAll
 public class VersionCheckResource {
+    private static final Logger LOGGER = LoggerFactory.getLogger(VersionCheckResource.class);
 
-    private final Set<VersionCheckPredicate> predicates;
+    private final VersionCheckPredicate predicate;
+    private final Localization localization;
+    private final Map<String, String> upgradeUrls;
 
 
     @Inject
-    public VersionCheckResource(Set<VersionCheckPredicate> predicates) {
-        this.predicates = checkNotNull(predicates);
+    public VersionCheckResource(@Named("app.versions.upgradeUrls") String upgradeUrls,
+                                VersionCheckPredicate predicate,
+                                @PropertyFile Localization localization) {
+        this.predicate = checkNotNull(predicate);
+        this.localization = checkNotNull(localization);
+        this.upgradeUrls = parsePropertyMap(checkNotNull(upgradeUrls));
+
     }
 
+    private static Map<String, String> parsePropertyMap(String formattedMap) {
+        return Splitter.on(",").withKeyValueSeparator("=").split(formattedMap);
+    }
 
     @GET
     @Path("{version}/check")
@@ -44,23 +57,21 @@ public class VersionCheckResource {
         checkNotNull(platform);
         checkNotNull(version);
 
-        boolean isVersionAllowed = predicates.isEmpty();
-        for (VersionCheckPredicate predicate : predicates) {
-            Optional<Boolean> optional = predicate.isVersionSupported(platform, version);
-            if (optional.isPresent()) {
-                isVersionAllowed = optional.get();
-                break;
-            }
-        }
-
-        if (isVersionAllowed) {
+        if (predicate.isVersionSupported(platform, version)) {
+            LOGGER.debug("Version supported {} {}", version, platform);
             return Response.ok().build();
         } else {
-            // TODO Localisation
+
+            LOGGER.debug("Version not supported {} {}", version, platform);
+            ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String>builder()
+                    .put("localizedMessage", localization.getMessage("updateRequired", "You must upgrade your application"));
+
+            if (null != upgradeUrls && null != upgradeUrls.get(platform)) {
+                builder.put("url", upgradeUrls.get(platform));
+            }
+
             return Response.status(Response.Status.GONE)
-                    .entity(ImmutableMap.builder()
-                    .put("localizedMessage", "<Change me>")
-                    .put("url", "<http://www.change.me>"))
+                    .entity(builder.build())
                     .build();
         }
 
@@ -72,73 +83,12 @@ public class VersionCheckResource {
      */
     public static interface VersionCheckPredicate {
         /**
-         *
+         * Check if a platform and application combination is supported.
          * @param platform App platform
          * @param version App version
-         * @return If the predicate can not decide if the version is supported of not return an optional with absent value.
-         *         Otherwise return an optional with value true or false.
+         * @return true is the version is supported by the backend
          */
-        Optional<Boolean> isVersionSupported(String platform, String version);
-    }
-
-
-    /** A version check function that always will return true */
-    public static class AlwaysReturnTruePredicate extends AlwaysReturnSameValuePredicate {
-        public AlwaysReturnTruePredicate() {
-            super(true);
-        }
-    }
-
-    /** A version check function that always will return false */
-    public static class AlwaysReturnFalsePredicate extends AlwaysReturnSameValuePredicate {
-        public AlwaysReturnFalsePredicate() {
-            super(false);
-        }
-    }
-
-    private static class AlwaysReturnSameValuePredicate implements VersionCheckPredicate {
-
-        private final boolean value;
-
-        public AlwaysReturnSameValuePredicate(boolean value) {
-            this.value = value;
-        }
-
-        @Override
-        public Optional<Boolean> isVersionSupported(String platform, String version) {
-            return Optional.of(value);
-        }
-    }
-
-    /** if the version is included in the white list return true */
-    public static class WhitelistPredicate extends ContainsPredicate {
-        public WhitelistPredicate(Collection<String> list) {
-            super(list, true);
-        }
-    }
-
-    /** If the version is included in the back list return false */
-    public static class BlacklistPredicate extends ContainsPredicate {
-        public BlacklistPredicate(Collection<String> list) {
-            super(list, false);
-        }
-    }
-
-    private static class ContainsPredicate implements VersionCheckPredicate {
-
-        private Collection<String> collection;
-        private final boolean trueOrFalse;
-
-        public ContainsPredicate(Collection<String> list, boolean trueOrFalse) {
-            this.collection = list;
-            this.trueOrFalse = trueOrFalse;
-        }
-
-        @Override
-        public Optional<Boolean> isVersionSupported(String platform, String version) {
-            return collection.contains(version) ? Optional.of(trueOrFalse) : Optional.<Boolean>absent();
-        }
-
+        boolean isVersionSupported(String platform, String version);
     }
 
 

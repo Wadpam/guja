@@ -3,6 +3,7 @@ package com.wadpam.guja.api;
 import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.wadpam.guja.readerwriter.DiagnosticsProtoMessageBodyReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import java.text.SimpleDateFormat;
  * @author mattiaslevin
  */
 @Path("api/diagnostics")
+@Singleton
 @PermitAll
 public class DiagnosticsResource {
 

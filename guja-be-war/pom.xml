@@ -88,7 +88,7 @@
         </resources>
 
         <plugins>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -150,7 +150,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <basePackage>com.afconsult.feeder</basePackage>
+                            <basePackage>com.wadpam.guja</basePackage>
                             <targetFolder>${project.basedir}/src/main/java</targetFolder>
                         </configuration>
                     </plugin>

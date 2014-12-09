@@ -2,6 +2,7 @@ package com.wadpam.guja.i18n;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.google.inject.servlet.RequestScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,20 +19,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Request build localization provider.
  * @author mattiaslevin
  */
+@RequestScoped
 public class PropertyFileLocalizationProvider implements Provider<Localization> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFileLocalizationProvider.class);
 
 
     private ResourceBundle resourceBundle;
 
+
     @Inject
-    public PropertyFileLocalizationProvider(@Context HttpServletRequest request,
-                                            @Named("app.i18n.bundleName") String bundleName) {
-        this(request.getLocale(), bundleName);
+    public PropertyFileLocalizationProvider(@Named("app.i18n.bundleName") String bundleName,
+                                            @Context HttpServletRequest request) {
+        this(bundleName, request.getLocale());
     }
 
-    public PropertyFileLocalizationProvider(Locale locale, String bundleName) {
-
+    public PropertyFileLocalizationProvider(String bundleName, Locale locale) {
         try {
             resourceBundle = ResourceBundle.getBundle(checkNotNull(bundleName),
                     checkNotNull(locale),
@@ -39,13 +41,13 @@ public class PropertyFileLocalizationProvider implements Provider<Localization> 
         } catch (MissingResourceException e) {
             LOGGER.warn("Resource bundle {} not found", bundleName);
         }
-
     }
 
     @Override
     public Localization get() {
 
         return new Localization() {
+
             @Override
             public String getMessage(String key, String defaultMessage, Object... parameters) {
 
