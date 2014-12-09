@@ -8,33 +8,34 @@ import java.util.Date;
 
 /**
  * Add a deleted by and date to the entity.
+ *
  * @author mattiaslevin
  */
 @Entity
 public abstract class AbstractLongDeletedEntity extends AbstractLongEntity {
 
-    public AbstractLongDeletedEntity() {
-    }
+  public AbstractLongDeletedEntity() {
+  }
 
-    @Basic
-    private String deletedBy;
+  @Basic
+  private String deletedBy;
 
-    @Basic
-    private Date deletedDate;
+  @Basic
+  private Date deletedDate;
 
-    public String getDeletedBy() {
-        return deletedBy;
-    }
+  public String getDeletedBy() {
+    return deletedBy;
+  }
 
-    public void setDeletedBy(String deletedBy) {
-        this.deletedBy = deletedBy;
-    }
+  public void setDeletedBy(String deletedBy) {
+    this.deletedBy = deletedBy;
+  }
 
-    public Date getDeletedDate() {
-        return deletedDate;
-    }
+  public Date getDeletedDate() {
+    return deletedDate;
+  }
 
-    public void setDeletedDate(Date deletedDate) {
-        this.deletedDate = deletedDate;
-    }
+  public void setDeletedDate(Date deletedDate) {
+    this.deletedDate = deletedDate;
+  }
 }

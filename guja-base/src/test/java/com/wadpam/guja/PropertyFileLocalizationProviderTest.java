@@ -8,62 +8,62 @@ import org.junit.Test;
 
 import java.util.Locale;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class PropertyFileLocalizationProviderTest {
 
-    private Localization localization;
+  private Localization localization;
 
-    @Before
-    public void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
 
-        localization = new PropertyFileLocalizationProvider(
-                "i18n.TestBundle",
-                new Locale.Builder()
-                        .setLanguage("en")
-                        .setRegion("US")
-                        .build()).get();
+    localization = new PropertyFileLocalizationProvider(
+        "i18n.TestBundle",
+        new Locale.Builder()
+            .setLanguage("en")
+            .setRegion("US")
+            .build()).get();
 
-    }
+  }
 
-    @After
-    public void tearDown() throws Exception {
-    }
+  @After
+  public void tearDown() throws Exception {
+  }
 
-    @Test
-    public void testResourceBundleMissing() {
+  @Test
+  public void testResourceBundleMissing() {
 
-        localization = new PropertyFileLocalizationProvider(
-                "i18n.MissingBundle",
-                new Locale.Builder()
-                        .setLanguage("en")
-                        .setRegion("US")
-                        .build()).get();
+    localization = new PropertyFileLocalizationProvider(
+        "i18n.MissingBundle",
+        new Locale.Builder()
+            .setLanguage("en")
+            .setRegion("US")
+            .build()).get();
 
-        assertTrue("default message".equals(localization.getMessage("key1", "default message")));
+    assertTrue("default message".equals(localization.getMessage("key1", "default message")));
 
-    }
-
-
-    @Test
-    public void testGetLocalization() {
-
-        assertTrue("value1".equals(localization.getMessage("key1", "default message")));
-
-    }
-
-    @Test
-    public void testGetLocalizationWithParameters() {
-
-        assertTrue("param 1 param 2".equals(localization.getMessage("key3", "default message", 1, 2)));
-
-    }
+  }
 
 
-    @Test
-    public void testMissingLocalization() {
+  @Test
+  public void testGetLocalization() {
 
-        assertTrue("default message".equals(localization.getMessage("missingKey", "default message")));
+    assertTrue("value1".equals(localization.getMessage("key1", "default message")));
 
-    }
+  }
+
+  @Test
+  public void testGetLocalizationWithParameters() {
+
+    assertTrue("param 1 param 2".equals(localization.getMessage("key3", "default message", 1, 2)));
+
+  }
+
+
+  @Test
+  public void testMissingLocalization() {
+
+    assertTrue("default message".equals(localization.getMessage("missingKey", "default message")));
+
+  }
 }

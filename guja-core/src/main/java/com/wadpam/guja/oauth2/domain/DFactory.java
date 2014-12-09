@@ -12,42 +12,45 @@ import javax.persistence.Entity;
 /**
  * A ConnectionFactory entity.
  * the ID is mapped to providerId.
+ *
  * @author sosandstrom
  */
 @Entity
 public class DFactory extends AbstractStringEntity {
 
-    @Basic
-    private String clientId;
+  @Basic
+  private String clientId;
 
-    @Basic
-    private String clientSecret;
-    
-    /** Base URL to the sign in provider */
-    @Basic
-    private String baseUrl;
+  @Basic
+  private String clientSecret;
 
-    public String getBaseUrl() {
-        return baseUrl;
-    }
+  /**
+   * Base URL to the sign in provider
+   */
+  @Basic
+  private String baseUrl;
 
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
-    }
+  public String getBaseUrl() {
+    return baseUrl;
+  }
 
-    public String getClientId() {
-        return clientId;
-    }
+  public void setBaseUrl(String baseUrl) {
+    this.baseUrl = baseUrl;
+  }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
+  public String getClientId() {
+    return clientId;
+  }
 
-    public String getClientSecret() {
-        return clientSecret;
-    }
+  public void setClientId(String clientId) {
+    this.clientId = clientId;
+  }
 
-    public void setClientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
-    }
+  public String getClientSecret() {
+    return clientSecret;
+  }
+
+  public void setClientSecret(String clientSecret) {
+    this.clientSecret = clientSecret;
+  }
 }

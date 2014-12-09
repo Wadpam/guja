@@ -35,7 +35,7 @@ public class MardaoTransactionManager implements MethodInterceptor {
    *
    * @param invocation the method invocation joinpoint
    * @return the result of the call to {@link org.aopalliance.intercept.Joinpoint#proceed()}, might be intercepted by the
-   *         interceptor.
+   * interceptor.
    * @throws Throwable if the interceptors or the target-object throws an exception.
    */
   @Override
@@ -46,8 +46,7 @@ public class MardaoTransactionManager implements MethodInterceptor {
     Object result;
     if (null == annotation) {
       result = invocation.proceed();
-    }
-    else {
+    } else {
       result = AbstractDao.withTransaction(new TransFunc<Object>() {
         @Override
         public Object apply() throws IOException {

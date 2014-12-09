@@ -10,12 +10,13 @@ import com.wadpam.guja.domain.Di18n;
 
 /**
  * The Di18n domain-object specific mapping methods go here.
- *
+ * <p/>
  * Generated on 2014-12-07T20:44:32.554+0100.
+ *
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class Di18nMapper
-  implements Mapper<Di18n, Long> {
+    implements Mapper<Di18n, Long> {
 
   private final Supplier supplier;
 
@@ -112,9 +113,9 @@ public class Di18nMapper
     entity.setCreatedDate(supplier.getDate(value, Field.CREATEDDATE.getFieldName()));
     entity.setUpdatedBy(supplier.getString(value, Field.UPDATEDBY.getFieldName()));
     entity.setUpdatedDate(supplier.getDate(value, Field.UPDATEDDATE.getFieldName()));
-}
+  }
 
-@Override
+  @Override
   public String getKind() {
     return Di18n.class.getSimpleName();
   }
@@ -162,30 +163,37 @@ public class Di18nMapper
       entity.setBaseBundle(baseBundle);
       return this;
     }
+
     public Di18nBuilder createdBy(String createdBy) {
       entity.setCreatedBy(createdBy);
       return this;
     }
+
     public Di18nBuilder createdDate(Date createdDate) {
       entity.setCreatedDate(createdDate);
       return this;
     }
+
     public Di18nBuilder key(String key) {
       entity.setKey(key);
       return this;
     }
+
     public Di18nBuilder locale(String locale) {
       entity.setLocale(locale);
       return this;
     }
+
     public Di18nBuilder localizedMessage(String localizedMessage) {
       entity.setLocalizedMessage(localizedMessage);
       return this;
     }
+
     public Di18nBuilder updatedBy(String updatedBy) {
       entity.setUpdatedBy(updatedBy);
       return this;
     }
+
     public Di18nBuilder updatedDate(Date updatedDate) {
       entity.setUpdatedDate(updatedDate);
       return this;

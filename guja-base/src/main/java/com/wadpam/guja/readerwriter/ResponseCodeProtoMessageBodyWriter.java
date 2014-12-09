@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 
 /**
  * Convert all other entities with x-protobuf Content-Type to just its http response code.
+ *
  * @author mattiaslevin
  */
 @Provider
@@ -27,31 +28,31 @@ import java.lang.reflect.Type;
 @Produces("application/x-protobuf")
 public class ResponseCodeProtoMessageBodyWriter implements MessageBodyWriter<ResponseCodeEntityWrapper> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseCodeProtoMessageBodyWriter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ResponseCodeProtoMessageBodyWriter.class);
 
 
-    @Override
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        LOGGER.debug("Media type {} entity type {}", mediaType, genericType);
-        return mediaType.equals(ProtoWrapperFilter.APPLICATION_X_PROTOBUF_TYPE) &&
-                type == ResponseCodeEntityWrapper.class;
-    }
+  @Override
+  public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    LOGGER.debug("Media type {} entity type {}", mediaType, genericType);
+    return mediaType.equals(ProtoWrapperFilter.APPLICATION_X_PROTOBUF_TYPE) &&
+        type == ResponseCodeEntityWrapper.class;
+  }
 
-    @Override
-    public long getSize(ResponseCodeEntityWrapper responseCodeEntityWrapper, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        // Not used
-        return 0;
-    }
+  @Override
+  public long getSize(ResponseCodeEntityWrapper responseCodeEntityWrapper, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    // Not used
+    return 0;
+  }
 
-    @Override
-    public void writeTo(ResponseCodeEntityWrapper responseCodeEntityWrapper, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
-        LOGGER.debug("Serialize to protocol buffer");
+  @Override
+  public void writeTo(ResponseCodeEntityWrapper responseCodeEntityWrapper, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+    LOGGER.debug("Serialize to protocol buffer");
 
-        ResponseCodeProtos.ResponseCode.Builder builder = ResponseCodeProtos.ResponseCode.newBuilder();
+    ResponseCodeProtos.ResponseCode.Builder builder = ResponseCodeProtos.ResponseCode.newBuilder();
 
-        builder.setResponseCode(responseCodeEntityWrapper.getResponseCode())
-                .build()
-                .writeTo(entityStream);
+    builder.setResponseCode(responseCodeEntityWrapper.getResponseCode())
+        .build()
+        .writeTo(entityStream);
 
-    }
+  }
 }

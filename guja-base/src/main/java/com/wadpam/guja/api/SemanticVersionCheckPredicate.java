@@ -14,43 +14,44 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Check an app version using semantic version check.
  * http://semver.org
+ *
  * @author mattiaslevin
  */
 public class SemanticVersionCheckPredicate implements VersionCheckResource.VersionCheckPredicate {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SemanticVersionCheckPredicate.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SemanticVersionCheckPredicate.class);
 
 
-    // {<device>, <semanticVersionExpression>}
-    private final Map<String, String> platformMap;
+  // {<device>, <semanticVersionExpression>}
+  private final Map<String, String> platformMap;
 
-    @Inject
-    public SemanticVersionCheckPredicate(@Named("app.versions.allowed") String allowedVersions) {
-        this(parsePropertyMap(checkNotNull(allowedVersions)));
+  @Inject
+  public SemanticVersionCheckPredicate(@Named("app.versions.allowed") String allowedVersions) {
+    this(parsePropertyMap(checkNotNull(allowedVersions)));
+  }
+
+  public SemanticVersionCheckPredicate(Map<String, String> platformMap) {
+    this.platformMap = checkNotNull(platformMap);
+
+  }
+
+  private static Map<String, String> parsePropertyMap(String formattedMap) {
+    return Splitter.on(",").withKeyValueSeparator("=").split(formattedMap);
+  }
+
+  @Override
+  public boolean isVersionSupported(String platform, String version) {
+
+    // get the semantic version expression for the platform
+    String expression = platformMap.get(platform);
+    LOGGER.debug("Check {} against {}", version, expression);
+
+    if (null != expression) {
+      return Version.valueOf(version).satisfies(expression);
+    } else {
+      // If no rule is available for a platform return true as default
+      return true;
     }
 
-    public SemanticVersionCheckPredicate(Map<String, String> platformMap) {
-        this.platformMap = checkNotNull(platformMap);
-
-    }
-
-    private static Map<String, String> parsePropertyMap(String formattedMap) {
-        return Splitter.on(",").withKeyValueSeparator("=").split(formattedMap);
-    }
-
-    @Override
-    public boolean isVersionSupported(String platform, String version) {
-
-        // get the semantic version expression for the platform
-        String expression = platformMap.get(platform);
-        LOGGER.debug("Check {} against {}", version, expression);
-
-        if (null != expression) {
-            return Version.valueOf(version).satisfies(expression);
-        } else {
-            // If no rule is available for a platform return true as default
-            return true;
-        }
-
-    }
+  }
 
 }

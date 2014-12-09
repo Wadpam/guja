@@ -12,49 +12,50 @@ import java.util.Collection;
 
 /**
  * Provide a SecurityContext based on Oauth2 authentication.
+ *
  * @author mattiaslevin
  */
 public class SecurityContextRequestWrapper extends HttpServletRequestWrapper {
 
-    private final String authType = "OAUTH2_AUTH";
-    private final Principal principal;
-    private final Collection<String> roles;
+  private final String authType = "OAUTH2_AUTH";
+  private final Principal principal;
+  private final Collection<String> roles;
 
-    public SecurityContextRequestWrapper(HttpServletRequest request) {
-        super(request);
-        this.principal = new Principal() {
-            @Override
-            public String getName() {
-                return "anonymous";
-            }
-        };
-        this.roles = Lists.newArrayList(OAuth2UserResource.ROLE_ANONYMOUS);
-    }
+  public SecurityContextRequestWrapper(HttpServletRequest request) {
+    super(request);
+    this.principal = new Principal() {
+      @Override
+      public String getName() {
+        return "anonymous";
+      }
+    };
+    this.roles = Lists.newArrayList(OAuth2UserResource.ROLE_ANONYMOUS);
+  }
 
-    public SecurityContextRequestWrapper(HttpServletRequest request, final DConnection connection) {
-        super(request);
-        this.principal = new Principal() {
-            @Override
-            public String getName() {
-                return connection.getId().toString();
-            }
-        };
-        this.roles = connection.getRoles();
-    }
+  public SecurityContextRequestWrapper(HttpServletRequest request, final DConnection connection) {
+    super(request);
+    this.principal = new Principal() {
+      @Override
+      public String getName() {
+        return connection.getId().toString();
+      }
+    };
+    this.roles = connection.getRoles();
+  }
 
-    @Override
-    public String getAuthType() {
-        return authType;
-    }
+  @Override
+  public String getAuthType() {
+    return authType;
+  }
 
 
-    @Override
-    public Principal getUserPrincipal() {
-        return principal;
-    }
+  @Override
+  public Principal getUserPrincipal() {
+    return principal;
+  }
 
-    @Override
-    public boolean isUserInRole(String role) {
-        return roles.contains(role);
-    }
+  @Override
+  public boolean isUserInRole(String role) {
+    return roles.contains(role);
+  }
 }

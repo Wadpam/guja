@@ -42,473 +42,480 @@ import java.util.Map;
  * An oauth2 implementation support the Resource Owner Password Credential Grant flow.
  * http://tools.ietf.org/html/rfc6749#section-4.3
  * This flow is typically used by trusted client that my touch the resource owners (user) credentials.
+ *
  * @author mattiaslevin
  */
 @Path("oauth")
 @Singleton
 @PermitAll
 public class OAuth2Resource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2Resource.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2Resource.class);
 
-    private static final String PASSWORD_GRANT_TYPE = "password";
-    private static final int DEFAULT_EXPIRES_IN = 60 * 60 * 24 * 7;  // 1 week
+  private static final String PASSWORD_GRANT_TYPE = "password";
+  private static final int DEFAULT_EXPIRES_IN = 60 * 60 * 24 * 7;  // 1 week
 
-    private final DConnectionDaoBean connectionDao;
-    private final DFactoryDaoBean factoryDao;
+  private final DConnectionDaoBean connectionDao;
+  private final DFactoryDaoBean factoryDao;
 
-    private final Oauth2UserProvider userProvider;
-    private final AccessTokenGenerator accessTokenGenerator;
-    private final UserAuthenticationProvider authenticationProvider;
+  private final Oauth2UserProvider userProvider;
+  private final AccessTokenGenerator accessTokenGenerator;
+  private final UserAuthenticationProvider authenticationProvider;
 
 
-    @Inject
-    public OAuth2Resource(UserAuthenticationProvider authenticationProvider,
-                          AccessTokenGenerator accessTokenGenerator,
-                          Oauth2UserProvider userProvider,
-                          ServerEnvironmentProvider serverEnvironment,
-                          DConnectionDaoBean connectionDao,
-                          DFactoryDaoBean factoryDao) {
+  @Inject
+  public OAuth2Resource(UserAuthenticationProvider authenticationProvider,
+                        AccessTokenGenerator accessTokenGenerator,
+                        Oauth2UserProvider userProvider,
+                        ServerEnvironmentProvider serverEnvironment,
+                        DConnectionDaoBean connectionDao,
+                        DFactoryDaoBean factoryDao) {
 
-        this.connectionDao = connectionDao;
-        this.factoryDao = factoryDao;
-        this.authenticationProvider = authenticationProvider;
-        this.accessTokenGenerator = accessTokenGenerator;
-        this.userProvider = userProvider;
+    this.connectionDao = connectionDao;
+    this.factoryDao = factoryDao;
+    this.authenticationProvider = authenticationProvider;
+    this.accessTokenGenerator = accessTokenGenerator;
+    this.userProvider = userProvider;
 
-        if (serverEnvironment.isDevEnvironment()) {
-            try {
+    if (serverEnvironment.isDevEnvironment()) {
+      try {
 
-                // TODO Move values to a property file
-                factoryDao.put(DFactoryMapper.newBuilder()
-                        .id(FactoryResource.PROVIDER_ID_FACEBOOK)
-                        .baseUrl("https://graph.facebook.com")
-                        .clientId("255653361131262")
-                        .clientSecret("43801e00b5f2e540b672b19943e164ba")
-                        .build());
+        // TODO Move values to a property file
+        factoryDao.put(DFactoryMapper.newBuilder()
+            .id(FactoryResource.PROVIDER_ID_FACEBOOK)
+            .baseUrl("https://graph.facebook.com")
+            .clientId("255653361131262")
+            .clientSecret("43801e00b5f2e540b672b19943e164ba")
+            .build());
 
-            } catch (IOException e) {
-                LOGGER.error("populating factory", e);
-            }
-        }
-
+      } catch (IOException e) {
+        LOGGER.error("populating factory", e);
+      }
     }
 
+  }
 
-    /**
-     * Authorize a user (basically a sign in)
-     * @param credentials user credentials
-     * @return access_token and refresh token if successful.
-     *         Success response http://tools.ietf.org/html/rfc6749#section-5.1
-     *         Failure response http://tools.ietf.org/html/rfc6749#section-5.2
-     */
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("authorize")
-    public Response authorize(UserCredentials credentials) {
 
-        // The client has been authenticated already in the interceptor
+  /**
+   * Authorize a user (basically a sign in)
+   *
+   * @param credentials user credentials
+   * @return access_token and refresh token if successful.
+   * Success response http://tools.ietf.org/html/rfc6749#section-5.1
+   * Failure response http://tools.ietf.org/html/rfc6749#section-5.2
+   */
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("authorize")
+  public Response authorize(UserCredentials credentials) {
 
-        if (!PASSWORD_GRANT_TYPE.equals(credentials.getGrant_type())) {
-            // Unsupported grant type
-            throw new BadRequestRestException(ImmutableMap.of("error", "unsupported_grant_type"));
-        }
+    // The client has been authenticated already in the interceptor
 
-        if (null == credentials.getUsername() ||
-                null == credentials.getPassword()) {
-            throw new BadRequestRestException(ImmutableMap.of("error", "invalid_request"));
-        }
+    if (!PASSWORD_GRANT_TYPE.equals(credentials.getGrant_type())) {
+      // Unsupported grant type
+      throw new BadRequestRestException(ImmutableMap.of("error", "unsupported_grant_type"));
+    }
 
-        DOAuth2User oauth2User = authenticationProvider.authenticate(credentials.getUsername(), credentials.getPassword());
-        if (null != oauth2User) {
+    if (null == credentials.getUsername() ||
+        null == credentials.getPassword()) {
+      throw new BadRequestRestException(ImmutableMap.of("error", "invalid_request"));
+    }
 
-            // load connection from db async style (likely case is new token for existing user)
-            final Iterable<DConnection> existingConnections = connectionDao.queryByProviderUserId(oauth2User.getId().toString());
+    DOAuth2User oauth2User = authenticationProvider.authenticate(credentials.getUsername(), credentials.getPassword());
+    if (null != oauth2User) {
 
-            DConnection connection = new DConnection();
-            connection.setAccessToken(accessTokenGenerator.generate());
-            connection.setRefreshToken(accessTokenGenerator.generate());
-            connection.setProviderId(FactoryResource.PROVIDER_ID_SELF);
-            connection.setProviderUserId(oauth2User.getId().toString());
-            connection.setUserId(oauth2User.getId());
-            connection.setExpireTime(calculateExpirationDate(DEFAULT_EXPIRES_IN));
-            connection.setUserRoles(convertRoles(oauth2User.getRoles()));
+      // load connection from db async style (likely case is new token for existing user)
+      final Iterable<DConnection> existingConnections = connectionDao.queryByProviderUserId(oauth2User.getId().toString());
 
-            put(connection);
+      DConnection connection = new DConnection();
+      connection.setAccessToken(accessTokenGenerator.generate());
+      connection.setRefreshToken(accessTokenGenerator.generate());
+      connection.setProviderId(FactoryResource.PROVIDER_ID_SELF);
+      connection.setProviderUserId(oauth2User.getId().toString());
+      connection.setUserId(oauth2User.getId());
+      connection.setExpireTime(calculateExpirationDate(DEFAULT_EXPIRES_IN));
+      connection.setUserRoles(convertRoles(oauth2User.getRoles()));
 
-            // Remove expired connections for the user
-            removeExpiredConnections(FactoryResource.PROVIDER_ID_SELF, existingConnections);
+      put(connection);
 
-            return Response.ok(ImmutableMap.builder()
-                    .put("access_token", connection.getAccessToken())
-                    .put("refresh_token", connection.getRefreshToken())
-                    .put("expires_in", DEFAULT_EXPIRES_IN)
-                    .build())
-                    .cookie(createCookie(connection.getAccessToken(), DEFAULT_EXPIRES_IN))
-                    .build();
+      // Remove expired connections for the user
+      removeExpiredConnections(FactoryResource.PROVIDER_ID_SELF, existingConnections);
 
+      return Response.ok(ImmutableMap.builder()
+          .put("access_token", connection.getAccessToken())
+          .put("refresh_token", connection.getRefreshToken())
+          .put("expires_in", DEFAULT_EXPIRES_IN)
+          .build())
+          .cookie(createCookie(connection.getAccessToken(), DEFAULT_EXPIRES_IN))
+          .build();
+
+    } else {
+      // authentication failed
+      throw new BadRequestRestException(ImmutableMap.of("error", "invalid_grant"));
+    }
+
+  }
+
+  private Date calculateExpirationDate(int expiresInSeconds) {
+    return DateTime.now().plusSeconds(expiresInSeconds).toDate();
+  }
+
+
+  public DConnection put(DConnection connection) {
+    try {
+      connectionDao.put(connection);
+      return connection;
+    } catch (IOException e) {
+      LOGGER.error("Failed to save connection {}", e);
+      throw new InternalServerErrorRestException("Failed to save connection");
+    }
+  }
+
+
+  private void delete(DConnection connection) {
+    try {
+      connectionDao.delete(connection.getId());
+    } catch (IOException e) {
+      LOGGER.error("Failed to delete connection {}", e);
+      throw new InternalServerErrorRestException("Failed to delete connection");
+    }
+  }
+
+
+  private NewCookie createCookie(String accessToken, int expiresInSeconds) {
+    return new NewCookie(OAuth2Filter.NAME_ACCESS_TOKEN, accessToken, "/api", null, null, expiresInSeconds, false);
+  }
+
+
+  /**
+   * Refresh an access_token using the refresh token
+   *
+   * @param refreshToken refresh token
+   * @return @return access_token and refresh token if successful.
+   * Success response http://tools.ietf.org/html/rfc6749#section-5.1
+   * Failure response http://tools.ietf.org/html/rfc6749#section-5.2
+   */
+  @POST
+  @Path("refresh")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response refreshAccessToken(RefreshTokenRequest refreshToken) {
+
+    if (null == refreshToken.getRefresh_token() ||
+        null == refreshToken.getGrant_type()) {
+      throw new BadRequestRestException(ImmutableMap.of("error", "invalid_request"));
+    }
+
+    if (!PASSWORD_GRANT_TYPE.equals(refreshToken.getGrant_type())) {
+      // Unsupported grant type
+      throw new BadRequestRestException(ImmutableMap.of("error", "unsupported_grant_type"));
+    }
+
+    DConnection connection = connectionDao.findByRefreshToken(refreshToken.getRefresh_token());
+    if (null == connection) {
+      throw new BadRequestRestException(ImmutableMap.of("error", "invalid_grant"));
+    }
+
+    connection.setAccessToken(accessTokenGenerator.generate());
+    connection.setExpireTime(calculateExpirationDate(DEFAULT_EXPIRES_IN));
+
+    put(connection);
+
+    return Response.ok(ImmutableMap.builder()
+        .put("access_token", connection.getAccessToken())
+        .put("refresh_token", connection.getRefreshToken())
+        .put("expires_in", DEFAULT_EXPIRES_IN)
+        .build())
+        .cookie(createCookie(connection.getAccessToken(), DEFAULT_EXPIRES_IN))
+        .build();
+
+  }
+
+
+  /**
+   * Revoke a users access_token and refresh_token.
+   * https://tools.ietf.org/html/rfc7009
+   *
+   * @param token either the access_token or refresh token
+   * @return will always return http 200
+   */
+  @GET
+  @Path("revoke")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response revoke(@QueryParam("token") String token) {
+
+    if (null != token) {
+
+      // Look both in access_token and refresh_token
+      DConnection connection = connectionDao.findByAccessToken(token);
+      boolean isAccessTokenType = true;
+      if (null == connection) {
+        isAccessTokenType = false;
+        connection = connectionDao.findByRefreshToken(token);
+      }
+
+      // Ignore expiration time
+      if (null != connection) {
+        if (isAccessTokenType) {
+          // Remove the access_token
+          // Still allow the user to refresh using the refresh token
+          connection.setAccessToken("0");
+          put(connection);
         } else {
-            // authentication failed
-            throw new BadRequestRestException(ImmutableMap.of("error", "invalid_grant"));
+          // Delete the connection completely
+          delete(connection);
         }
+      }
 
     }
 
-    private Date calculateExpirationDate(int expiresInSeconds) {
-        return DateTime.now().plusSeconds(expiresInSeconds).toDate();
+    // Always send http 200 according to the specification
+    return Response.ok().build();
+
+  }
+
+
+  /**
+   * Validate an access_token.
+   * The Oauth2 specification does not specify how this should be done. Do similar to what Google does
+   *
+   * @param access_token access token to validate
+   * @return http 200 if success and some basic info about the access_token
+   */
+  @GET
+  @Path("tokeninfo")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response validate(@QueryParam("access_token") String access_token) {
+
+    if (null == access_token) {
+      throw new BadRequestRestException("Missing access_token in request");
     }
 
-
-    public DConnection put(DConnection connection) {
-        try {
-            connectionDao.put(connection);
-            return connection;
-        } catch (IOException e) {
-            LOGGER.error("Failed to save connection {}", e);
-            throw new InternalServerErrorRestException("Failed to save connection");
-        }
+    DConnection connection = connectionDao.findByAccessToken(access_token);
+    LOGGER.debug("Connection {}", connection);
+    if (null == connection || hasAccessTokenExpired(connection)) {
+      throw new BadRequestRestException("Invalid access_token");
     }
 
+    return Response.ok(ImmutableMap.builder()
+        .put("user_id", connection.getUserId())
+        .put("expires_in", Seconds.secondsBetween(DateTime.now(), new DateTime(connection.getExpireTime())).getSeconds())
+        .build())
+        .build();
 
-    private void delete(DConnection connection) {
-        try {
-            connectionDao.delete(connection.getId());
-        } catch (IOException e) {
-            LOGGER.error("Failed to delete connection {}", e);
-            throw new InternalServerErrorRestException("Failed to delete connection");
-        }
+  }
+
+  private boolean hasAccessTokenExpired(DConnection connection) {
+    return new DateTime(connection.getExpireTime()).isBeforeNow();
+  }
+
+
+  /**
+   * Remove cookie from the user agent.
+   *
+   * @return Redirect to requests
+   * @throws URISyntaxException
+   */
+  @GET
+  @Path("logout")
+  public Response logout() throws URISyntaxException {
+    return Response
+        .temporaryRedirect(new URI("/"))
+        .cookie(createCookie(null, 0))
+        .build();
+  }
+
+
+  /**
+   * Register federated using an access token obtained from a 3rd party service such as Facebook, Google etc.
+   *
+   * @param providerId     unique provider id
+   * @param providerUserId unique user id within the provider context
+   * @param access_token   access token
+   * @param secret         secret
+   * @param expiresIn      access token expiration
+   * @param appArg0        ?
+   * @return the userId associated with the Connection, null if new Connection
+   */
+  @GET
+  public Response registerFederatedGet(
+      @QueryParam("providerId") String providerId,
+      @QueryParam("providerUserId") String providerUserId,
+      @QueryParam("access_token") String access_token,
+      @QueryParam("secret") String secret,
+      @QueryParam("expires_in") @DefaultValue("4601") Integer expiresIn,
+      @QueryParam("appArg0") String appArg0
+  ) throws IOException {
+    return registerFederated(access_token, providerId, providerUserId,
+        secret, expiresIn, appArg0);
+  }
+
+
+  /**
+   * Register federated using an access token obtained from a 3rd party service such as Facebook, Google etc.
+   *
+   * @param providerId     unique provider id
+   * @param providerUserId unique user id within the provider context
+   * @param access_token   access token
+   * @param secret         secret
+   * @param expiresIn      access token expiration
+   * @param appArg0        ?
+   * @return the userId associated with the Connection, null if new Connection
+   */
+  @GET
+  @Path("{providerId}")
+  public Response registerFederatedGetPath(
+      @PathParam("providerId") String providerId,
+      @QueryParam("providerUserId") String providerUserId,
+      @QueryParam("access_token") String access_token,
+      @QueryParam("secret") String secret,
+      @QueryParam("expires_in") @DefaultValue("4601") Integer expiresIn,
+      @QueryParam("appArg0") String appArg0
+  ) throws IOException {
+    return registerFederated(access_token, providerId, providerUserId,
+        secret, expiresIn, appArg0);
+  }
+
+
+  protected Response registerFederated(
+      String access_token,
+      String providerId,
+      String providerUserId,
+      String secret,
+      Integer expiresInSeconds,
+      String appArg0) throws IOException {
+
+    if (null == expiresInSeconds) {
+      expiresInSeconds = DEFAULT_EXPIRES_IN;
     }
 
+    // use the connectionFactory
+    final SocialTemplate socialTemplate = SocialTemplate.create(
+        providerId, access_token, appArg0, null);
 
-    private NewCookie createCookie(String accessToken, int expiresInSeconds) {
-        return new NewCookie(OAuth2Filter.NAME_ACCESS_TOKEN, accessToken, "/api", null, null, expiresInSeconds, false);
+    SocialProfile profile = null;
+    try {
+      profile = socialTemplate.getProfile();
+      if (null == profile) {
+        throw new UnauthorizedRestException("Invalid connection");
+      }
+    } catch (IOException unauthorized) {
+      throw new UnauthorizedRestException("Unauthorized federated side");
     }
 
-
-    /**
-     * Refresh an access_token using the refresh token
-     * @param refreshToken refresh token
-     * @return @return access_token and refresh token if successful.
-     *         Success response http://tools.ietf.org/html/rfc6749#section-5.1
-     *         Failure response http://tools.ietf.org/html/rfc6749#section-5.2
-     */
-    @POST
-    @Path("refresh")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response refreshAccessToken(RefreshTokenRequest refreshToken) {
-
-        if (null == refreshToken.getRefresh_token() ||
-                null == refreshToken.getGrant_type()) {
-            throw new BadRequestRestException(ImmutableMap.of("error", "invalid_request"));
-        }
-
-        if (!PASSWORD_GRANT_TYPE.equals(refreshToken.getGrant_type())) {
-            // Unsupported grant type
-            throw new BadRequestRestException(ImmutableMap.of("error", "unsupported_grant_type"));
-        }
-
-        DConnection connection = connectionDao.findByRefreshToken(refreshToken.getRefresh_token());
-        if (null == connection) {
-            throw new BadRequestRestException(ImmutableMap.of("error", "invalid_grant"));
-        }
-
-        connection.setAccessToken(accessTokenGenerator.generate());
-        connection.setExpireTime(calculateExpirationDate(DEFAULT_EXPIRES_IN));
-
-        put(connection);
-
-        return Response.ok(ImmutableMap.builder()
-                .put("access_token", connection.getAccessToken())
-                .put("refresh_token", connection.getRefreshToken())
-                .put("expires_in", DEFAULT_EXPIRES_IN)
-                .build())
-                .cookie(createCookie(connection.getAccessToken(), DEFAULT_EXPIRES_IN))
-                .build();
-
+    // providerUserId is optional, fetch it if necessary:
+    final String realProviderUserId = profile.getId();
+    if (null == providerUserId) {
+      providerUserId = realProviderUserId;
+    } else if (!providerUserId.equals(realProviderUserId)) {
+      throw new UnauthorizedRestException("Unauthorized federated side mismatch");
     }
 
+    // load connection from db async style (likely case is new token for existing user)
+    final Iterable<DConnection> existingConnections = connectionDao.queryByProviderUserId(providerUserId);
 
-    /**
-     * Revoke a users access_token and refresh_token.
-     * https://tools.ietf.org/html/rfc7009
-     * @param token either the access_token or refresh token
-     * @return will always return http 200
-     */
-    @GET
-    @Path("revoke")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response revoke(@QueryParam("token") String token) {
-
-        if (null != token) {
-
-            // Look both in access_token and refresh_token
-            DConnection connection = connectionDao.findByAccessToken(token);
-            boolean isAccessTokenType = true;
-            if (null == connection) {
-                isAccessTokenType = false;
-                connection = connectionDao.findByRefreshToken(token);
-            }
-
-            // Ignore expiration time
-            if (null != connection) {
-                if (isAccessTokenType) {
-                    // Remove the access_token
-                    // Still allow the user to refresh using the refresh token
-                    connection.setAccessToken("0");
-                    put(connection);
-                } else {
-                    // Delete the connection completely
-                    delete(connection);
-                }
-            }
-
+    // extend short-lived token?
+    if (expiresInSeconds < 4601) {
+      SocialTemplate extendTemplate = SocialTemplate.create(providerId, null, socialTemplate.getBaseUrl(), null);
+      DFactory client = factoryDao.get(providerId);
+      if (null != client) {
+        final Map.Entry<String, Integer> extended = extendTemplate.extend(providerId, client.getClientId(), client.getClientSecret(), access_token);
+        if (null != extended) {
+          access_token = extended.getKey();
+          expiresInSeconds = extended.getValue();
         }
-
-        // Always send http 200 according to the specification
-        return Response.ok().build();
-
+      }
     }
 
+    boolean isNewUser = !existingConnections.iterator().hasNext();
+    DOAuth2User user = null;
+    if (isNewUser) {
 
-    /**
-     * Validate an access_token.
-     * The Oauth2 specification does not specify how this should be done. Do similar to what Google does
-     * @param access_token access token to validate
-     * @return http 200 if success and some basic info about the access_token
-     */
-    @GET
-    @Path("tokeninfo")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response validate(@QueryParam("access_token") String access_token) {
+      // Create new oauth2 user
+      user = userProvider.createUser();
+      user.setDisplayName(profile.getDisplayName());
+      user.setEmail(profile.getEmail());
+      user.setProfileLink(profile.getProfileUrl());
+      user.setRoles(OAuth2UserResource.DEFAULT_ROLES_USER);
 
-        if (null == access_token) {
-            throw new BadRequestRestException("Missing access_token in request");
-        }
+    } else {
+      user = userProvider.getUserById(existingConnections.iterator().next().getUserId());
+    }
+    // Always update thumbnail
+    user.setThumbnailUrl(profile.getThumbnailUrl());
 
-        DConnection connection = connectionDao.findByAccessToken(access_token);
-        LOGGER.debug("Connection {}", connection);
-        if (null == connection || hasAccessTokenExpired(connection)) {
-            throw new BadRequestRestException("Invalid access_token");
-        }
+    user = userProvider.putUser(user);
 
-        return Response.ok(ImmutableMap.builder()
-                .put("user_id", connection.getUserId())
-                .put("expires_in", Seconds.secondsBetween(DateTime.now(), new DateTime(connection.getExpireTime())).getSeconds())
-                .build())
-                .build();
+    // load existing conn for token
+    DConnection connection = connectionDao.findByAccessToken(access_token);
+    if (null == connection) {
+
+      connection = new DConnection();
+      connection.setAccessToken(access_token);
+      connection.setProviderId(providerId);
+      connection.setProviderUserId(providerUserId);
+      connection.setSecret(secret);
+      connection.setDisplayName(user.getDisplayName());
+      connection.setUserId(user.getId());
+      connection.setExpireTime(calculateExpirationDate(expiresInSeconds));
 
     }
+    // Always update some properties
+    connection.setAppArg0(appArg0);
+    connection.setImageUrl(profile.getProfileUrl());
+    connection.setProfileUrl(profile.getProfileUrl());
+    connection.setUserRoles(convertRoles(user.getRoles()));
 
-    private boolean hasAccessTokenExpired(DConnection connection) {
-        return new DateTime(connection.getExpireTime()).isBeforeNow();
+    connectionDao.put(connection);
+
+    // Remove expired connections for the user
+    removeExpiredConnections(providerId, existingConnections);
+
+    return Response.status(isNewUser ? Response.Status.CREATED : Response.Status.OK)
+        .cookie(createCookie(connection.getAccessToken(), null != expiresInSeconds ? expiresInSeconds : DEFAULT_EXPIRES_IN))
+        .entity(connection)
+        .build();
+  }
+
+
+  private void removeExpiredConnections(String providerId, Iterable<DConnection> connections) {
+
+    // find other connections for this user, discard expired
+    final ArrayList<Long> expiredTokens = new ArrayList<Long>();
+
+    for (DConnection dc : connections) {
+      if (providerId.equals(dc.getProviderId())) {
+        // expired?
+        if (null != dc.getExpireTime() && hasAccessTokenExpired(dc)) {
+          expiredTokens.add(dc.getId());
+        }
+      }
     }
 
-
-    /**
-     * Remove cookie from the user agent.
-     * @return Redirect to requests
-     * @throws URISyntaxException
-     */
-    @GET
-    @Path("logout")
-    public Response logout() throws URISyntaxException {
-        return Response
-                .temporaryRedirect(new URI("/"))
-                .cookie(createCookie(null, 0))
-                .build();
+    try {
+      connectionDao.delete(expiredTokens);
+    } catch (IOException e) {
+      LOGGER.error("Failed to delete expired tokens {}", e);
+      throw new InternalServerErrorRestException("Failed to delete expired tokens");
     }
 
+  }
 
-    /**
-     * Register federated using an access token obtained from a 3rd party service such as Facebook, Google etc.
-     * @param providerId unique provider id
-     * @param providerUserId unique user id within the provider context
-     * @param access_token access token
-     * @param secret secret
-     * @param expiresIn access token expiration
-     * @param appArg0 ?
-     * @return the userId associated with the Connection, null if new Connection
-     */
-    @GET
-    public Response registerFederatedGet(
-            @QueryParam("providerId") String providerId,
-            @QueryParam("providerUserId") String providerUserId,
-            @QueryParam("access_token") String access_token,
-            @QueryParam("secret") String secret,
-            @QueryParam("expires_in") @DefaultValue("4601") Integer expiresIn,
-            @QueryParam("appArg0") String appArg0
-    ) throws IOException {
-        return registerFederated(access_token, providerId, providerUserId,
-                secret, expiresIn, appArg0);
+
+  public static String convertRoles(Iterable<String> from) {
+    if (null == from) {
+      return null;
     }
-
-
-    /**
-     * Register federated using an access token obtained from a 3rd party service such as Facebook, Google etc.
-     * @param providerId unique provider id
-     * @param providerUserId unique user id within the provider context
-     * @param access_token access token
-     * @param secret secret
-     * @param expiresIn access token expiration
-     * @param appArg0 ?
-     * @return the userId associated with the Connection, null if new Connection
-     */
-    @GET
-    @Path("{providerId}")
-    public Response registerFederatedGetPath(
-            @PathParam("providerId") String providerId,
-            @QueryParam("providerUserId") String providerUserId,
-            @QueryParam("access_token") String access_token,
-            @QueryParam("secret") String secret,
-            @QueryParam("expires_in") @DefaultValue("4601") Integer expiresIn,
-            @QueryParam("appArg0") String appArg0
-    ) throws IOException {
-        return registerFederated(access_token, providerId, providerUserId,
-                secret, expiresIn, appArg0);
+    final StringBuffer to = new StringBuffer();
+    boolean first = true;
+    for (String s : from) {
+      if (!first) {
+        to.append(DConnection.ROLE_SEPARATOR);
+      }
+      to.append(s.trim());
+      first = false;
     }
-
-
-    protected Response registerFederated(
-            String access_token,
-            String providerId,
-            String providerUserId,
-            String secret,
-            Integer expiresInSeconds,
-            String appArg0) throws IOException {
-
-        if (null == expiresInSeconds) {
-            expiresInSeconds = DEFAULT_EXPIRES_IN;
-        }
-
-        // use the connectionFactory
-        final SocialTemplate socialTemplate = SocialTemplate.create(
-                providerId, access_token, appArg0, null);
-
-        SocialProfile profile = null;
-        try {
-            profile = socialTemplate.getProfile();
-            if (null == profile) {
-                throw new UnauthorizedRestException("Invalid connection");
-            }
-        } catch (IOException unauthorized) {
-            throw new UnauthorizedRestException("Unauthorized federated side");
-        }
-
-        // providerUserId is optional, fetch it if necessary:
-        final String realProviderUserId = profile.getId();
-        if (null == providerUserId) {
-            providerUserId = realProviderUserId;
-        }
-        else if (!providerUserId.equals(realProviderUserId)) {
-            throw new UnauthorizedRestException("Unauthorized federated side mismatch");
-        }
-
-        // load connection from db async style (likely case is new token for existing user)
-        final Iterable<DConnection> existingConnections = connectionDao.queryByProviderUserId(providerUserId);
-
-        // extend short-lived token?
-        if (expiresInSeconds < 4601) {
-            SocialTemplate extendTemplate = SocialTemplate.create(providerId, null, socialTemplate.getBaseUrl(), null);
-            DFactory client = factoryDao.get(providerId);
-            if (null != client) {
-                final Map.Entry<String, Integer> extended = extendTemplate.extend(providerId, client.getClientId(), client.getClientSecret(), access_token);
-                if (null != extended) {
-                    access_token = extended.getKey();
-                    expiresInSeconds = extended.getValue();
-                }
-            }
-        }
-
-        boolean isNewUser = !existingConnections.iterator().hasNext();
-        DOAuth2User user = null;
-        if (isNewUser) {
-
-            // Create new oauth2 user
-            user = userProvider.createUser();
-            user.setDisplayName(profile.getDisplayName());
-            user.setEmail(profile.getEmail());
-            user.setProfileLink(profile.getProfileUrl());
-            user.setRoles(OAuth2UserResource.DEFAULT_ROLES_USER);
-
-        } else {
-            user = userProvider.getUserById(existingConnections.iterator().next().getUserId());
-        }
-        // Always update thumbnail
-        user.setThumbnailUrl(profile.getThumbnailUrl());
-
-        user = userProvider.putUser(user);
-
-        // load existing conn for token
-        DConnection connection = connectionDao.findByAccessToken(access_token);
-        if (null == connection) {
-
-            connection = new DConnection();
-            connection.setAccessToken(access_token);
-            connection.setProviderId(providerId);
-            connection.setProviderUserId(providerUserId);
-            connection.setSecret(secret);
-            connection.setDisplayName(user.getDisplayName());
-            connection.setUserId(user.getId());
-            connection.setExpireTime(calculateExpirationDate(expiresInSeconds));
-
-        }
-        // Always update some properties
-        connection.setAppArg0(appArg0);
-        connection.setImageUrl(profile.getProfileUrl());
-        connection.setProfileUrl(profile.getProfileUrl());
-        connection.setUserRoles(convertRoles(user.getRoles()));
-
-        connectionDao.put(connection);
-
-        // Remove expired connections for the user
-        removeExpiredConnections(providerId, existingConnections);
-
-        return Response.status(isNewUser ? Response.Status.CREATED : Response.Status.OK)
-                .cookie(createCookie(connection.getAccessToken(), null != expiresInSeconds ? expiresInSeconds : DEFAULT_EXPIRES_IN))
-                .entity(connection)
-                .build();
-    }
-
-
-    private void removeExpiredConnections(String providerId, Iterable<DConnection> connections) {
-
-        // find other connections for this user, discard expired
-        final ArrayList<Long> expiredTokens = new ArrayList<Long>();
-
-        for (DConnection dc : connections) {
-            if (providerId.equals(dc.getProviderId())) {
-                // expired?
-                if (null != dc.getExpireTime() && hasAccessTokenExpired(dc)) {
-                    expiredTokens.add(dc.getId());
-                }
-            }
-        }
-
-        try {
-            connectionDao.delete(expiredTokens);
-        } catch (IOException e) {
-            LOGGER.error("Failed to delete expired tokens {}", e);
-            throw new InternalServerErrorRestException("Failed to delete expired tokens");
-        }
-
-    }
-
-
-    public static String convertRoles(Iterable<String> from) {
-        if (null == from) {
-            return null;
-        }
-        final StringBuffer to = new StringBuffer();
-        boolean first = true;
-        for (String s : from) {
-            if (!first) {
-                to.append(DConnection.ROLE_SEPARATOR);
-            }
-            to.append(s.trim());
-            first = false;
-        }
-        return to.toString();
-    }
+    return to.toString();
+  }
 
 }

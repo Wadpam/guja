@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  * Created with IntelliJ IDEA.
  *
  * @author osandstrom
- * Date: 1/19/14 Time: 8:12 PM
+ *         Date: 1/19/14 Time: 8:12 PM
  */
 public class MardaoGuicePersistService implements PersistService {
   static final Logger LOGGER = LoggerFactory.getLogger(MardaoGuicePersistService.class);

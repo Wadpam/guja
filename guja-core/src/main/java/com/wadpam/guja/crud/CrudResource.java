@@ -17,12 +17,12 @@ import java.net.URISyntaxException;
  * Resource with CRUD operations backed by a Dao.
  *
  * @author osandstrom
- * Date: 1/19/14 Time: 10:54 AM
+ *         Date: 1/19/14 Time: 10:54 AM
  */
 @Consumes(value = {MediaType.APPLICATION_JSON})
 @Produces(CrudResource.MIME_JSON_UTF8)
 public class CrudResource<T, ID extends Serializable, D extends AbstractDao<T, ID>> {
-    public static final String MIME_JSON_UTF8 = "application/json; charset=UTF-8";
+  public static final String MIME_JSON_UTF8 = "application/json; charset=UTF-8";
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(CrudResource.class);
 

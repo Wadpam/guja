@@ -9,25 +9,26 @@ import java.security.SecureRandom;
 
 /**
  * Generate access tokens based on md5 hashing
+ *
  * @author mattiaslevin
  */
 public class DefaultAccessTokenGenerator implements AccessTokenGenerator {
 
-    private static final SecureRandom random = new SecureRandom();
+  private static final SecureRandom random = new SecureRandom();
 
-    @Override
-    public String generate() {
+  @Override
+  public String generate() {
 
-        byte[] randomBytes = new byte[24];
-        random.nextBytes(randomBytes);
+    byte[] randomBytes = new byte[24];
+    random.nextBytes(randomBytes);
 
-        HashCode hashCode = Hashing.goodFastHash(256).newHasher()
-                .putBytes(randomBytes)
-                .putLong(System.nanoTime())
-                .hash();
+    HashCode hashCode = Hashing.goodFastHash(256).newHasher()
+        .putBytes(randomBytes)
+        .putLong(System.nanoTime())
+        .hash();
 
-        return BaseEncoding.base64().encode(hashCode.asBytes());
-    }
+    return BaseEncoding.base64().encode(hashCode.asBytes());
+  }
 
 
 }

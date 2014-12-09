@@ -15,7 +15,7 @@ import javax.ws.rs.core.MediaType;
  * Created with IntelliJ IDEA.
  *
  * @author osandstrom
- * Date: 1/18/14 Time: 8:07 PM
+ *         Date: 1/18/14 Time: 8:07 PM
  */
 @Path("_adm/connections")
 @Produces(MediaType.APPLICATION_JSON)

@@ -11,6 +11,7 @@ import javax.ws.rs.Path;
 
 /**
  * Manage translations
+ *
  * @author mattiaslevin
  */
 @Path("api/i18n")
@@ -18,8 +19,8 @@ import javax.ws.rs.Path;
 @RolesAllowed("{ROLE_ADMIN}")
 public class I18nResource extends CrudResource<Di18n, Long, Di18nDaoBean> {
 
-    public I18nResource(Di18nDaoBean dao) {
-        super(dao);
-    }
+  public I18nResource(Di18nDaoBean dao) {
+    super(dao);
+  }
 
 }

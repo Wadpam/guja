@@ -12,13 +12,11 @@ import com.wadpam.guja.oauth2.dao.DFactoryDaoBean;
 import com.wadpam.guja.oauth2.domain.DFactory;
 
 import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
  * @author osandstrom
  */
 @Path("_adm/factories")
@@ -26,13 +24,13 @@ import javax.ws.rs.core.MediaType;
 @PermitAll // This resource is protected in web.xml. Must be GAE app developer to access this resource.
 public class FactoryResource extends CrudResource<DFactory, String, DFactoryDaoBean> {
 
-    public static final String PROVIDER_ID_FACEBOOK = "facebook";
-    public static final String PROVIDER_ID_SELF = "self";
+  public static final String PROVIDER_ID_FACEBOOK = "facebook";
+  public static final String PROVIDER_ID_SELF = "self";
 
-    @Inject
-    public FactoryResource(DFactoryDaoBean dao) {
-        super(dao);
-    }
+  @Inject
+  public FactoryResource(DFactoryDaoBean dao) {
+    super(dao);
+  }
 
-    
+
 }
