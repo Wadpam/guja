@@ -1,10 +1,7 @@
 package com.wadpam.guja.guice;
 
 import com.google.inject.AbstractModule;
-import com.wadpam.guja.api.DiagnosticsResource;
-import com.wadpam.guja.api.MonitorResource;
-import com.wadpam.guja.api.SemanticVersionCheckPredicate;
-import com.wadpam.guja.api.VersionCheckResource;
+import com.wadpam.guja.api.*;
 import com.wadpam.guja.i18n.*;
 import com.wadpam.guja.readerwriter.ResponseCodeProtoMessageBodyWriter;
 
@@ -30,6 +27,8 @@ public class GujaBaseModule extends AbstractModule {
 
     bind(Localization.class).annotatedWith(Dynamic.class).toProvider(DynamicLocalizationProvider.class);
     bind(Localization.class).annotatedWith(PropertyFile.class).toProvider(PropertyFileLocalizationProvider.class);
+
+    bind(GAEBlobResource.class);
 
     bind(ResponseCodeProtoMessageBodyWriter.class);
 
