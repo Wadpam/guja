@@ -70,7 +70,7 @@ public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, DOAuth2U
 
   @GET
   @Path("me")
-  @RolesAllowed("{ROLE_ADMIN, ROLE_USER}")
+  @RolesAllowed({ROLE_ADMIN, ROLE_USER})
   public Response readMe(@Context HttpServletRequest request) throws IOException {
     Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
     return read(id);

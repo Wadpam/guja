@@ -149,14 +149,7 @@ public class OAuth2Resource {
       // load connection from db async style (likely case is new token for existing user)
       final Iterable<DConnection> existingConnections = connectionDao.queryByProviderUserId(oauth2User.getId().toString());
 
-      DConnection connection = new DConnection();
-      connection.setAccessToken(accessTokenGenerator.generate());
-      connection.setRefreshToken(accessTokenGenerator.generate());
-      connection.setProviderId(FactoryResource.PROVIDER_ID_SELF);
-      connection.setProviderUserId(oauth2User.getId().toString());
-      connection.setUserId(oauth2User.getId());
-      connection.setExpireTime(calculateExpirationDate(DEFAULT_EXPIRES_IN));
-      connection.setUserRoles(convertRoles(oauth2User.getRoles()));
+      DConnection connection = generateConnection(oauth2User, null, null);
 
       put(connection);
 
@@ -176,6 +169,22 @@ public class OAuth2Resource {
       throw new BadRequestRestException(ImmutableMap.of("error", "invalid_grant"));
     }
 
+  }
+
+  private DConnection generateConnection(DOAuth2User oauth2User, String profileUrl, String imageUrl) {
+    DConnection connection = new DConnection();
+    connection.setAccessToken(accessTokenGenerator.generate());
+    connection.setRefreshToken(accessTokenGenerator.generate());
+    connection.setProviderId(FactoryResource.PROVIDER_ID_SELF);
+    connection.setProviderUserId(oauth2User.getId().toString());
+    connection.setUserId(oauth2User.getId());
+    connection.setExpireTime(calculateExpirationDate(DEFAULT_EXPIRES_IN));
+    connection.setUserRoles(convertRoles(oauth2User.getRoles()));
+    connection.setDisplayName(oauth2User.getDisplayName());
+    connection.setImageUrl(imageUrl);
+    connection.setProfileUrl(profileUrl);
+
+    return connection;
   }
 
   private Date calculateExpirationDate(int expiresInSeconds) {
@@ -360,6 +369,8 @@ public class OAuth2Resource {
    * @return the userId associated with the Connection, null if new Connection
    */
   @GET
+  @Path("federated")
+  @Produces(MediaType.APPLICATION_JSON)
   public Response registerFederatedGet(
       @QueryParam("providerId") String providerId,
       @QueryParam("providerUserId") String providerUserId,
@@ -385,7 +396,8 @@ public class OAuth2Resource {
    * @return the userId associated with the Connection, null if new Connection
    */
   @GET
-  @Path("{providerId}")
+  @Path("federated/{providerId}")
+  @Produces(MediaType.APPLICATION_JSON)
   public Response registerFederatedGetPath(
       @PathParam("providerId") String providerId,
       @QueryParam("providerUserId") String providerUserId,
@@ -487,11 +499,14 @@ public class OAuth2Resource {
     connection.setImageUrl(profile.getProfileUrl());
     connection.setProfileUrl(profile.getProfileUrl());
     connection.setUserRoles(convertRoles(user.getRoles()));
-
     connectionDao.put(connection);
 
     // Remove expired connections for the user
     removeExpiredConnections(providerId, existingConnections);
+
+    // do not return and use the providers token, but instead create self:
+    connection = generateConnection(user, profile.getProfileUrl(), profile.getThumbnailUrl());
+    connectionDao.put(connection);
 
     return Response.status(isNewUser ? Response.Status.CREATED : Response.Status.OK)
         .cookie(createCookie(connection.getAccessToken(), null != expiresInSeconds ? expiresInSeconds : DEFAULT_EXPIRES_IN))
@@ -540,4 +555,10 @@ public class OAuth2Resource {
     return to.toString();
   }
 
+  @Path("ping")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  public String ping() {
+    return "PONG";
+  }
 }
