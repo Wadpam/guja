@@ -30,6 +30,7 @@ import com.google.inject.persist.PersistService;
 import com.google.inject.persist.Transactional;
 import com.google.inject.persist.UnitOfWork;
 import com.wadpam.guja.admintask.AdminTask;
+import com.wadpam.guja.admintask.AdminTaskResource;
 import com.wadpam.guja.exceptions.RestExceptionMapper;
 import com.wadpam.guja.oauth2.api.*;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
@@ -66,8 +67,6 @@ public class GujaCoreModule extends AbstractModule {
     bind(AccessTokenGenerator.class).to(DefaultAccessTokenGenerator.class);
     bind(ServerEnvironmentProvider.class);
 
-    bind(UserAdminTask.class);
-
     bind(OAuth2Resource.class);
 
     bind(UserAuthenticationProvider.class).to(UserServiceImpl.class);
@@ -85,6 +84,8 @@ public class GujaCoreModule extends AbstractModule {
 
     bind(OAuth2UserResource.class);
     bind(DOAuth2UserDaoBean.class);
+
+    bind(AdminTaskResource.class);
 
     Multibinder<AdminTask> adminTaskBinder = Multibinder.newSetBinder(binder(), AdminTask.class);
     adminTaskBinder.addBinding().to(UserAdminTask.class);
