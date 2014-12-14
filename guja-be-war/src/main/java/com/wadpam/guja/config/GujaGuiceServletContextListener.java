@@ -84,7 +84,7 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
                         // Filters
                         //filter("/*").through(PersistFilter.class);
                         filter("/api/*").through(OAuth2Filter.class);
-                        filter("/oauth/*").through(Oauth2ClientAuthenticationFilter.class);
+                        filter("/oauth/authorize", "/oauth/refresh", "/oauth/revoke", "/oauth/tokeninfo").through(Oauth2ClientAuthenticationFilter.class);
 
                         // Servlets
                         serve("/*").with(GuiceContainer.class, ImmutableMap.of(
