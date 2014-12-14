@@ -1,21 +1,43 @@
 package com.wadpam.guja.oauth2.dao;
 
-import com.wadpam.guja.oauth2.domain.DFactory;
+/*
+ * #%L
+ * guja-core
+ * %%
+ * Copyright (C) 2014 Wadpam
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
+import java.util.Collection;
+import java.util.Date;
+
 import net.sf.mardao.dao.Mapper;
 import net.sf.mardao.dao.Supplier;
 import net.sf.mardao.domain.AbstractEntityBuilder;
-
-import java.util.Date;
+import com.wadpam.guja.oauth2.domain.DFactory;
 
 /**
  * The DFactory domain-object specific mapping methods go here.
- * <p/>
- * Generated on 2014-12-11T13:31:52.156+0100.
  *
+ * Generated on 2014-12-14T21:20:34.275+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DFactoryMapper
-    implements Mapper<DFactory, String> {
+  implements Mapper<DFactory, String> {
 
   private final Supplier supplier;
 
@@ -110,9 +132,9 @@ public class DFactoryMapper
     entity.setCreatedDate(supplier.getDate(value, Field.CREATEDDATE.getFieldName()));
     entity.setUpdatedBy(supplier.getString(value, Field.UPDATEDBY.getFieldName()));
     entity.setUpdatedDate(supplier.getDate(value, Field.UPDATEDDATE.getFieldName()));
-  }
+}
 
-  @Override
+@Override
   public String getKind() {
     return DFactory.class.getSimpleName();
   }
@@ -159,32 +181,26 @@ public class DFactoryMapper
       entity.setBaseUrl(baseUrl);
       return this;
     }
-
     public DFactoryBuilder clientId(String clientId) {
       entity.setClientId(clientId);
       return this;
     }
-
     public DFactoryBuilder clientSecret(String clientSecret) {
       entity.setClientSecret(clientSecret);
       return this;
     }
-
     public DFactoryBuilder createdBy(String createdBy) {
       entity.setCreatedBy(createdBy);
       return this;
     }
-
     public DFactoryBuilder createdDate(Date createdDate) {
       entity.setCreatedDate(createdDate);
       return this;
     }
-
     public DFactoryBuilder updatedBy(String updatedBy) {
       entity.setUpdatedBy(updatedBy);
       return this;
     }
-
     public DFactoryBuilder updatedDate(Date updatedDate) {
       entity.setUpdatedDate(updatedDate);
       return this;

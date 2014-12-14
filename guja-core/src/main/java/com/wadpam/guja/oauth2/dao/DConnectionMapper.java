@@ -1,21 +1,43 @@
 package com.wadpam.guja.oauth2.dao;
 
-import com.wadpam.guja.oauth2.domain.DConnection;
+/*
+ * #%L
+ * guja-core
+ * %%
+ * Copyright (C) 2014 Wadpam
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
+import java.util.Collection;
+import java.util.Date;
+
 import net.sf.mardao.dao.Mapper;
 import net.sf.mardao.dao.Supplier;
 import net.sf.mardao.domain.AbstractEntityBuilder;
-
-import java.util.Date;
+import com.wadpam.guja.oauth2.domain.DConnection;
 
 /**
  * The DConnection domain-object specific mapping methods go here.
- * <p/>
- * Generated on 2014-12-11T13:31:52.156+0100.
  *
+ * Generated on 2014-12-14T21:20:34.275+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DConnectionMapper
-    implements Mapper<DConnection, Long> {
+  implements Mapper<DConnection, Long> {
 
   private final Supplier supplier;
 
@@ -128,9 +150,9 @@ public class DConnectionMapper
     entity.setCreatedDate(supplier.getDate(value, Field.CREATEDDATE.getFieldName()));
     entity.setUpdatedBy(supplier.getString(value, Field.UPDATEDBY.getFieldName()));
     entity.setUpdatedDate(supplier.getDate(value, Field.UPDATEDDATE.getFieldName()));
-  }
+}
 
-  @Override
+@Override
   public String getKind() {
     return DConnection.class.getSimpleName();
   }
@@ -186,77 +208,62 @@ public class DConnectionMapper
       entity.setAccessToken(accessToken);
       return this;
     }
-
     public DConnectionBuilder appArg0(String appArg0) {
       entity.setAppArg0(appArg0);
       return this;
     }
-
     public DConnectionBuilder createdBy(String createdBy) {
       entity.setCreatedBy(createdBy);
       return this;
     }
-
     public DConnectionBuilder createdDate(Date createdDate) {
       entity.setCreatedDate(createdDate);
       return this;
     }
-
     public DConnectionBuilder displayName(String displayName) {
       entity.setDisplayName(displayName);
       return this;
     }
-
     public DConnectionBuilder expireTime(Date expireTime) {
       entity.setExpireTime(expireTime);
       return this;
     }
-
     public DConnectionBuilder imageUrl(String imageUrl) {
       entity.setImageUrl(imageUrl);
       return this;
     }
-
     public DConnectionBuilder profileUrl(String profileUrl) {
       entity.setProfileUrl(profileUrl);
       return this;
     }
-
     public DConnectionBuilder providerId(String providerId) {
       entity.setProviderId(providerId);
       return this;
     }
-
     public DConnectionBuilder providerUserId(String providerUserId) {
       entity.setProviderUserId(providerUserId);
       return this;
     }
-
     public DConnectionBuilder refreshToken(String refreshToken) {
       entity.setRefreshToken(refreshToken);
       return this;
     }
-
     public DConnectionBuilder secret(String secret) {
       entity.setSecret(secret);
       return this;
     }
-
     public DConnectionBuilder updatedBy(String updatedBy) {
       entity.setUpdatedBy(updatedBy);
       return this;
     }
-
     public DConnectionBuilder updatedDate(Date updatedDate) {
       entity.setUpdatedDate(updatedDate);
       return this;
     }
-
     public DConnectionBuilder userId(Long userId) {
       entity.setUserId(userId);
       return this;
     }
-
     public DConnectionBuilder userRoles(String userRoles) {
       entity.setUserRoles(userRoles);
       return this;
