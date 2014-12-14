@@ -3,9 +3,11 @@ package com.wadpam.guja.guice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.Transactional;
 import com.google.inject.persist.UnitOfWork;
+import com.wadpam.guja.admintask.AdminTask;
 import com.wadpam.guja.exceptions.RestExceptionMapper;
 import com.wadpam.guja.oauth2.api.*;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
@@ -13,6 +15,7 @@ import com.wadpam.guja.oauth2.dao.DFactoryDaoBean;
 import com.wadpam.guja.oauth2.dao.DOAuth2UserDaoBean;
 import com.wadpam.guja.oauth2.dao.DUserDaoBean;
 import com.wadpam.guja.oauth2.providers.*;
+import com.wadpam.guja.oauth2.service.UserAdminTask;
 import com.wadpam.guja.oauth2.service.UserService;
 import com.wadpam.guja.oauth2.service.UserServiceImpl;
 import com.wadpam.guja.provider.NonNullObjectMapperProvider;
@@ -41,7 +44,7 @@ public class GujaCoreModule extends AbstractModule {
     bind(AccessTokenGenerator.class).to(DefaultAccessTokenGenerator.class);
     bind(ServerEnvironmentProvider.class);
 
-    bind(AdminResource.class);
+    bind(UserAdminTask.class);
 
     bind(OAuth2Resource.class);
 
@@ -60,6 +63,9 @@ public class GujaCoreModule extends AbstractModule {
 
     bind(OAuth2UserResource.class);
     bind(DOAuth2UserDaoBean.class);
+
+    Multibinder<AdminTask> adminTaskBinder = Multibinder.newSetBinder(binder(), AdminTask.class);
+    adminTaskBinder.addBinding().to(UserAdminTask.class);
 
     MardaoTransactionManager transactionManager = new MardaoTransactionManager(getProvider(Supplier.class));
     requestInjection(transactionManager);

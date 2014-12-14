@@ -1,4 +1,4 @@
-package com.wadpam.guja.api;
+package com.wadpam.guja.admintask;
 
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
@@ -18,6 +18,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,11 +37,11 @@ public class AdminTaskResource {
 
   public static final String PATH_ADMIN_TASK = "/adm/task/%s";
 
-  private final AdminTask adminTask;
+  private final Set<AdminTask> adminTasks;
 
   @Inject
-  public AdminTaskResource(AdminTask adminTask) {
-    this.adminTask = adminTask;
+  public AdminTaskResource(Set<AdminTask> adminTasks) {
+    this.adminTasks = adminTasks;
   }
 
   @GET
@@ -72,10 +73,14 @@ public class AdminTaskResource {
   @Path("{taskName}")
   public Response processTask(@RequestParameters Map<String, String[]> paramMap,
                               @PathParam("taskName") String taskName) {
+    checkNotNull(taskName);
+    checkNotNull(paramMap);
 
     LOGGER.info("Processing task for {}...", taskName);
-    final Object body = adminTask.processTask(checkNotNull(taskName), checkNotNull(paramMap));
-    LOGGER.info("Processed task for {}: {}", taskName, body);
+    for (AdminTask adminTask : adminTasks) {
+      final Object body = adminTask.processTask(taskName, paramMap);
+      LOGGER.info("Processed tasks for {}: {}", taskName, body);
+    }
 
     return Response.ok().build();
   }

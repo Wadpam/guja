@@ -133,6 +133,7 @@ public class OAuth2Resource {
       connection.setProviderId(FactoryResource.PROVIDER_ID_SELF);
       connection.setProviderUserId(oauth2User.getId().toString());
       connection.setUserId(oauth2User.getId());
+      connection.setDisplayName(oauth2User.getDisplayName());
       connection.setExpireTime(calculateExpirationDate(DEFAULT_EXPIRES_IN));
       connection.setUserRoles(convertRoles(oauth2User.getRoles()));
 

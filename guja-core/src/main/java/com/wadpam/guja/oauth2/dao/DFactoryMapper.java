@@ -1,21 +1,21 @@
 package com.wadpam.guja.oauth2.dao;
 
-import java.util.Collection;
-import java.util.Date;
-
+import com.wadpam.guja.oauth2.domain.DFactory;
 import net.sf.mardao.dao.Mapper;
 import net.sf.mardao.dao.Supplier;
 import net.sf.mardao.domain.AbstractEntityBuilder;
-import com.wadpam.guja.oauth2.domain.DFactory;
+
+import java.util.Date;
 
 /**
  * The DFactory domain-object specific mapping methods go here.
+ * <p/>
+ * Generated on 2014-12-11T13:31:52.156+0100.
  *
- * Generated on 2014-12-03T00:02:58.463+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DFactoryMapper
-  implements Mapper<DFactory, String> {
+    implements Mapper<DFactory, String> {
 
   private final Supplier supplier;
 
@@ -110,9 +110,9 @@ public class DFactoryMapper
     entity.setCreatedDate(supplier.getDate(value, Field.CREATEDDATE.getFieldName()));
     entity.setUpdatedBy(supplier.getString(value, Field.UPDATEDBY.getFieldName()));
     entity.setUpdatedDate(supplier.getDate(value, Field.UPDATEDDATE.getFieldName()));
-}
+  }
 
-@Override
+  @Override
   public String getKind() {
     return DFactory.class.getSimpleName();
   }
@@ -159,26 +159,32 @@ public class DFactoryMapper
       entity.setBaseUrl(baseUrl);
       return this;
     }
+
     public DFactoryBuilder clientId(String clientId) {
       entity.setClientId(clientId);
       return this;
     }
+
     public DFactoryBuilder clientSecret(String clientSecret) {
       entity.setClientSecret(clientSecret);
       return this;
     }
+
     public DFactoryBuilder createdBy(String createdBy) {
       entity.setCreatedBy(createdBy);
       return this;
     }
+
     public DFactoryBuilder createdDate(Date createdDate) {
       entity.setCreatedDate(createdDate);
       return this;
     }
+
     public DFactoryBuilder updatedBy(String updatedBy) {
       entity.setUpdatedBy(updatedBy);
       return this;
     }
+
     public DFactoryBuilder updatedDate(Date updatedDate) {
       entity.setUpdatedDate(updatedDate);
       return this;

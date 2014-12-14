@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 
 
@@ -19,9 +20,9 @@ import java.util.Collection;
  */
 @Provider
 @Singleton
-public class ProtoWrapperFilter implements ContainerResponseFilter {
+public class ProtoWrapperResponseFilter implements ContainerResponseFilter {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProtoWrapperFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProtoWrapperResponseFilter.class);
 
   public static final String APPLICATION_X_PROTOBUF = "application/x-protobuf";
   public static final MediaType APPLICATION_X_PROTOBUF_TYPE = new MediaType("application", "x-protobuf");
@@ -35,12 +36,11 @@ public class ProtoWrapperFilter implements ContainerResponseFilter {
     if (null != contentTypes) {
 
       for (Object contentType : contentTypes) {
-        if (contentType.equals(APPLICATION_X_PROTOBUF_TYPE)) {
+        if (contentType.equals(APPLICATION_X_PROTOBUF_TYPE) &&
+            !response.getEntity().getClass().isAnnotationPresent(SkipProtoWrapper.class)) {
           LOGGER.debug("Content type is x-protobuf, wrap response entity");
-
           ResponseCodeEntityWrapper<Object> wrapper = new ResponseCodeEntityWrapper<>(response.getStatus(), response.getEntity());
           response.setEntity(wrapper, response.getEntityType());
-
           break;
         }
       }

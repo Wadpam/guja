@@ -7,6 +7,7 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import java.util.Collection;
 
 /**
  * User domain object.
@@ -32,12 +33,12 @@ public class DUser extends DOAuth2User {
   private String password;
 
   /**
-   * State of the user account.
-   * 0 - unverified; user has not verified the email yet
-   * 1 - verified; user has verified the email
-   * 2 - locked; account is locked
+   * User users marked as friends.
+   * Can be used to create associations between users. The exact meaning of the relations is up to the domain.
    */
-  private Integer state;
+  @Basic
+  private Collection<Long> friends;
+
 
   public String getUsername() {
     return username;
@@ -57,13 +58,11 @@ public class DUser extends DOAuth2User {
     this.password = password;
   }
 
-  public Integer getState() {
-    return state;
+  public Collection<Long> getFriends() {
+    return friends;
   }
 
-  public void setState(Integer state) {
-    this.state = state;
+  public void setFriends(Collection<Long> friends) {
+    this.friends = friends;
   }
-
-
 }

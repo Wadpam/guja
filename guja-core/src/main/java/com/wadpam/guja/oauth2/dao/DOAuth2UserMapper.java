@@ -1,21 +1,22 @@
 package com.wadpam.guja.oauth2.dao;
 
-import java.util.Collection;
-import java.util.Date;
-
+import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import net.sf.mardao.dao.Mapper;
 import net.sf.mardao.dao.Supplier;
 import net.sf.mardao.domain.AbstractEntityBuilder;
-import com.wadpam.guja.oauth2.domain.DOAuth2User;
+
+import java.util.Collection;
+import java.util.Date;
 
 /**
  * The DOAuth2User domain-object specific mapping methods go here.
+ * <p/>
+ * Generated on 2014-12-11T13:31:52.156+0100.
  *
- * Generated on 2014-12-03T00:02:58.463+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DOAuth2UserMapper
-  implements Mapper<DOAuth2User, Long> {
+    implements Mapper<DOAuth2User, Long> {
 
   private final Supplier supplier;
 
@@ -116,9 +117,9 @@ public class DOAuth2UserMapper
     entity.setCreatedDate(supplier.getDate(value, Field.CREATEDDATE.getFieldName()));
     entity.setUpdatedBy(supplier.getString(value, Field.UPDATEDBY.getFieldName()));
     entity.setUpdatedDate(supplier.getDate(value, Field.UPDATEDDATE.getFieldName()));
-}
+  }
 
-@Override
+  @Override
   public String getKind() {
     return DOAuth2User.class.getSimpleName();
   }
@@ -168,38 +169,47 @@ public class DOAuth2UserMapper
       entity.setCreatedBy(createdBy);
       return this;
     }
+
     public DOAuth2UserBuilder createdDate(Date createdDate) {
       entity.setCreatedDate(createdDate);
       return this;
     }
+
     public DOAuth2UserBuilder displayName(String displayName) {
       entity.setDisplayName(displayName);
       return this;
     }
+
     public DOAuth2UserBuilder email(String email) {
       entity.setEmail(email);
       return this;
     }
+
     public DOAuth2UserBuilder profileLink(String profileLink) {
       entity.setProfileLink(profileLink);
       return this;
     }
+
     public DOAuth2UserBuilder roles(Collection roles) {
       entity.setRoles(roles);
       return this;
     }
+
     public DOAuth2UserBuilder state(Integer state) {
       entity.setState(state);
       return this;
     }
+
     public DOAuth2UserBuilder thumbnailUrl(String thumbnailUrl) {
       entity.setThumbnailUrl(thumbnailUrl);
       return this;
     }
+
     public DOAuth2UserBuilder updatedBy(String updatedBy) {
       entity.setUpdatedBy(updatedBy);
       return this;
     }
+
     public DOAuth2UserBuilder updatedDate(Date updatedDate) {
       entity.setUpdatedDate(updatedDate);
       return this;

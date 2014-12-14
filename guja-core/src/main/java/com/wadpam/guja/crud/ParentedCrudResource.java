@@ -1,6 +1,7 @@
 package com.wadpam.guja.crud;
 
 import com.google.inject.persist.Transactional;
+import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.AbstractDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,10 +70,9 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
   public Response readPage(@PathParam("parentId") PID parentId,
                            @QueryParam("pageSize") @DefaultValue("10") int pageSize,
                            @QueryParam("cursorKey") String cursorKey) {
-    throw new UnsupportedOperationException("readPage");
-//        final Object parentKey = parentDao.getKey(null, parentId);
-//        final CursorPage<T> page = dao.queryPage(parentKey, pageSize, cursorKey);
-//        return Response.ok(page).build();
+        final Object parentKey = parentDao.getKey(null, parentId);
+        final CursorPage<T> page = dao.queryPage(parentKey, pageSize, cursorKey);
+        return Response.ok(page).build();
   }
 
   @POST

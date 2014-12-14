@@ -1,6 +1,7 @@
 package com.wadpam.guja.crud;
 
 import com.google.inject.persist.Transactional;
+import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.AbstractDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,9 +69,8 @@ public class CrudResource<T, ID extends Serializable, D extends AbstractDao<T, I
   @GET
   public Response readPage(@QueryParam("pageSize") @DefaultValue("10") int pageSize,
                            @QueryParam("cursorKey") String cursorKey) {
-    //FIXME: final CursorPage<T> page = dao.queryPage(pageSize, cursorKey);
-    // return Response.ok(page).build();
-    return Response.status(405).build();
+    final CursorPage<T> page = dao.queryPage(pageSize, cursorKey);
+    return Response.ok(page).build();
   }
 
   @POST

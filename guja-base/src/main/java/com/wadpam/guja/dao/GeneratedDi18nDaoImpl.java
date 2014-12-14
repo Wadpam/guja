@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
-
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import net.sf.mardao.core.CursorPage;
@@ -20,23 +19,20 @@ import com.wadpam.guja.domain.Di18n;
 
 /**
  * The Di18n domain-object specific finders and methods go in this POJO.
- * <p/>
- * Generated on 2014-12-07T20:44:32.554+0100.
- *
+ * 
+ * Generated on 2014-12-11T13:31:56.431+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDi18nDaoImpl
-    extends AbstractDao<Di18n, java.lang.Long> {
+  extends AbstractDao<Di18n, java.lang.Long> {
 
   public GeneratedDi18nDaoImpl(Supplier supplier) {
     super(new Di18nMapper(supplier), supplier);
   }
 
 // ----------------------- field finders -------------------------------
-
   /**
    * query-by method for field baseBundle
-   *
    * @param baseBundle the specified attribute
    * @return an Iterable of Di18ns for the specified baseBundle
    */
@@ -46,7 +42,6 @@ public class GeneratedDi18nDaoImpl
 
   /**
    * query-by method for field createdBy
-   *
    * @param createdBy the specified attribute
    * @return an Iterable of Di18ns for the specified createdBy
    */
@@ -56,7 +51,6 @@ public class GeneratedDi18nDaoImpl
 
   /**
    * query-by method for field createdDate
-   *
    * @param createdDate the specified attribute
    * @return an Iterable of Di18ns for the specified createdDate
    */
@@ -66,7 +60,6 @@ public class GeneratedDi18nDaoImpl
 
   /**
    * query-by method for field key
-   *
    * @param key the specified attribute
    * @return an Iterable of Di18ns for the specified key
    */
@@ -76,7 +69,6 @@ public class GeneratedDi18nDaoImpl
 
   /**
    * query-by method for field locale
-   *
    * @param locale the specified attribute
    * @return an Iterable of Di18ns for the specified locale
    */
@@ -86,7 +78,6 @@ public class GeneratedDi18nDaoImpl
 
   /**
    * query-by method for field localizedMessage
-   *
    * @param localizedMessage the specified attribute
    * @return an Iterable of Di18ns for the specified localizedMessage
    */
@@ -96,7 +87,6 @@ public class GeneratedDi18nDaoImpl
 
   /**
    * query-by method for field updatedBy
-   *
    * @param updatedBy the specified attribute
    * @return an Iterable of Di18ns for the specified updatedBy
    */
@@ -106,7 +96,6 @@ public class GeneratedDi18nDaoImpl
 
   /**
    * query-by method for field updatedDate
-   *
    * @param updatedDate the specified attribute
    * @return an Iterable of Di18ns for the specified updatedDate
    */
@@ -117,8 +106,5 @@ public class GeneratedDi18nDaoImpl
 
 // ----------------------- query methods -------------------------------
 
-  public CursorPage<Di18n> queryPage(int requestedPageSize, String cursorString) {
-    return queryPage(false, requestedPageSize, null,
-        null, false, null, false, null, cursorString);
-  }
+
 }

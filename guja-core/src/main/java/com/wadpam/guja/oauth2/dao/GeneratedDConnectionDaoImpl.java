@@ -1,38 +1,28 @@
 package com.wadpam.guja.oauth2.dao;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import net.sf.mardao.core.CursorPage;
-import net.sf.mardao.core.filter.Filter;
-import net.sf.mardao.core.geo.DLocation;
+import com.wadpam.guja.oauth2.domain.DConnection;
 import net.sf.mardao.dao.AbstractDao;
 import net.sf.mardao.dao.Supplier;
-import com.wadpam.guja.oauth2.domain.DConnection;
 
 /**
  * The DConnection domain-object specific finders and methods go in this POJO.
- * 
- * Generated on 2014-12-03T00:02:58.463+0100.
+ * <p/>
+ * Generated on 2014-12-11T13:31:52.156+0100.
+ *
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDConnectionDaoImpl
-  extends AbstractDao<DConnection, java.lang.Long> {
+    extends AbstractDao<DConnection, java.lang.Long> {
 
   public GeneratedDConnectionDaoImpl(Supplier supplier) {
     super(new DConnectionMapper(supplier), supplier);
   }
 
 // ----------------------- field finders -------------------------------
+
   /**
    * find-by method for unique field accessToken
+   *
    * @param accessToken the unique attribute
    * @return the unique DConnection for the specified accessToken
    */
@@ -42,6 +32,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field appArg0
+   *
    * @param appArg0 the specified attribute
    * @return an Iterable of DConnections for the specified appArg0
    */
@@ -51,6 +42,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field createdBy
+   *
    * @param createdBy the specified attribute
    * @return an Iterable of DConnections for the specified createdBy
    */
@@ -60,6 +52,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field createdDate
+   *
    * @param createdDate the specified attribute
    * @return an Iterable of DConnections for the specified createdDate
    */
@@ -69,6 +62,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field displayName
+   *
    * @param displayName the specified attribute
    * @return an Iterable of DConnections for the specified displayName
    */
@@ -78,6 +72,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field expireTime
+   *
    * @param expireTime the specified attribute
    * @return an Iterable of DConnections for the specified expireTime
    */
@@ -87,6 +82,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field imageUrl
+   *
    * @param imageUrl the specified attribute
    * @return an Iterable of DConnections for the specified imageUrl
    */
@@ -96,6 +92,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field profileUrl
+   *
    * @param profileUrl the specified attribute
    * @return an Iterable of DConnections for the specified profileUrl
    */
@@ -105,6 +102,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field providerId
+   *
    * @param providerId the specified attribute
    * @return an Iterable of DConnections for the specified providerId
    */
@@ -114,6 +112,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field providerUserId
+   *
    * @param providerUserId the specified attribute
    * @return an Iterable of DConnections for the specified providerUserId
    */
@@ -123,6 +122,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * find-by method for unique field refreshToken
+   *
    * @param refreshToken the unique attribute
    * @return the unique DConnection for the specified refreshToken
    */
@@ -132,6 +132,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field secret
+   *
    * @param secret the specified attribute
    * @return an Iterable of DConnections for the specified secret
    */
@@ -141,6 +142,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field updatedBy
+   *
    * @param updatedBy the specified attribute
    * @return an Iterable of DConnections for the specified updatedBy
    */
@@ -150,6 +152,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field updatedDate
+   *
    * @param updatedDate the specified attribute
    * @return an Iterable of DConnections for the specified updatedDate
    */
@@ -159,6 +162,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field userId
+   *
    * @param userId the specified attribute
    * @return an Iterable of DConnections for the specified userId
    */
@@ -168,6 +172,7 @@ public class GeneratedDConnectionDaoImpl
 
   /**
    * query-by method for field userRoles
+   *
    * @param userRoles the specified attribute
    * @return an Iterable of DConnections for the specified userRoles
    */
@@ -178,8 +183,5 @@ public class GeneratedDConnectionDaoImpl
 
 // ----------------------- query methods -------------------------------
 
-  public CursorPage<DConnection> queryPage(int requestedPageSize, String cursorString) {
-    return queryPage(false, requestedPageSize, null,
-      null, false, null, false, null, cursorString);
-  }
+
 }

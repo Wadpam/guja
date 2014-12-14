@@ -1,6 +1,6 @@
 package com.wadpam.guja.readerwriter;
 
-import com.wadpam.guja.filter.ProtoWrapperFilter;
+import com.wadpam.guja.filter.ProtoWrapperResponseFilter;
 import com.wadpam.guja.filter.ResponseCodeEntityWrapper;
 import com.wadpam.guja.proto.ResponseCodeProtos;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class ResponseCodeProtoMessageBodyWriter implements MessageBodyWriter<Res
   @Override
   public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     LOGGER.debug("Media type {} entity type {}", mediaType, genericType);
-    return mediaType.equals(ProtoWrapperFilter.APPLICATION_X_PROTOBUF_TYPE) &&
+    return mediaType.equals(ProtoWrapperResponseFilter.APPLICATION_X_PROTOBUF_TYPE) &&
         type == ResponseCodeEntityWrapper.class;
   }
 
