@@ -52,7 +52,6 @@ import java.util.Collection;
  */
 @Path("api/oauth2user")
 @Produces(MediaType.APPLICATION_JSON)
-@RolesAllowed("{ROLE_ADMIN}")
 public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, DOAuth2UserDaoBean> {
 
   public static final String ROLE_USER = "ROLE_USER";
@@ -73,12 +72,13 @@ public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, DOAuth2U
   @RolesAllowed({ROLE_ADMIN, ROLE_USER})
   public Response readMe(@Context HttpServletRequest request) throws IOException {
     Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
+    LOGGER.debug("user id = {}", id);
     return read(id);
   }
 
   @POST
   @Path("me")
-  @RolesAllowed("{ROLE_ADMIN, ROLE_USER}")
+  @RolesAllowed({ROLE_ADMIN, ROLE_USER})
   public Response updateMe(@Context HttpServletRequest request, DOAuth2User entity)
       throws URISyntaxException, IOException {
     Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);

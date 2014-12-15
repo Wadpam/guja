@@ -22,10 +22,6 @@
   -->
 
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-  <context-param>
-    <param-name>jersey.config.server.tracing.type</param-name>
-    <param-value>ALL</param-value>
-  </context-param>
   <listener>
     <listener-class>com.wadpam.guja.config.GujaGuiceServletContextListener</listener-class>
   </listener>

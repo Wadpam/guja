@@ -60,24 +60,24 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
                 new GujaBaseModule(),
                 new JerseyServletModule() {
 
-                    private void bindProperties() {
+                    private Properties bindProperties() {
                         LOGGER.info("Bind application properties");
 
+                        Properties properties = new Properties();
                         try {
-                            Properties properties = new Properties();
                             properties.load(getServletContext().getResourceAsStream(APP_CONFIG_PROPERTY_FILE));
                             Names.bindProperties(binder(), properties);
                         } catch (IOException e) {
                             LOGGER.error("Failed to load app properties from resource file {} with error {}", APP_CONFIG_PROPERTY_FILE, e);
                         }
-
+                        return properties;
                     }
 
                     @Override
                     protected void configureServlets() {
 
                         // Bindings
-                        bindProperties();
+                        Properties props = bindProperties();
 
                         bind(Supplier.class).to(DatastoreSupplier.class);
 

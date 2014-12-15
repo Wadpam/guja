@@ -29,7 +29,7 @@
         <script type="text/javascript">
 
 $(function() {
-  crud_Read("api/oauth2user", "me")
+  crud_Read("api/user", "me")
   .success(function(data) {
       var beginIndex = data.displayName.lastIndexOf(' ');
       var firstName = data.displayName.substr(0, beginIndex);

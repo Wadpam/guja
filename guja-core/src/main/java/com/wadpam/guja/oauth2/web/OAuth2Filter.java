@@ -87,14 +87,14 @@ public class OAuth2Filter implements Filter {
         LOGGER.info("Authenticated");
         LOGGER.debug("oauth displayName is {}, userId = {}", conn.getDisplayName(), conn.getUserId());
 
+        AbstractDao.setPrincipalName(null != conn.getUserId() ? conn.getUserId().toString() : null);
+
+        request = new SecurityContextRequestWrapper(request, conn);
+
         // User is authenticated
         request.setAttribute(NAME_CONNECTION, conn);
         request.setAttribute(NAME_USER_ID, conn.getUserId());
         request.setAttribute(NAME_ROLES, conn.getRoles());
-
-        AbstractDao.setPrincipalName(null != conn.getUserId() ? conn.getUserId().toString() : null);
-
-        request = new SecurityContextRequestWrapper(request, conn);
 
       } else {
         LOGGER.info("Unauthorised");

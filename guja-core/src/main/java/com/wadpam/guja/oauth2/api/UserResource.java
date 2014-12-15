@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
  * @author mattiaslevin
  */
 @Singleton
-@Path("api/users")
+@Path("api/user")
 public class UserResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserResource.class);
 
