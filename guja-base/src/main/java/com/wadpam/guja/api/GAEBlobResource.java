@@ -28,12 +28,12 @@ import com.google.appengine.api.images.ImagesServiceFactory;
 import com.google.appengine.api.images.ServingUrlOptions;
 import com.google.appengine.repackaged.com.google.common.io.BaseEncoding;
 import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
 import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.exceptions.NotFoundRestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
@@ -47,11 +47,12 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * Mange blobs in GAE blobstore.
+ * Mange GAE blobs.
  *
  * @author mattiaslevin
  */
 @Path("api/blob")
+@PermitAll
 public class GAEBlobResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(GAEBlobResource.class);
 

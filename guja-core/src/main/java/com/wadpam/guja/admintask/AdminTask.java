@@ -1,4 +1,4 @@
-package com.wadpam.guja.api;
+package com.wadpam.guja.admintask;
 
 /*
  * #%L

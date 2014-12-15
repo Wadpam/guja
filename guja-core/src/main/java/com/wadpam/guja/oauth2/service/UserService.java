@@ -92,4 +92,14 @@ public interface UserService {
    * @return
    */
   DUser createDefaultAdmin();
+
+
+  /**
+   * Get users that added me to their friends list.
+   * @param id current user
+   * @param cursorKey Optional. Cursor key
+   * @param pageSize Optional. Page size
+   * @return page of users
+   */
+  CursorPage<DUser> getFriendsWith(Long id, String cursorKey, int pageSize);
 }

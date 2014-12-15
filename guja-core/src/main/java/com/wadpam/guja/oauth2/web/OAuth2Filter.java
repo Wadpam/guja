@@ -85,7 +85,7 @@ public class OAuth2Filter implements Filter {
       final DConnection conn = verifyAccessToken(accessToken);
       if (null != conn) {
         LOGGER.info("Authenticated");
-        LOGGER.debug("oauth displayName is {}, userId = {}", conn.getDisplayName(), conn.getUserId());
+        LOGGER.debug(" userId = {} roles {}", conn.getUserId(), conn.getRoles());
 
         AbstractDao.setPrincipalName(null != conn.getUserId() ? conn.getUserId().toString() : null);
 
@@ -125,12 +125,13 @@ public class OAuth2Filter implements Filter {
       LOGGER.debug("{}: {}", HEADER_AUTHORIZATION, auth);
       int beginIndex = auth.indexOf(PREFIX_OAUTH);
       if (-1 < beginIndex) {
-        accessToken = auth.substring(beginIndex + PREFIX_OAUTH.length());
+        return auth.substring(beginIndex + PREFIX_OAUTH.length());
       }
     }
 
     // check for cookie:
     if (null == accessToken && null != request.getCookies()) {
+      LOGGER.debug("Look for cookie");
       for (Cookie c : request.getCookies()) {
         if (NAME_ACCESS_TOKEN.equals(c.getName())) {
           return c.getValue();
@@ -138,7 +139,7 @@ public class OAuth2Filter implements Filter {
       }
     }
 
-    return accessToken;
+    return null;
   }
 
   public static Long getUserId(HttpServletRequest request) {

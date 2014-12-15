@@ -42,7 +42,7 @@ import com.wadpam.guja.oauth2.domain.DUser;
 /**
  * The DUser domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2014-12-03T00:02:58.463+0100.
+ * Generated on 2014-12-14T21:20:34.275+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDUserDaoImpl
@@ -87,6 +87,15 @@ public class GeneratedDUserDaoImpl
    */
   public Iterable<DUser> queryByEmail(java.lang.String email) {
     return queryByField(null, DUserMapper.Field.EMAIL.getFieldName(), email);
+  }
+
+  /**
+   * query-by method for field friends
+   * @param friends the specified attribute
+   * @return an Iterable of DUsers for the specified friends
+   */
+  public Iterable<DUser> queryByFriends(java.lang.Object friends) {
+    return queryByField(null, DUserMapper.Field.FRIENDS.getFieldName(), friends);
   }
 
   /**
@@ -164,8 +173,5 @@ public class GeneratedDUserDaoImpl
 
 // ----------------------- query methods -------------------------------
 
-  public CursorPage<DUser> queryPage(int requestedPageSize, String cursorString) {
-    return queryPage(false, requestedPageSize, null,
-      null, false, null, false, null, cursorString);
-  }
+
 }

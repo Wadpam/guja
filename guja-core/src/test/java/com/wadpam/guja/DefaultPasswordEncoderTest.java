@@ -48,16 +48,15 @@ public class DefaultPasswordEncoderTest {
   public void testEncode() throws Exception {
 
     String encodedPassword = encoder.encode("Password01");
-    LOGGER.debug("Password {}", encodedPassword);
+    assertTrue(encoder.matches("Password01", encodedPassword));
 
-    // TODO Make sure the encoder always give back the same string. LOGGER is not working
   }
 
   @org.junit.Test
   public void testMatches() throws Exception {
 
     String encodedPassword = encoder.encode("Password01");
-    assertTrue(encoder.matches("Password01", encodedPassword));
+    assertTrue(encoder.matches("Password01", "1000:283754265ae0b0ac9a9cdf2cec645c6247ac5ad1aca878a8:a22a4f1dd54c366fab33278f313db46b36d9905facf65948"));
 
   }
 

@@ -38,7 +38,7 @@ import javax.ws.rs.Path;
  */
 @Path("api/i18n")
 @Singleton
-@RolesAllowed("{ROLE_ADMIN}")
+@RolesAllowed({"ROLE_ADMIN"})
 public class I18nResource extends CrudResource<Di18n, Long, Di18nDaoBean> {
 
   public I18nResource(Di18nDaoBean dao) {

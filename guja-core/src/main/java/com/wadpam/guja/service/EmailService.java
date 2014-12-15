@@ -26,6 +26,7 @@ import java.util.List;
 
 /**
  * Simple service for sending emails.
+ * Supports different implementations, e.g. JavaMail or Amazon Simple Email.
  * @mattiaslevin
  */
 public interface EmailService {

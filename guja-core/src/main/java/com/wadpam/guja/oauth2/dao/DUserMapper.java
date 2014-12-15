@@ -33,7 +33,7 @@ import com.wadpam.guja.oauth2.domain.DUser;
 /**
  * The DUser domain-object specific mapping methods go here.
  *
- * Generated on 2014-12-03T00:02:58.463+0100.
+ * Generated on 2014-12-14T21:20:34.275+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DUserMapper
@@ -47,6 +47,7 @@ public class DUserMapper
     CREATEDDATE("createdDate"),
     DISPLAYNAME("displayName"),
     EMAIL("email"),
+    FRIENDS("friends"),
     PASSWORD("password"),
     PROFILELINK("profileLink"),
     ROLES("roles"),
@@ -89,6 +90,7 @@ public class DUserMapper
     entity.setCreatedDate(supplier.getDate(value, Field.CREATEDDATE.getFieldName()));
     entity.setDisplayName(supplier.getString(value, Field.DISPLAYNAME.getFieldName()));
     entity.setEmail(supplier.getString(value, Field.EMAIL.getFieldName()));
+    entity.setFriends(supplier.getCollection(value, Field.FRIENDS.getFieldName()));
     entity.setPassword(supplier.getString(value, Field.PASSWORD.getFieldName()));
     entity.setProfileLink(supplier.getString(value, Field.PROFILELINK.getFieldName()));
     entity.setRoles(supplier.getCollection(value, Field.ROLES.getFieldName()));
@@ -165,6 +167,7 @@ public class DUserMapper
     supplier.setDate(value, Field.CREATEDDATE.getFieldName(), entity.getCreatedDate());
     supplier.setString(value, Field.DISPLAYNAME.getFieldName(), entity.getDisplayName());
     supplier.setString(value, Field.EMAIL.getFieldName(), entity.getEmail());
+    supplier.setCollection(value, Field.FRIENDS.getFieldName(), entity.getFriends());
     supplier.setString(value, Field.PASSWORD.getFieldName(), entity.getPassword());
     supplier.setString(value, Field.PROFILELINK.getFieldName(), entity.getProfileLink());
     supplier.setCollection(value, Field.ROLES.getFieldName(), entity.getRoles());
@@ -206,6 +209,10 @@ public class DUserMapper
     }
     public DUserBuilder email(String email) {
       entity.setEmail(email);
+      return this;
+    }
+    public DUserBuilder friends(Collection friends) {
+      entity.setFriends(friends);
       return this;
     }
     public DUserBuilder password(String password) {

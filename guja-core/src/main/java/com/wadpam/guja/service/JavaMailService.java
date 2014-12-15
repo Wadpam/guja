@@ -37,11 +37,11 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * This class is responsible for sending emails.
+ * An email service based on JavaMail for sending emails.
  * @author mattiaslevin
  */
-public class EmailServiceImpl implements EmailService {
-    static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
+public class JavaMailService implements EmailService {
+    static final Logger LOGGER = LoggerFactory.getLogger(JavaMailService.class);
 
 
     public boolean sendEmail(String toEmail, String fromEmail, String subject, String body) {

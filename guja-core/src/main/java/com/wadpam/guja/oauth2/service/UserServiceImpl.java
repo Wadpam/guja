@@ -173,6 +173,12 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     return userDao.queryPage(pageSize, cursorKey);
   }
 
+
+  @Override
+  public CursorPage<DUser> getFriendsWith(Long id, String cursorKey, int pageSize) {
+    return userDao.queryFriendsWith(id, pageSize, cursorKey);
+  }
+
   @Override
   public DUser update(Long id, DUser user, boolean isAdmin) {
 

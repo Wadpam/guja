@@ -38,6 +38,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 
@@ -133,7 +135,7 @@ public class UserResource {
   @GET
   @Path("{id}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("{ROLE_ADMIN}")
+  @RolesAllowed({"ROLE_ADMIN"})
   public Response read(@PathParam("id") Long id) {
     return Response.ok(userService.getById(id)).build();
   }
@@ -148,7 +150,7 @@ public class UserResource {
    */
   @GET
   @Path("me")
-  @RolesAllowed("{ROLE_ADMIN, ROLE_USER}")
+  @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
   public Response readMe(@Context HttpServletRequest request) throws IOException {
     Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
     return read(id);
@@ -163,7 +165,7 @@ public class UserResource {
    * @return a page of user domain objects
    */
   @GET
-  @RolesAllowed("{ROLE_ADMIN}")
+  @RolesAllowed({"ROLE_ADMIN"})
   public Response readPage(@QueryParam("pageSize") @DefaultValue("10") int pageSize,
                            @QueryParam("cursorKey") String cursorKey) {
 
@@ -181,7 +183,7 @@ public class UserResource {
    */
   @DELETE
   @Path("id")
-  @RolesAllowed("{ROLE_ADMIN}")
+  @RolesAllowed({"ROLE_ADMIN"})
   public Response delete(@PathParam("id") Long id) {
 
     userService.deleteById(id);
@@ -201,7 +203,7 @@ public class UserResource {
    */
   @POST
   @Path("{id}")
-  @RolesAllowed("{ROLE_ADMIN}")
+  @RolesAllowed({"ROLE_ADMIN"})
   public Response update(@PathParam("id") Long id,
                          @Context UriInfo uriInfo,
                          @Context SecurityContext securityContext,
@@ -232,7 +234,7 @@ public class UserResource {
    */
   @POST
   @Path("me")
-  @RolesAllowed("{ROLE_ADMIN, ROLE_USER}")
+  @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
   public Response updateMe(@Context HttpServletRequest request,
                            @Context UriInfo uriInfo,
                            @Context SecurityContext securityContext,
@@ -249,6 +251,30 @@ public class UserResource {
   }
 
 
+  @GET
+  @Path("friendswith")
+  @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
+  public Response friendsWith(@Context HttpServletRequest request,
+                              @QueryParam("pageSize") @DefaultValue("10") int pageSize,
+                              @QueryParam("cursorKey") String cursorKey) {
+
+    Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
+    CursorPage<DUser> page = userService.getFriendsWith(id, cursorKey, pageSize);
+
+    // Only return basic user information about your friends
+    Collection<DUser> users = new ArrayList<>();
+    for (DUser user : page.getItems()) {
+      DUser limitedUserInfo = new DUser();
+      limitedUserInfo.setId(user.getId());
+      limitedUserInfo.setUsername(user.getUsername());
+      users.add(limitedUserInfo);
+    }
+    page.setItems(users);
+
+    return Response.ok(page).build();
+  }
+
+
   /**
    * Change my password.
    * Both the old and new password must be provided.
@@ -258,7 +284,7 @@ public class UserResource {
    */
   @POST
   @Path("me/password")
-  @RolesAllowed("{ROLE_ADMIN, ROLE_USER}")
+  @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
   public Response changePassword(@Context HttpServletRequest request, Passwords passwords) {
 
     if (null == passwords.getOldPassword() || null == passwords.getNewPassword()) {
