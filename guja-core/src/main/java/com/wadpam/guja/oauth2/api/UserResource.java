@@ -42,6 +42,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 
 /**
  * Resource for managing users.
@@ -50,6 +52,8 @@ import java.util.regex.Pattern;
  */
 @Singleton
 @Path("api/users")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserResource.class);
 
@@ -75,7 +79,6 @@ public class UserResource {
    * The URI of the created user will be stated in the Location header
    */
   @POST
-  @Consumes(MediaType.APPLICATION_JSON)
   @PermitAll
   public Response signup(DUser user, @Context UriInfo uriInfo) {
 
@@ -134,7 +137,6 @@ public class UserResource {
    */
   @GET
   @Path("{id}")
-  @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed({"ROLE_ADMIN"})
   public Response read(@PathParam("id") Long id) {
     return Response.ok(userService.getById(id)).build();
@@ -298,6 +300,24 @@ public class UserResource {
     userService.changePassword(id, passwords.oldPassword, passwords.getNewPassword());
 
     return Response.noContent().build();
+
+  }
+
+
+  /**
+   * Reset user password by sending out a rest email.
+   * @param email users unique email
+   * @return http 200
+   */
+  @POST
+  @Path("password/reset")
+  @PermitAll
+  public Response resetPassword(@QueryParam("email") String email) {
+    checkNotNull(email);
+
+    userService.resetPassword(email);
+
+    return Response.ok().build();
 
   }
 

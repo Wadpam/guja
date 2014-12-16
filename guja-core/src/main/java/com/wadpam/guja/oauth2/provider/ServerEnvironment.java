@@ -1,4 +1,4 @@
-package com.wadpam.guja.oauth2.providers;
+package com.wadpam.guja.oauth2.provider;
 
 /*
  * #%L
@@ -22,34 +22,19 @@ package com.wadpam.guja.oauth2.providers;
  * #L%
  */
 
-import com.wadpam.guja.oauth2.domain.DOAuth2User;
+import com.google.appengine.api.utils.SystemProperty;
+import com.sun.jersey.spi.resource.Singleton;
 
 /**
- * Provide oauth2 compliant users.
+ * Provide basic information about the current server environment.
  *
  * @author mattiaslevin
  */
-public interface Oauth2UserProvider {
+@Singleton
+public class ServerEnvironment {
 
-
-  /**
-   * Find a user by its id.
-   *
-   * @param id unique user id
-   * @return oauth2 compliant user
-   */
-  DOAuth2User getUserById(Long id);
-
-  /**
-   * Create a new Oauth2 user.
-   *
-   * @return
-   */
-  DOAuth2User createUser();
-
-  /**
-   * Update user.
-   */
-  DOAuth2User putUser(DOAuth2User user);
+  public boolean isDevEnvironment() {
+    return SystemProperty.Environment.Value.Development == SystemProperty.environment.value();
+  }
 
 }

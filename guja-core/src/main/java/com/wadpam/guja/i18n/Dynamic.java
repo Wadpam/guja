@@ -1,8 +1,8 @@
-package com.wadpam.guja.oauth2.providers;
+package com.wadpam.guja.i18n;
 
 /*
  * #%L
- * guja-core
+ * guja-base
  * %%
  * Copyright (C) 2014 Wadpam
  * %%
@@ -22,21 +22,21 @@ package com.wadpam.guja.oauth2.providers;
  * #L%
  */
 
-import com.wadpam.guja.oauth2.domain.DOAuth2User;
-
 /**
+ * Annotation binding for dao based localization.
  * @author mattiaslevin
  */
-public interface UserAuthenticationProvider {
 
-  /**
-   * Authenticate a user during sign in.
-   *
-   * @param username unique user name
-   * @param password password
-   * @return a oauth2 user if authentication was successful, otherwise null
-   */
-  // TODO Do not like the return value, refactor later on
-  DOAuth2User authenticate(String username, String password);
+import com.google.inject.BindingAnnotation;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+@BindingAnnotation
+@Target({FIELD, PARAMETER, METHOD})
+@Retention(RUNTIME)
+public @interface Dynamic {
 }

@@ -1,4 +1,4 @@
-package com.wadpam.guja.domain;
+package com.wadpam.guja.i18n.domain;
 
 /*
  * #%L

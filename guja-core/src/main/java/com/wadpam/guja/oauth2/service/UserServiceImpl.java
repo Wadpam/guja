@@ -23,24 +23,28 @@ package com.wadpam.guja.oauth2.service;
  */
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.servlet.RequestScoped;
 import com.sun.jersey.spi.resource.Singleton;
 import com.wadpam.guja.exceptions.ConflictRestException;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.exceptions.NotFoundRestException;
 import com.wadpam.guja.exceptions.UnauthorizedRestException;
+import com.wadpam.guja.i18n.RequestScopedPropertyFileLocalization;
 import com.wadpam.guja.oauth2.api.OAuth2UserResource;
 import com.wadpam.guja.oauth2.dao.DUserDaoBean;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import com.wadpam.guja.oauth2.domain.DUser;
-import com.wadpam.guja.oauth2.providers.Oauth2UserProvider;
-import com.wadpam.guja.oauth2.providers.PasswordEncoder;
-import com.wadpam.guja.oauth2.providers.ServerEnvironmentProvider;
-import com.wadpam.guja.oauth2.providers.UserAuthenticationProvider;
+import com.wadpam.guja.oauth2.provider.*;
+import com.wadpam.guja.service.EmailService;
+import com.wadpam.guja.template.RequestScopedVelocityTemplateStringWriterBuilder;
+import com.wadpam.guja.template.VelocityTemplateStringWriterBuilder;
 import net.sf.mardao.core.CursorPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * User service implementation based on Mardao.
@@ -53,19 +57,34 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   private final static String DEFAULT_ADMIN_USERNAME = "admin";
 
+  private static final String VELOCITY_TEMPLATE_VERIFY_EMAIL = "email_verification.vm";
+  private static final String VELOCITY_TEMPLATE_RESET_PASSWORD = "reset_password.vm";
+
   private DUserDaoBean userDao;
 
   @Inject(optional = true)
   private boolean shouldVerifyEmail = true;
 
-  private ServerEnvironmentProvider severEnvironment;
-  private PasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
+  private final ServerEnvironment severEnvironment;
+  private final EmailService emailService;
+  private final Provider<RequestScopedVelocityTemplateStringWriterBuilder> templateProvider;
+  private final Provider<RequestScopedPropertyFileLocalization> localizationProvider;
 
 
   @Inject
-  public UserServiceImpl(DUserDaoBean userDao, PasswordEncoder passwordEncoder, ServerEnvironmentProvider severEnvironment) {
+  public UserServiceImpl(DUserDaoBean userDao,
+                         PasswordEncoder passwordEncoder,
+                         EmailService emailService,
+                         Provider<RequestScopedVelocityTemplateStringWriterBuilder> templateProvider,
+                         Provider<RequestScopedPropertyFileLocalization> localizationProvider,
+                         ServerEnvironment severEnvironment) {
+
     this.userDao = userDao;
     this.passwordEncoder = passwordEncoder;
+    this.emailService = emailService;
+    this.templateProvider = templateProvider;
+    this.localizationProvider = localizationProvider;
     this.severEnvironment = severEnvironment;
 
     if (severEnvironment.isDevEnvironment()) {
@@ -99,9 +118,18 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     // Save
     put(user);
 
-    if (shouldVerifyEmail && !severEnvironment.isDevEnvironment()) {
+    if (shouldVerifyEmail) {
 
-      // TODO Send out verification email
+      String subject = localizationProvider.get().getMessage("verifyEmailAddress", "Verify email address"); // TODO provide translation
+      String verifyUrl = "http://www.dn.se"; // TODO calculate, include locale
+
+      String body = templateProvider.get()
+          .templateName(VELOCITY_TEMPLATE_VERIFY_EMAIL)
+          .put("verifyEmailLink", verifyUrl)
+          .build()
+          .toString();
+
+      emailService.sendEmail(user.getEmail(), user.getDisplayName(), subject, body, true);
 
     }
 
@@ -154,6 +182,14 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
       throw new InternalServerErrorRestException(String.format("Failed to read user %s", id));
     }
 
+  }
+
+  public DUser getByEmail(String email) {
+    DUser user = userDao.findByEmail(email);
+    if (null == user) {
+      throw new NotFoundRestException();
+    }
+    return user;
   }
 
   @Override
@@ -212,6 +248,25 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   }
 
+  @Override
+  public void resetPassword(String email) {
+
+    DUser user = getByEmail(email); // Throw 404 if not found
+
+    String subject = localizationProvider.get().getMessage("restPassword", "Reset password"); // TODO Provide translations
+    String resetUrl = "http://www.dn.se"; // TODO calculate, included locale
+
+    String body = templateProvider.get()
+        .templateName(VELOCITY_TEMPLATE_RESET_PASSWORD)
+        .put("resetPasswordLink", resetUrl)
+        .build()
+        .toString();
+
+    emailService.sendEmail(user.getEmail(), user.getDisplayName(), subject, body, true);
+
+  }
+
+  @Override
   public DOAuth2User authenticate(String username, String password) {
 
     DUser user = userDao.findByUsername(username);
@@ -221,8 +276,6 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
     return passwordEncoder.matches(password, user.getPassword()) ? user : null;
   }
-
-  // TODO Missing implementation
 
 
   @Override

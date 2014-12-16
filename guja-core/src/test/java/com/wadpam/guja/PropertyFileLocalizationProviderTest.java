@@ -22,8 +22,9 @@ package com.wadpam.guja;
  * #L%
  */
 
+import com.google.inject.Provider;
 import com.wadpam.guja.i18n.Localization;
-import com.wadpam.guja.i18n.PropertyFileLocalizationProvider;
+import com.wadpam.guja.i18n.PropertyFileLocalization;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,12 +40,12 @@ public class PropertyFileLocalizationProviderTest {
   @Before
   public void setUp() throws Exception {
 
-    localization = new PropertyFileLocalizationProvider(
+    localization = new PropertyFileLocalization(
         "i18n.TestBundle",
         new Locale.Builder()
             .setLanguage("en")
             .setRegion("US")
-            .build()).get();
+            .build());
 
   }
 
@@ -55,12 +56,12 @@ public class PropertyFileLocalizationProviderTest {
   @Test
   public void testResourceBundleMissing() {
 
-    localization = new PropertyFileLocalizationProvider(
+    localization = new PropertyFileLocalization(
         "i18n.MissingBundle",
         new Locale.Builder()
             .setLanguage("en")
             .setRegion("US")
-            .build()).get();
+            .build());
 
     assertTrue("default message".equals(localization.getMessage("key1", "default message")));
 

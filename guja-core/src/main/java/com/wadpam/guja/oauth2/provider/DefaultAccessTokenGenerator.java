@@ -1,8 +1,8 @@
-package com.wadpam.guja.guice;
+package com.wadpam.guja.oauth2.provider;
 
 /*
  * #%L
- * guja-base
+ * guja-core
  * %%
  * Copyright (C) 2014 Wadpam
  * %%
@@ -22,34 +22,37 @@ package com.wadpam.guja.guice;
  * #L%
  */
 
-import com.google.inject.AbstractModule;
-import com.wadpam.guja.api.*;
-import com.wadpam.guja.readerwriter.ResponseCodeProtoMessageBodyWriter;
 
+import com.google.appengine.repackaged.com.google.common.io.BaseEncoding;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.inject.Singleton;
+
+import java.security.SecureRandom;
 
 /**
- * Configure Guice module.
+ * Generate access tokens based on md5 hashing
  *
  * @author mattiaslevin
  */
-public class GujaBaseModule extends AbstractModule {
+@Singleton
+public class DefaultAccessTokenGenerator implements AccessTokenGenerator {
 
+  private static final SecureRandom random = new SecureRandom();
 
   @Override
-  protected void configure() {
+  public String generate() {
 
-    bind(MonitorResource.class);
+    byte[] randomBytes = new byte[24];
+    random.nextBytes(randomBytes);
 
-    bind(DiagnosticsResource.class);
-    bind(DiagnosticsResource.DiagnosticsLogger.class).to(DiagnosticsResource.DefaultDiagnosticLogger.class);
+    HashCode hashCode = Hashing.goodFastHash(256).newHasher()
+        .putBytes(randomBytes)
+        .putLong(System.nanoTime())
+        .hash();
 
-    bind(VersionCheckResource.class);
-    bind(VersionCheckResource.VersionCheckPredicate.class).to(SemanticVersionCheckPredicate.class);
-
-    bind(GAEBlobResource.class);
-
-    bind(ResponseCodeProtoMessageBodyWriter.class);
-
+    return BaseEncoding.base64().encode(hashCode.asBytes());
   }
+
 
 }

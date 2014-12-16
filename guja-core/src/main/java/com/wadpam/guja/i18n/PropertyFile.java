@@ -23,6 +23,7 @@ package com.wadpam.guja.i18n;
  */
 
 /**
+ * Annotation binding for Java resource bundle property based localization.
  * @author mattiaslevin
  */
 

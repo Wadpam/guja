@@ -22,6 +22,8 @@ package com.wadpam.guja.service;
  * #L%
  */
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,16 +45,33 @@ import java.util.Properties;
 public class JavaMailService implements EmailService {
     static final Logger LOGGER = LoggerFactory.getLogger(JavaMailService.class);
 
+    // Please note the restrictions on GAE when setting the from email.
+    // https://developers.google.com/appengine/docs/java/mail/usingjavamail#Senders_and_Recipients
+    private final String fromEmailAddress;
+    private final String fromEmailName;
 
-    public boolean sendEmail(String toEmail, String fromEmail, String subject, String body) {
-        return sendEmail(toEmail, null, fromEmail, null, subject, body, false);
+    @Inject
+    public JavaMailService(@Named("app.email.fromAddress") String fromEmailAddress,
+                           @Named("app.email.fromName") String fromEmailName) {
+        this.fromEmailAddress = fromEmailAddress;
+        this.fromEmailName = fromEmailName;
+    }
+
+
+    @Override
+    public boolean sendEmail(String toEmail, String toName, String subject, String body, boolean asHtml) {
+        return sendEmail(fromEmailAddress, fromEmailName, toEmail, toName, subject, body, asHtml);
     }
 
     @Override
-    public boolean sendEmail(String toEmail, String toName,
-                                    String fromEmail, String fromName,
-                                    String subject,
-                                    String body, boolean asHtml) {
+    public boolean sendEmail(List<String> toAddresses, List<String> ccAddresses, List<String> bccAddresses, String subject, String body, boolean asHtml, byte[] attachment, String filename, String contentType) {
+        return sendEmail(fromEmailAddress, fromEmailName, toAddresses, ccAddresses, bccAddresses, subject, body, asHtml, attachment, filename, contentType);
+    }
+
+    protected boolean sendEmail(String fromEmail, String fromName,
+                                String toEmail, String toName,
+                                String subject,
+                                String body, boolean asHtml) {
 
         LOGGER.debug("Send email to:{}, subject:{}", toEmail, subject);
 
@@ -90,14 +109,13 @@ public class JavaMailService implements EmailService {
     }
 
 
-    @Override
-    public boolean sendEmail(String fromAddress, String fromName,
-                             List<String> toAddresses,
-                             List<String> ccAddresses,
-                             List<String> bccAddresses,
-                             String subject,
-                             String body, boolean asHtml,
-                             byte[] attachment, String filename, String contentType) {
+    protected boolean sendEmail(String fromAddress, String fromName,
+                                List<String> toAddresses,
+                                List<String> ccAddresses,
+                                List<String> bccAddresses,
+                                String subject,
+                                String body, boolean asHtml,
+                                byte[] attachment, String filename, String contentType) {
         LOGGER.info("Send email to:{}, subject:{}", toAddresses, subject);
 
         final Session session = Session.getDefaultInstance(new Properties(), null);

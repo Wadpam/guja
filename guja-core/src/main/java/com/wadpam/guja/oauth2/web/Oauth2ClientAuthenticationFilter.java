@@ -32,7 +32,7 @@ import com.wadpam.guja.oauth2.api.requests.ClientCredentials;
 import com.wadpam.guja.oauth2.dao.DFactoryDaoBean;
 import com.wadpam.guja.oauth2.dao.DFactoryMapper;
 import com.wadpam.guja.oauth2.domain.DFactory;
-import com.wadpam.guja.oauth2.providers.ServerEnvironmentProvider;
+import com.wadpam.guja.oauth2.provider.ServerEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +61,7 @@ public class Oauth2ClientAuthenticationFilter implements Filter {
 
   @Inject
   public Oauth2ClientAuthenticationFilter(
-      ObjectMapper objectMapper, DFactoryDaoBean factoryDaoBean, ServerEnvironmentProvider serverEnvironment) {
+      ObjectMapper objectMapper, DFactoryDaoBean factoryDaoBean, ServerEnvironment serverEnvironment) {
 
     this.objectMapper = objectMapper;
     this.factoryDao = factoryDaoBean;

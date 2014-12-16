@@ -1,0 +1,5 @@
+<html>
+    <body>
+        <p><a href='${verifyEmailLink}'>Klicka här</a> för att verifiera din email</p>
+    </body>
+</html>

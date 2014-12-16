@@ -30,6 +30,8 @@ import net.sf.mardao.core.domain.AbstractLongEntity;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.util.Collection;
 
 /**
@@ -39,6 +41,7 @@ import java.util.Collection;
  * @author mattiaslevin
  */
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
 public class DOAuth2User extends AbstractLongEntity {
 
   public static final int UNVERIFIED_STATE = 0;

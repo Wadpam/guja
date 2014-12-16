@@ -1,6 +1,7 @@
 package com.wadpam.guja;
 
 import com.wadpam.guja.template.VelocityTemplateStringWriterBuilder;
+import org.apache.velocity.VelocityContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +52,6 @@ public class VelocityTemplateStringWriterBuilderTest {
 
   }
 
-
   // TODO More tests
+
 }

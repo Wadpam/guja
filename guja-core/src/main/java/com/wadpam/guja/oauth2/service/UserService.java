@@ -86,10 +86,17 @@ public interface UserService {
   void changePassword(Long id, String oldPassword, String newPassword);
 
   /**
+   * Reset a users password by sending an password reset email.
+   *
+   * @param email unique user email
+   */
+  void resetPassword(String email);
+
+  /**
    * Create a default admin account.
    * This account should be deleted in productions environment after the system has been configured.
    *
-   * @return
+   * @return the create admin user
    */
   DUser createDefaultAdmin();
 
@@ -102,4 +109,5 @@ public interface UserService {
    * @return page of users
    */
   CursorPage<DUser> getFriendsWith(Long id, String cursorKey, int pageSize);
+
 }

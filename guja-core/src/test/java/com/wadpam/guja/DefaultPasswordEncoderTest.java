@@ -22,8 +22,8 @@ package com.wadpam.guja;
  * #L%
  */
 
-import com.wadpam.guja.oauth2.providers.DefaultPasswordEncoder;
-import com.wadpam.guja.oauth2.providers.PasswordEncoder;
+import com.wadpam.guja.oauth2.provider.DefaultPasswordEncoder;
+import com.wadpam.guja.oauth2.provider.PasswordEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

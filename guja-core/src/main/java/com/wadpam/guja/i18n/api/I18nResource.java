@@ -1,8 +1,8 @@
-package com.wadpam.guja.oauth2.providers;
+package com.wadpam.guja.i18n.api;
 
 /*
  * #%L
- * guja-core
+ * guja-base
  * %%
  * Copyright (C) 2014 Wadpam
  * %%
@@ -22,22 +22,27 @@ package com.wadpam.guja.oauth2.providers;
  * #L%
  */
 
-import com.google.appengine.api.utils.SystemProperty;
-import com.sun.jersey.spi.resource.Singleton;
+import com.google.inject.Singleton;
+import com.wadpam.guja.crud.CrudResource;
+import com.wadpam.guja.i18n.dao.Di18nDaoBean;
+import com.wadpam.guja.i18n.domain.Di18n;
 
-import javax.ws.rs.ext.Provider;
+import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.Path;
+
 
 /**
- * Provide basic information about the current server environment.
+ * Manage translations.
  *
  * @author mattiaslevin
  */
+@Path("api/i18n")
 @Singleton
-@Provider
-public class ServerEnvironmentProvider {
+@RolesAllowed({"ROLE_ADMIN"})
+public class I18nResource extends CrudResource<Di18n, Long, Di18nDaoBean> {
 
-  public boolean isDevEnvironment() {
-    return SystemProperty.Environment.Value.Development == SystemProperty.environment.value();
+  public I18nResource(Di18nDaoBean dao) {
+    super(dao);
   }
 
 }

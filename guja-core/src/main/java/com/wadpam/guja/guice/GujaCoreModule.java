@@ -32,16 +32,21 @@ import com.google.inject.persist.UnitOfWork;
 import com.wadpam.guja.admintask.AdminTask;
 import com.wadpam.guja.admintask.AdminTaskResource;
 import com.wadpam.guja.exceptions.RestExceptionMapper;
+import com.wadpam.guja.i18n.*;
 import com.wadpam.guja.oauth2.api.*;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
 import com.wadpam.guja.oauth2.dao.DFactoryDaoBean;
 import com.wadpam.guja.oauth2.dao.DOAuth2UserDaoBean;
 import com.wadpam.guja.oauth2.dao.DUserDaoBean;
-import com.wadpam.guja.oauth2.providers.*;
+import com.wadpam.guja.oauth2.provider.*;
 import com.wadpam.guja.oauth2.service.UserAdminTask;
 import com.wadpam.guja.oauth2.service.UserService;
 import com.wadpam.guja.oauth2.service.UserServiceImpl;
 import com.wadpam.guja.provider.NonNullObjectMapperProvider;
+import com.wadpam.guja.service.EmailService;
+import com.wadpam.guja.service.MockEmailService;
+import com.wadpam.guja.template.RequestScopedVelocityTemplateStringWriterBuilder;
+import com.wadpam.guja.template.VelocityTemplateStringWriterBuilder;
 import net.sf.mardao.dao.Supplier;
 
 /**
@@ -60,12 +65,17 @@ public class GujaCoreModule extends AbstractModule {
 
     bind(RestExceptionMapper.class);
 
+    bind(RequestScopedLocale.class);
+
+    bind(Localization.class).annotatedWith(Dynamic.class).to(RequestScopedDynamicLocalization.class);
+    bind(Localization.class).annotatedWith(PropertyFile.class).to(RequestScopedPropertyFileLocalization.class);
+
     bind(NonNullObjectMapperProvider.class);
     bind(ObjectMapper.class).toProvider(NonNullObjectMapperProvider.class);
 
     bind(PasswordEncoder.class).to(DefaultPasswordEncoder.class);
     bind(AccessTokenGenerator.class).to(DefaultAccessTokenGenerator.class);
-    bind(ServerEnvironmentProvider.class);
+    bind(ServerEnvironment.class);
 
     bind(OAuth2Resource.class);
 
@@ -77,6 +87,10 @@ public class GujaCoreModule extends AbstractModule {
 
     bind(FactoryResource.class);
     bind(DFactoryDaoBean.class);
+
+    bind(RequestScopedVelocityTemplateStringWriterBuilder.class);
+
+    bind(EmailService.class).to(MockEmailService.class); // TODO Using mock email service
 
     bind(UserResource.class);
     bind(UserService.class).to(UserServiceImpl.class);

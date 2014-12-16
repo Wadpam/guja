@@ -1,4 +1,4 @@
-package com.wadpam.guja.oauth2.providers;
+package com.wadpam.guja.oauth2.provider;
 
 /*
  * #%L
@@ -22,35 +22,34 @@ package com.wadpam.guja.oauth2.providers;
  * #L%
  */
 
-
-import com.google.appengine.repackaged.com.google.common.io.BaseEncoding;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
-
-import java.security.SecureRandom;
+import com.wadpam.guja.oauth2.domain.DOAuth2User;
 
 /**
- * Generate access tokens based on md5 hashing
+ * Provide oauth2 compliant users.
  *
  * @author mattiaslevin
  */
-public class DefaultAccessTokenGenerator implements AccessTokenGenerator {
+public interface Oauth2UserProvider {
 
-  private static final SecureRandom random = new SecureRandom();
 
-  @Override
-  public String generate() {
+  /**
+   * Find a user by its id.
+   *
+   * @param id unique user id
+   * @return oauth2 compliant user
+   */
+  DOAuth2User getUserById(Long id);
 
-    byte[] randomBytes = new byte[24];
-    random.nextBytes(randomBytes);
+  /**
+   * Create a new Oauth2 user.
+   *
+   * @return
+   */
+  DOAuth2User createUser();
 
-    HashCode hashCode = Hashing.goodFastHash(256).newHasher()
-        .putBytes(randomBytes)
-        .putLong(System.nanoTime())
-        .hash();
-
-    return BaseEncoding.base64().encode(hashCode.asBytes());
-  }
-
+  /**
+   * Update user.
+   */
+  DOAuth2User putUser(DOAuth2User user);
 
 }

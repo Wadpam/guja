@@ -1,4 +1,4 @@
-package com.wadpam.guja.oauth2.providers;
+package com.wadpam.guja.oauth2.provider;
 
 /*
  * #%L

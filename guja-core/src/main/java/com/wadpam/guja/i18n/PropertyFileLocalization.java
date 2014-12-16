@@ -22,15 +22,9 @@ package com.wadpam.guja.i18n;
  * #L%
  */
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import com.google.inject.servlet.RequestScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Provider;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -42,62 +36,54 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author mattiaslevin
  */
-@RequestScoped
-public class PropertyFileLocalizationProvider implements Provider<Localization> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFileLocalizationProvider.class);
+public class PropertyFileLocalization implements Localization {
+  private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFileLocalization.class);
 
 
+  private final String bundleName;
   private ResourceBundle resourceBundle;
+  private final Locale locale;
 
 
-  @Inject
-  public PropertyFileLocalizationProvider(@Named("app.i18n.bundleName") String bundleName,
-                                          @Context HttpServletRequest request) {
-    this(bundleName, request.getLocale());
-  }
+  public PropertyFileLocalization(String bundleName, Locale locale) {
+    this.bundleName = bundleName;
+    this.locale = locale;
 
-  public PropertyFileLocalizationProvider(String bundleName, Locale locale) {
     try {
       resourceBundle = ResourceBundle.getBundle(checkNotNull(bundleName),
           checkNotNull(locale),
           ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES));
     } catch (MissingResourceException e) {
       LOGGER.warn("Resource bundle {} not found", bundleName);
+      resourceBundle = null;
     }
   }
 
+
   @Override
-  public Localization get() {
+  public String getMessage(String key, String defaultMessage, Object... parameters) {
 
-    return new Localization() {
+    if (null == resourceBundle) {
+      return defaultMessage;
+    }
 
-      @Override
-      public String getMessage(String key, String defaultMessage, Object... parameters) {
+    String message;
+    try {
+      message = resourceBundle.getString(key);
+    } catch (MissingResourceException e) {
+      message = defaultMessage;
+    }
 
-        if (null == resourceBundle) {
-          return defaultMessage;
-        }
+    if (parameters.length > 0) {
+      message = String.format(message, parameters);
+    }
 
-        String message;
-        try {
-          message = resourceBundle.getString(key);
-        } catch (MissingResourceException e) {
-          message = defaultMessage;
-        }
+    return message;
+  }
 
-        if (parameters.length > 0) {
-          message = String.format(message, parameters);
-        }
-
-        return message;
-      }
-
-      @Override
-      public Locale getLocale() {
-        return resourceBundle.getLocale();
-      }
-    };
-
+  @Override
+  public Locale getLocale() {
+    return resourceBundle.getLocale();
   }
 
 }
