@@ -27,9 +27,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.jersey.spi.resource.Singleton;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import java.util.Locale;
 
 /**

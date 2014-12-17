@@ -293,7 +293,7 @@ public class UserResource {
   @POST
   @Path("me/password")
   @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
-  public Response changePassword(HttpServletRequest request, Request passwordRequest) {
+  public Response changePassword(@Context HttpServletRequest request, Request passwordRequest) {
 
     checkPasswordFormat(passwordRequest.getNewPassword());
     checkNotNull(passwordRequest.getOldPassword());
@@ -330,7 +330,7 @@ public class UserResource {
 
 
   /**
-   * Reset user password by sending out a rest email.
+   * Reset user password by sending out a reset email.
    *
    * @param passwordRequest users unique email
    * @return http 200

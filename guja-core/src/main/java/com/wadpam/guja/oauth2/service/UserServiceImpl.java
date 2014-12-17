@@ -257,11 +257,12 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Override
   public void changePassword(Long id, String oldPassword, String newPassword) {
 
-    DUser dUser = getById(id); // Will raise 404 if user is not found
+    DUser user = getById(id); // Will raise 404 if user is not found
 
     // Verify old password before setting new password
-    if (passwordEncoder.matches(oldPassword, dUser.getPassword())) {
-      dUser.setPassword(passwordEncoder.encode(newPassword));
+    if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+      user.setPassword(passwordEncoder.encode(newPassword));
+      put(user);
     } else {
       throw new UnauthorizedRestException("Wrong password");
     }
@@ -290,7 +291,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
     String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 10 * 60 * 1000);
     String pageUrl = String.format("%s/html/reset_password.html", baseUrl); // TODO he location of the web page must be project specific
-    return String.format("%s?id=%s&token=%s&language=%s", userId, pageUrl, temporaryToken, locale.getLanguage());
+    return String.format("%s?id=%s&token=%s&language=%s", pageUrl, userId, temporaryToken, locale.getLanguage());
 
   }
 
@@ -301,6 +302,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
       tokenCache.removeToken(userId.toString()); // Remember to remove the token
       DUser user = getById(userId);
       user.setPassword(passwordEncoder.encode(newPassword));
+      put(user);
       return true;
     }
 

@@ -5,6 +5,7 @@ import com.google.inject.name.Named;
 import com.google.inject.servlet.RequestScoped;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
 import java.util.Locale;
 
 /**
