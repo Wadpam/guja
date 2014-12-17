@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -69,10 +70,10 @@ public class AdminTaskResource {
   @GET
   @Path("{taskName}")
   public Response enqueueTask(@RequestParameters Map<String, String[]> paramMap,
-                              @PathParam("taskName") String taskName) {
+                              @NotNull @PathParam("taskName") String taskName) {
 
     final Queue queue = QueueFactory.getDefaultQueue();
-    final TaskOptions options = TaskOptions.Builder.withUrl(String.format(PATH_ADMIN_TASK, checkNotNull(taskName)));
+    final TaskOptions options = TaskOptions.Builder.withUrl(String.format(PATH_ADMIN_TASK, taskName));
     for (Entry<String, String[]> param : paramMap.entrySet()) {
       for (String value : param.getValue()) {
         options.param(param.getKey(), value);
@@ -93,10 +94,8 @@ public class AdminTaskResource {
 
   @POST
   @Path("{taskName}")
-  public Response processTask(@RequestParameters Map<String, String[]> paramMap,
-                              @PathParam("taskName") String taskName) {
-    checkNotNull(taskName);
-    checkNotNull(paramMap);
+  public Response processTask(@NotNull @RequestParameters Map<String, String[]> paramMap,
+                              @NotNull @PathParam("taskName") String taskName) {
 
     LOGGER.info("Processing task for {}...", taskName);
     for (AdminTask adminTask : adminTasks) {

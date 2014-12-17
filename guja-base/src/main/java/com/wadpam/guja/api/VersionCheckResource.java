@@ -34,14 +34,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Check if an apps version is supported or not.
@@ -63,9 +62,10 @@ public class VersionCheckResource {
   public VersionCheckResource(@Named("app.versions.upgradeUrls") String upgradeUrls,
                               VersionCheckPredicate predicate,
                               @PropertyFile Localization localization) {
-    this.predicate = checkNotNull(predicate);
-    this.localization = checkNotNull(localization);
-    this.upgradeUrls = parsePropertyMap(checkNotNull(upgradeUrls));
+
+    this.predicate = predicate;
+    this.localization = localization;
+    this.upgradeUrls = parsePropertyMap(upgradeUrls);
 
   }
 
@@ -75,10 +75,8 @@ public class VersionCheckResource {
 
   @GET
   @Path("{version}/check")
-  public Response checkVersion(@QueryParam("platform") String platform,
-                               @PathParam("version") String version) {
-    checkNotNull(platform);
-    checkNotNull(version);
+  public Response checkVersion(@NotNull @QueryParam("platform") String platform,
+                               @NotNull @PathParam("version") String version) {
 
     if (predicate.isVersionSupported(platform, version)) {
       LOGGER.debug("Version supported {} {}", version, platform);

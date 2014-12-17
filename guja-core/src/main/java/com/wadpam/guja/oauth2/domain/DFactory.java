@@ -30,6 +30,7 @@ import net.sf.mardao.core.domain.AbstractStringEntity;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.validation.constraints.NotNull;
 
 /**
  * A ConnectionFactory entity.
@@ -40,9 +41,11 @@ import javax.persistence.Entity;
 @Entity
 public class DFactory extends AbstractStringEntity {
 
+  @NotNull
   @Basic
   private String clientId;
 
+  @NotNull
   @Basic
   private String clientSecret;
 

@@ -49,6 +49,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
@@ -130,6 +132,7 @@ public class OAuth2Resource {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("authorize")
   public Response authorize(UserCredentials credentials) {
+    // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
     // The client has been authenticated already in the interceptor
 
@@ -223,6 +226,7 @@ public class OAuth2Resource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response refreshAccessToken(RefreshTokenRequest refreshToken) {
+    // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
     if (null == refreshToken.getRefresh_token() ||
         null == refreshToken.getGrant_type()) {
@@ -266,6 +270,7 @@ public class OAuth2Resource {
   @Path("revoke")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response revoke(@QueryParam("token") String token) {
+    // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
     if (null != token) {
 
@@ -308,11 +313,7 @@ public class OAuth2Resource {
   @GET
   @Path("tokeninfo")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response validate(@QueryParam("access_token") String access_token) {
-
-    if (null == access_token) {
-      throw new BadRequestRestException("Missing access_token in request");
-    }
+  public Response validate(@NotNull @QueryParam("access_token") String access_token) {
 
     DConnection connection = connectionDao.findByAccessToken(access_token);
     LOGGER.debug("Connection {}", connection);
@@ -362,9 +363,9 @@ public class OAuth2Resource {
    */
   @GET
   public Response registerFederatedGet(
-      @QueryParam("providerId") String providerId,
+      @NotNull @QueryParam("providerId") String providerId,
       @QueryParam("providerUserId") String providerUserId,
-      @QueryParam("access_token") String access_token,
+      @NotNull @QueryParam("access_token") String access_token,
       @QueryParam("secret") String secret,
       @QueryParam("expires_in") @DefaultValue("4601") Integer expiresIn,
       @QueryParam("appArg0") String appArg0
@@ -388,9 +389,9 @@ public class OAuth2Resource {
   @GET
   @Path("{providerId}")
   public Response registerFederatedGetPath(
-      @PathParam("providerId") String providerId,
+      @NotNull @PathParam("providerId") String providerId,
       @QueryParam("providerUserId") String providerUserId,
-      @QueryParam("access_token") String access_token,
+      @NotNull @QueryParam("access_token") String access_token,
       @QueryParam("secret") String secret,
       @QueryParam("expires_in") @DefaultValue("4601") Integer expiresIn,
       @QueryParam("appArg0") String appArg0

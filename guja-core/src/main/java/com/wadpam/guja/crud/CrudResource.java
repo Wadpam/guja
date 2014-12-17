@@ -28,6 +28,8 @@ import net.sf.mardao.dao.AbstractDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -71,7 +73,7 @@ public class CrudResource<T, ID extends Serializable, D extends AbstractDao<T, I
 
   @DELETE
   @Path("{id}")
-  public Response delete(@PathParam("id") ID id) throws IOException {
+  public Response delete(@NotNull @PathParam("id") ID id) throws IOException {
     dao.delete(id);
 
     return Response.noContent().build();
@@ -79,7 +81,7 @@ public class CrudResource<T, ID extends Serializable, D extends AbstractDao<T, I
 
   @GET
   @Path("{id}")
-  public Response read(@PathParam("id") ID id) throws IOException {
+  public Response read(@NotNull @PathParam("id") ID id) throws IOException {
     final T entity = dao.get(id);
 
     if (null == entity) {

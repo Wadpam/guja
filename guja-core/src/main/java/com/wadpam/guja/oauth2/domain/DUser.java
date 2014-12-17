@@ -41,7 +41,6 @@ import java.util.Collection;
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"username"}))
 public class DUser extends DOAuth2User {
 
-
   /**
    * A unique user name
    */

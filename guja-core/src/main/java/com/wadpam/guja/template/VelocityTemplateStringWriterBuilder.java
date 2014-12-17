@@ -74,6 +74,7 @@ public class VelocityTemplateStringWriterBuilder {
 
   public StringWriter build() {
     checkNotNull(templateName);
+    checkNotNull(vc);
 
     // Load template based on locale
     // Will trow exception if template is not found

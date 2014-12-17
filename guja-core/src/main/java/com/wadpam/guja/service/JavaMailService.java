@@ -38,6 +38,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Properties;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * An email service based on JavaMail for sending emails.
  * @author mattiaslevin
@@ -72,6 +74,11 @@ public class JavaMailService implements EmailService {
                                 String toEmail, String toName,
                                 String subject,
                                 String body, boolean asHtml) {
+
+        checkNotNull(fromEmail);
+        checkNotNull(fromName);
+        checkNotNull(toEmail);
+        checkNotNull(toName);
 
         LOGGER.debug("Send email to:{}, subject:{}", toEmail, subject);
 
@@ -116,6 +123,11 @@ public class JavaMailService implements EmailService {
                                 String subject,
                                 String body, boolean asHtml,
                                 byte[] attachment, String filename, String contentType) {
+
+        checkNotNull(fromAddress);
+        checkNotNull(fromName);
+        checkNotNull(toAddresses);
+
         LOGGER.info("Send email to:{}, subject:{}", toAddresses, subject);
 
         final Session session = Session.getDefaultInstance(new Properties(), null);
