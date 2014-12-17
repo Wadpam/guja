@@ -52,4 +52,12 @@ public class TemporaryTokenCache {
           new DateTime(storedToken.getSecond()).isAfterNow();
   }
 
+  /**
+   * Remove a token from the cache.
+   * @param key
+   */
+  public void removeToken(String key) {
+    cache.remove(key);
+  }
+
 }

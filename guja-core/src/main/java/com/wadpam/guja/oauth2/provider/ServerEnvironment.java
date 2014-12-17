@@ -24,11 +24,13 @@ package com.wadpam.guja.oauth2.provider;
 
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.sun.jersey.spi.resource.Singleton;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import java.util.Locale;
 
 /**
  * Provide basic information about the current server environment.
@@ -38,8 +40,17 @@ import javax.ws.rs.core.UriInfo;
 @Singleton
 public class ServerEnvironment {
 
+  private final Locale defaultLocale;
+
+  @Inject
+  public ServerEnvironment(@Named("app.locale.default") String defaultLocale) {
+    this.defaultLocale = new Locale.Builder().setLanguage(defaultLocale).build();
+  }
+
   public boolean isDevEnvironment() {
     return SystemProperty.Environment.Value.Development == SystemProperty.environment.value();
   }
+
+
 
 }

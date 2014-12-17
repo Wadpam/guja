@@ -367,7 +367,10 @@ public class UserResource {
   }
 
 
-  private class Request {
+  public static class Request {
+
+    public Request() {
+    }
 
     private String oldPassword;
     private String newPassword;

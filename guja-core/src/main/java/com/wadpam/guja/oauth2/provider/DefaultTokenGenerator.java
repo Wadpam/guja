@@ -31,7 +31,7 @@ import com.google.inject.Singleton;
 import java.security.SecureRandom;
 
 /**
- * Generate random tokens based on md5 hashing
+ * Generate random tokens based on md5 hashing and url safe Base64 encoding.
  *
  * @author mattiaslevin
  */
@@ -51,7 +51,7 @@ public class DefaultTokenGenerator implements TokenGenerator {
         .putLong(System.nanoTime())
         .hash();
 
-    return BaseEncoding.base64().encode(hashCode.asBytes());
+    return BaseEncoding.base64Url().encode(hashCode.asBytes());
   }
 
 

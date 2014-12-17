@@ -302,7 +302,7 @@ public class OAuth2Resource {
    * Validate an access_token.
    * The Oauth2 specification does not specify how this should be done. Do similar to what Google does
    *
-   * @param access_token access token to validate
+   * @param access_token access token to validate. Be careful about using url safe tokens or use url encoding.
    * @return http 200 if success and some basic info about the access_token
    */
   @GET

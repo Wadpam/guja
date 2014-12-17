@@ -298,6 +298,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   public boolean changePasswordUsingToken(Long userId, String newPassword, String token) {
 
     if (tokenCache.validateToken(userId.toString(), token)) {
+      tokenCache.removeToken(userId.toString()); // Remember to remove the token
       DUser user = getById(userId);
       user.setPassword(passwordEncoder.encode(newPassword));
       return true;
@@ -309,6 +310,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Override
   public boolean confirmEmail(Long userId, String token) {
     if (tokenCache.validateToken(userId.toString(), token)) {
+      tokenCache.removeToken(userId.toString()); // Remember to remove the token
       DUser user = getById(userId);
       if (user.getState() != DUser.LOCKED_STATE) {
         // Only change state if user account is not locked

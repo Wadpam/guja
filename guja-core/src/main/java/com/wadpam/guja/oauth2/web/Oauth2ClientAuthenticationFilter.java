@@ -105,7 +105,9 @@ public class Oauth2ClientAuthenticationFilter implements Filter {
       int beginIndex = auth.indexOf(PREFIX_BASIC_AUTHENTICATION);
       if (-1 < beginIndex) {
         String baString = auth.substring(beginIndex + PREFIX_BASIC_AUTHENTICATION.length());
-        if (!baString.equals(getBasicAuthenticationString())) {
+        String storedBaString = getBasicAuthenticationString();
+        LOGGER.debug("{} equals? {}", baString, storedBaString);
+        if (!baString.equals(storedBaString)) {
           LOGGER.info("Unauthorized");
           response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
           return;
