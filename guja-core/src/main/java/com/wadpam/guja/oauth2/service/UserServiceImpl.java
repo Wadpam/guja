@@ -131,21 +131,26 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     put(user);
 
     if (shouldVerifyEmail) {
-
-      String subject = localizationProvider.get().getMessage("verifyEmailAddress", "Verify email address"); // TODO provide translation
-      String verifyUrl = createVerifyEmailUrl(user.getId(), localizationProvider.get().getLocale());
-
-      String body = templateProvider.get()
-          .templateName(VELOCITY_TEMPLATE_VERIFY_EMAIL)
-          .put("verifyEmailLink", verifyUrl)
-          .build()
-          .toString();
-
-      emailService.sendEmail(user.getEmail(), user.getDisplayName(), subject, body, true);
-
+      // Send email confirmation email
+      sendConfirmEmail(user);
     }
 
     return user;
+  }
+
+  private boolean sendConfirmEmail(DUser user) {
+
+    String subject = localizationProvider.get().getMessage("verifyEmailAddress", "Verify email address"); // TODO provide translation
+    String verifyUrl = createVerifyEmailUrl(user.getId(), localizationProvider.get().getLocale());
+
+    String body = templateProvider.get()
+        .templateName(VELOCITY_TEMPLATE_VERIFY_EMAIL)
+        .put("verifyEmailLink", verifyUrl)
+        .build()
+        .toString();
+
+    return emailService.sendEmail(user.getEmail(), user.getDisplayName(), subject, body, true);
+
   }
 
   private String createVerifyEmailUrl(Long userId, Locale locale) {
@@ -153,6 +158,14 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 30 * 60 * 1000);
     String pageUrl = String.format("%s/html/verify_email.html", baseUrl); // TODO he location of the web page must be project specific
     return String.format("%s?id=%s&token=%s&language=%s", pageUrl, userId, temporaryToken, locale.getLanguage());
+
+  }
+
+  @Override
+  public boolean resendConfirmEmail(Long userId) {
+
+    DUser user = getById(userId); // Will throw 404 if not found
+    return sendConfirmEmail(user);
 
   }
 

@@ -351,7 +351,7 @@ public class UserResource {
    * Confirm a users email address using a temporary token.
    * @param userId unique user id
    * @param passwordRequest token
-   * @return 200 is success, otherwiee 403
+   * @return 200 if success
    */
   @POST
   @Path("{id}/email/confirm")
@@ -361,7 +361,22 @@ public class UserResource {
     checkNotNull(passwordRequest.getToken());
 
     boolean isSuccess = userService.confirmEmail(userId, passwordRequest.getToken());
+    return isSuccess ? Response.ok().build() : Response.status(Response.Status.BAD_REQUEST).build();
 
+  }
+
+  /**
+   * Resend confirm email.
+   * @param userId unique user id
+   * @return 200 if success
+   */
+  @POST
+  @Path("{id}/email/resendconfirm")
+  @PermitAll
+  public Response resendConfirmEmail(@PathParam("id") Long userId) {
+    checkNotNull(userId);
+
+    boolean isSuccess = userService.resendConfirmEmail(userId);
     return isSuccess ? Response.ok().build() : Response.status(Response.Status.BAD_REQUEST).build();
 
   }

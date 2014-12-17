@@ -52,6 +52,13 @@ public interface UserService {
   boolean confirmEmail(Long userId, String token);
 
   /**
+   * Resend email confirmation email.
+   * @param userId unique user id
+   * @return true of the email was sent
+   */
+  boolean resendConfirmEmail(Long userId);
+
+  /**
    * Get user by user id.
    *
    * @param id unique user id
@@ -126,5 +133,4 @@ public interface UserService {
    * @return page of users
    */
   CursorPage<DUser> getFriendsWith(Long id, String cursorKey, int pageSize);
-
 }
