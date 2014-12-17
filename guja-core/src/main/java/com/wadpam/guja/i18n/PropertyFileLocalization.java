@@ -40,13 +40,11 @@ public class PropertyFileLocalization implements Localization {
   private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFileLocalization.class);
 
 
-  private final String bundleName;
   private ResourceBundle resourceBundle;
   private final Locale locale;
 
 
   public PropertyFileLocalization(String bundleName, Locale locale) {
-    this.bundleName = bundleName;
     this.locale = locale;
 
     try {
@@ -57,6 +55,7 @@ public class PropertyFileLocalization implements Localization {
       LOGGER.warn("Resource bundle {} not found", bundleName);
       resourceBundle = null;
     }
+
   }
 
 
@@ -83,7 +82,7 @@ public class PropertyFileLocalization implements Localization {
 
   @Override
   public Locale getLocale() {
-    return resourceBundle.getLocale();
+    return locale;
   }
 
 }

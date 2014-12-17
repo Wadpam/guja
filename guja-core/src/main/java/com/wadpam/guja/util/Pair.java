@@ -22,12 +22,14 @@ package com.wadpam.guja.util;
  * #L%
  */
 
+import java.io.Serializable;
+
 /**
  * Holds a Pair of objects.
  *
  * @author osandstrom Date: 2014-09-20 Time: 12:29
  */
-public class Pair<M, N> {
+public class Pair<M, N> implements Serializable {
   private final M first;
   private final N second;
 

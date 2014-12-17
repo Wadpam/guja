@@ -98,6 +98,7 @@ public class OAuth2Filter implements Filter {
 
       } else {
         LOGGER.info("Unauthorised");
+        // TODO Should be return 401 or allow the user to continue as anonymous?
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         return;
       }

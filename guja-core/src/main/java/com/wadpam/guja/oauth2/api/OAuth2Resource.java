@@ -38,7 +38,7 @@ import com.wadpam.guja.oauth2.dao.DFactoryMapper;
 import com.wadpam.guja.oauth2.domain.DConnection;
 import com.wadpam.guja.oauth2.domain.DFactory;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
-import com.wadpam.guja.oauth2.provider.AccessTokenGenerator;
+import com.wadpam.guja.oauth2.provider.TokenGenerator;
 import com.wadpam.guja.oauth2.provider.Oauth2UserProvider;
 import com.wadpam.guja.oauth2.provider.ServerEnvironment;
 import com.wadpam.guja.oauth2.provider.UserAuthenticationProvider;
@@ -80,13 +80,13 @@ public class OAuth2Resource {
   private final DFactoryDaoBean factoryDao;
 
   private final Oauth2UserProvider userProvider;
-  private final AccessTokenGenerator accessTokenGenerator;
+  private final TokenGenerator accessTokenGenerator;
   private final UserAuthenticationProvider authenticationProvider;
 
 
   @Inject
   public OAuth2Resource(UserAuthenticationProvider authenticationProvider,
-                        AccessTokenGenerator accessTokenGenerator,
+                        TokenGenerator accessTokenGenerator,
                         Oauth2UserProvider userProvider,
                         ServerEnvironment serverEnvironment,
                         DConnectionDaoBean connectionDao,

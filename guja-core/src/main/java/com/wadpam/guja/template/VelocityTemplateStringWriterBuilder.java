@@ -1,10 +1,9 @@
 package com.wadpam.guja.template;
 
-import com.google.inject.Inject;
-import com.google.inject.servlet.RequestScoped;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.ResourceNotFoundException;
 
 import java.io.StringWriter;
 import java.util.Locale;
@@ -78,13 +77,25 @@ public class VelocityTemplateStringWriterBuilder {
 
     // Load template based on locale
     // Will trow exception if template is not found
-    Template template = Velocity.getTemplate(localizedTemplateName(templateName, locale));
+    Template template = getTemplate(templateName);
 
     // Merge template and context
     StringWriter writer = new StringWriter();
     template.merge(vc, writer);
 
     return writer;
+  }
+
+  private Template getTemplate(String templateName) {
+
+    try {
+      return Velocity.getTemplate(localizedTemplateName(templateName, locale));
+    } catch (ResourceNotFoundException e) {
+      // Fall back to default template name without any local postfix
+      // If this also fails let the exception propagate
+      return Velocity.getTemplate(templateName);
+    }
+
   }
 
   private static String localizedTemplateName(String templateName, Locale locale) {

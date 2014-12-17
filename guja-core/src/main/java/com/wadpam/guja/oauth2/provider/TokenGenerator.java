@@ -23,36 +23,18 @@ package com.wadpam.guja.oauth2.provider;
  */
 
 
-import com.google.appengine.repackaged.com.google.common.io.BaseEncoding;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
-import com.google.inject.Singleton;
-
-import java.security.SecureRandom;
-
 /**
- * Generate access tokens based on md5 hashing
+ * Strategy for generating tokens.
  *
- * @author mattiaslevin
+ * @author mattiasLevin
  */
-@Singleton
-public class DefaultAccessTokenGenerator implements AccessTokenGenerator {
+public interface TokenGenerator {
 
-  private static final SecureRandom random = new SecureRandom();
-
-  @Override
-  public String generate() {
-
-    byte[] randomBytes = new byte[24];
-    random.nextBytes(randomBytes);
-
-    HashCode hashCode = Hashing.goodFastHash(256).newHasher()
-        .putBytes(randomBytes)
-        .putLong(System.nanoTime())
-        .hash();
-
-    return BaseEncoding.base64().encode(hashCode.asBytes());
-  }
-
+  /**
+   * Generate a new access_token
+   *
+   * @return
+   */
+  String generate();
 
 }

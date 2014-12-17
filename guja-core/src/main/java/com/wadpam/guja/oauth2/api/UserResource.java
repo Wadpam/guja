@@ -51,7 +51,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author mattiaslevin
  */
 @Singleton
-@Path("api/users")
+@Path("api/user")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
@@ -253,6 +253,13 @@ public class UserResource {
   }
 
 
+  /**
+   * Get all users added me as friends
+   * @param request injected
+   * @param pageSize page size
+   * @param cursorKey cursor key
+   * @return page of users
+   */
   @GET
   @Path("friendswith")
   @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
@@ -278,54 +285,94 @@ public class UserResource {
 
 
   /**
-   * Change my password.
-   * Both the old and new password must be provided.
+   * Change my password. Both the old and new password must be provided.
    *
-   * @param passwords old and new password
+   * @param passwordRequest old and new password
    * @return 200 (no content) if successful
    */
   @POST
   @Path("me/password")
   @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
-  public Response changePassword(@Context HttpServletRequest request, Passwords passwords) {
+  public Response changePassword(HttpServletRequest request, Request passwordRequest) {
 
-    if (null == passwords.getOldPassword() || null == passwords.getNewPassword()) {
-      throw new BadRequestRestException("Must provide both old and new password");
-    }
+    checkPasswordFormat(passwordRequest.getNewPassword());
+    checkNotNull(passwordRequest.getOldPassword());
 
     // Only allow changing your own password
     Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
-    checkPasswordFormat(passwords.getNewPassword());
-
-    userService.changePassword(id, passwords.oldPassword, passwords.getNewPassword());
+    userService.changePassword(id, passwordRequest.oldPassword, passwordRequest.getNewPassword());
 
     return Response.noContent().build();
+
+  }
+
+  /**
+   * Change password using a temporary token. Used during password reset flow.
+   *
+   * @param userId unique user id
+   * @param passwordRequest newPassword and token
+   * @return 200 if success, otherwise 403
+   */
+  @POST
+  @Path("{id}/password")
+  @PermitAll
+  public Response changePassword(@PathParam("id") Long userId, Request passwordRequest) {
+
+    checkNotNull(userId);
+    checkNotNull(passwordRequest.getToken());
+    checkPasswordFormat(passwordRequest.newPassword);
+
+    boolean isSuccess = userService.changePasswordUsingToken(userId, passwordRequest.getNewPassword(), passwordRequest.getToken());
+
+    return isSuccess ? Response.ok().build() : Response.status(Response.Status.BAD_REQUEST).build();
 
   }
 
 
   /**
    * Reset user password by sending out a rest email.
-   * @param email users unique email
+   *
+   * @param passwordRequest users unique email
    * @return http 200
    */
   @POST
   @Path("password/reset")
   @PermitAll
-  public Response resetPassword(@QueryParam("email") String email) {
-    checkNotNull(email);
+  public Response resetPassword(Request passwordRequest) {
+    checkNotNull(passwordRequest.getEmail());
 
-    userService.resetPassword(email);
+    userService.resetPassword(passwordRequest.getEmail());
 
     return Response.ok().build();
 
   }
 
+  /**
+   * Confirm a users email address using a temporary token.
+   * @param userId unique user id
+   * @param passwordRequest token
+   * @return 200 is success, otherwiee 403
+   */
+  @POST
+  @Path("{id}/email/confirm")
+  @PermitAll
+  public Response confirmEmail(@PathParam("id") Long userId, Request passwordRequest) {
+    checkNotNull(userId);
+    checkNotNull(passwordRequest.getToken());
 
-  private class Passwords {
+    boolean isSuccess = userService.confirmEmail(userId, passwordRequest.getToken());
+
+    return isSuccess ? Response.ok().build() : Response.status(Response.Status.BAD_REQUEST).build();
+
+  }
+
+
+  private class Request {
 
     private String oldPassword;
     private String newPassword;
+    private String token;
+    private String email;
 
     public String getOldPassword() {
       return oldPassword;
@@ -341,6 +388,22 @@ public class UserResource {
 
     public void setNewPassword(String newPassword) {
       this.newPassword = newPassword;
+    }
+
+    public String getToken() {
+      return token;
+    }
+
+    public void setToken(String token) {
+      this.token = token;
+    }
+
+    public String getEmail() {
+      return email;
+    }
+
+    public void setEmail(String email) {
+      this.email = email;
     }
   }
 

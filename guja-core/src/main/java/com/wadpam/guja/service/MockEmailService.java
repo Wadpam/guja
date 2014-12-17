@@ -15,13 +15,13 @@ public class MockEmailService implements EmailService {
 
   @Override
   public boolean sendEmail(String toEmail, String toName, String subject, String body, boolean asHtml) {
-    LOGGER.info("to: {} subject {}", toEmail, subject);
+    LOGGER.info(String.format("to: %s subject: %s body: %s", toEmail, subject, body));
     return true;
   }
 
   @Override
   public boolean sendEmail(List<String> toAddresses, List<String> ccAddresses, List<String> bccAddresses, String subject, String body, boolean asHtml, byte[] attachment, String filename, String contentType) {
-    LOGGER.info("to: {} subject {}", toAddresses, subject);
+    LOGGER.info(String.format("to: %s subject: %s body: %s", toAddresses, subject, body));
     return true;
   }
 

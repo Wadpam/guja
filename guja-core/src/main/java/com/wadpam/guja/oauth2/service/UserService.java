@@ -22,6 +22,7 @@ package com.wadpam.guja.oauth2.service;
  * #L%
  */
 
+import com.wadpam.guja.oauth2.api.UserResource;
 import com.wadpam.guja.oauth2.domain.DUser;
 import net.sf.mardao.core.CursorPage;
 
@@ -41,6 +42,14 @@ public interface UserService {
    * @return A new user domain object
    */
   DUser signup(DUser user);
+
+  /**
+   * Let the user confirm their email address.
+   * @param userId unique user id
+   * @param token temporary generated token
+   * @return true if the email was confirmed
+   */
+  boolean confirmEmail(Long userId, String token);
 
   /**
    * Get user by user id.
@@ -93,13 +102,21 @@ public interface UserService {
   void resetPassword(String email);
 
   /**
+   * Change password using a short lived temporary token (part of the password reset flow)
+   * @param userId unique user id
+   * @param newPassword new password
+   * @param token temporary password
+   * @return true if the password was successfully changed
+   */
+  boolean changePasswordUsingToken(Long userId, String newPassword, String token);
+
+  /**
    * Create a default admin account.
    * This account should be deleted in productions environment after the system has been configured.
    *
    * @return the create admin user
    */
   DUser createDefaultAdmin();
-
 
   /**
    * Get users that added me to their friends list.

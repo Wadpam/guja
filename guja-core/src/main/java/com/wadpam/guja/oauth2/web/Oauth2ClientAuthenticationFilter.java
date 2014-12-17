@@ -112,11 +112,11 @@ public class Oauth2ClientAuthenticationFilter implements Filter {
         }
       }
 
-    } else {
+    } else if (request.getContentLength() > 0) {
       // Check JSON
       BodyRequestWrapper wrappedRequest = new BodyRequestWrapper(request);
       ClientCredentials credentials = objectMapper.readValue(wrappedRequest.getBody(), ClientCredentials.class);
-      //LOGGER.debug(String.format("%s: %s, %s", PREFIX_BASIC_AUTHENTICATION, credentials.getClient_id(), credentials.getClient_secret()));
+      LOGGER.debug(String.format("%s: %s, %s", PREFIX_BASIC_AUTHENTICATION, credentials.getClient_id(), credentials.getClient_secret()));
       if (null == credentials ||
           null == credentials.getClient_id() ||
           null == credentials.getClient_secret() ||
@@ -127,6 +127,10 @@ public class Oauth2ClientAuthenticationFilter implements Filter {
       }
 
       request = wrappedRequest;
+
+    } else {
+      LOGGER.info("Unauthorized (no body)");
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     chain.doFilter(request, response);

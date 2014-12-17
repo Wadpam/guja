@@ -24,7 +24,7 @@ package com.wadpam.guja.oauth2.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.servlet.RequestScoped;
+import com.google.inject.name.Named;
 import com.sun.jersey.spi.resource.Singleton;
 import com.wadpam.guja.exceptions.ConflictRestException;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
@@ -38,11 +38,12 @@ import com.wadpam.guja.oauth2.domain.DUser;
 import com.wadpam.guja.oauth2.provider.*;
 import com.wadpam.guja.service.EmailService;
 import com.wadpam.guja.template.RequestScopedVelocityTemplateStringWriterBuilder;
-import com.wadpam.guja.template.VelocityTemplateStringWriterBuilder;
 import net.sf.mardao.core.CursorPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -57,8 +58,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   private final static String DEFAULT_ADMIN_USERNAME = "admin";
 
-  private static final String VELOCITY_TEMPLATE_VERIFY_EMAIL = "email_verification.vm";
-  private static final String VELOCITY_TEMPLATE_RESET_PASSWORD = "reset_password.vm";
+  private static final String VELOCITY_TEMPLATE_VERIFY_EMAIL = "email_verification.vm"; // TODO Make a property
+  private static final String VELOCITY_TEMPLATE_RESET_PASSWORD = "reset_password.vm"; // TODO Make a property
 
   private DUserDaoBean userDao;
 
@@ -70,7 +71,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   private final EmailService emailService;
   private final Provider<RequestScopedVelocityTemplateStringWriterBuilder> templateProvider;
   private final Provider<RequestScopedPropertyFileLocalization> localizationProvider;
-
+  private final TemporaryTokenCache tokenCache;
+  private final String baseUrl;
 
   @Inject
   public UserServiceImpl(DUserDaoBean userDao,
@@ -78,7 +80,9 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
                          EmailService emailService,
                          Provider<RequestScopedVelocityTemplateStringWriterBuilder> templateProvider,
                          Provider<RequestScopedPropertyFileLocalization> localizationProvider,
-                         ServerEnvironment severEnvironment) {
+                         ServerEnvironment severEnvironment,
+                         TemporaryTokenCache tokenCache,
+                         @Named("app.baseUrl") String baseUrl) {
 
     this.userDao = userDao;
     this.passwordEncoder = passwordEncoder;
@@ -86,6 +90,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     this.templateProvider = templateProvider;
     this.localizationProvider = localizationProvider;
     this.severEnvironment = severEnvironment;
+    this.tokenCache = tokenCache;
+    this.baseUrl = baseUrl;
 
     if (severEnvironment.isDevEnvironment()) {
       createDefaultAdmin();
@@ -97,9 +103,15 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   public DUser signup(DUser user) {
 
     // Check if username already exists
-    if (null != userDao.findByUsername(user.getUsername())) {
+    if (null != userDao.findByUsername(user.getUsername())) { // TODO Change to asynch request
       LOGGER.info("Username already taken {}", user.getUsername());
       throw new ConflictRestException("Username already taken");
+    }
+
+    // Check if email already exists
+    if (null != userDao.findByEmail(user.getEmail())) {  // TODO Change to asynch request
+      LOGGER.info("Email already taken {}", user.getEmail());
+      throw new ConflictRestException("Email already taken");
     }
 
     // encode password before storage
@@ -121,7 +133,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     if (shouldVerifyEmail) {
 
       String subject = localizationProvider.get().getMessage("verifyEmailAddress", "Verify email address"); // TODO provide translation
-      String verifyUrl = "http://www.dn.se"; // TODO calculate, include locale
+      String verifyUrl = createVerifyEmailUrl(user.getId(), localizationProvider.get().getLocale());
 
       String body = templateProvider.get()
           .templateName(VELOCITY_TEMPLATE_VERIFY_EMAIL)
@@ -134,6 +146,14 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     }
 
     return user;
+  }
+
+  private String createVerifyEmailUrl(Long userId, Locale locale) {
+
+    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 30 * 60 * 1000);
+    String pageUrl = String.format("%s/html/verify_email.html", baseUrl); // TODO he location of the web page must be project specific
+    return String.format("%s?id=%s&token=%s&language=%s", pageUrl, userId, temporaryToken, locale.getLanguage());
+
   }
 
   @Override
@@ -254,7 +274,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     DUser user = getByEmail(email); // Throw 404 if not found
 
     String subject = localizationProvider.get().getMessage("restPassword", "Reset password"); // TODO Provide translations
-    String resetUrl = "http://www.dn.se"; // TODO calculate, included locale
+    String resetUrl = createResetPasswordUrl(user.getId(), localizationProvider.get().getLocale());
 
     String body = templateProvider.get()
         .templateName(VELOCITY_TEMPLATE_RESET_PASSWORD)
@@ -264,6 +284,41 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
     emailService.sendEmail(user.getEmail(), user.getDisplayName(), subject, body, true);
 
+  }
+
+  private String createResetPasswordUrl(Long userId, Locale locale) {
+
+    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 10 * 60 * 1000);
+    String pageUrl = String.format("%s/html/reset_password.html", baseUrl); // TODO he location of the web page must be project specific
+    return String.format("%s?id=%s&token=%s&language=%s", userId, pageUrl, temporaryToken, locale.getLanguage());
+
+  }
+
+  @Override
+  public boolean changePasswordUsingToken(Long userId, String newPassword, String token) {
+
+    if (tokenCache.validateToken(userId.toString(), token)) {
+      DUser user = getById(userId);
+      user.setPassword(passwordEncoder.encode(newPassword));
+      return true;
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean confirmEmail(Long userId, String token) {
+    if (tokenCache.validateToken(userId.toString(), token)) {
+      DUser user = getById(userId);
+      if (user.getState() != DUser.LOCKED_STATE) {
+        // Only change state if user account is not locked
+        user.setState(DUser.ACTIVE_STATE);
+        put(user);
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @Override

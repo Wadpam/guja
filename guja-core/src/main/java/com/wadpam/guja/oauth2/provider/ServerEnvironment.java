@@ -23,7 +23,12 @@ package com.wadpam.guja.oauth2.provider;
  */
 
 import com.google.appengine.api.utils.SystemProperty;
+import com.google.inject.Inject;
 import com.sun.jersey.spi.resource.Singleton;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * Provide basic information about the current server environment.
