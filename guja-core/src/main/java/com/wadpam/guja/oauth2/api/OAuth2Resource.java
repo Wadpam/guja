@@ -49,8 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
@@ -61,6 +59,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An oauth2 implementation support the Resource Owner Password Credential Grant flow.
@@ -313,7 +313,8 @@ public class OAuth2Resource {
   @GET
   @Path("tokeninfo")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response validate(@NotNull @QueryParam("access_token") String access_token) {
+  public Response validate(@QueryParam("access_token") String access_token) {
+    checkNotNull(access_token);
 
     DConnection connection = connectionDao.findByAccessToken(access_token);
     LOGGER.debug("Connection {}", connection);
@@ -363,9 +364,9 @@ public class OAuth2Resource {
    */
   @GET
   public Response registerFederatedGet(
-      @NotNull @QueryParam("providerId") String providerId,
+      @QueryParam("providerId") String providerId,
       @QueryParam("providerUserId") String providerUserId,
-      @NotNull @QueryParam("access_token") String access_token,
+      @QueryParam("access_token") String access_token,
       @QueryParam("secret") String secret,
       @QueryParam("expires_in") @DefaultValue("4601") Integer expiresIn,
       @QueryParam("appArg0") String appArg0
@@ -389,9 +390,9 @@ public class OAuth2Resource {
   @GET
   @Path("{providerId}")
   public Response registerFederatedGetPath(
-      @NotNull @PathParam("providerId") String providerId,
+      @PathParam("providerId") String providerId,
       @QueryParam("providerUserId") String providerUserId,
-      @NotNull @QueryParam("access_token") String access_token,
+      @QueryParam("access_token") String access_token,
       @QueryParam("secret") String secret,
       @QueryParam("expires_in") @DefaultValue("4601") Integer expiresIn,
       @QueryParam("appArg0") String appArg0
@@ -408,6 +409,9 @@ public class OAuth2Resource {
       String secret,
       Integer expiresInSeconds,
       String appArg0) throws IOException {
+
+    checkNotNull(access_token);
+    checkNotNull(providerId);
 
     if (null == expiresInSeconds) {
       expiresInSeconds = DEFAULT_EXPIRES_IN;

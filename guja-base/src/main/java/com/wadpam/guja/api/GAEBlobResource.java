@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -46,6 +45,8 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.Map.Entry;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Mange GAE blobs.
@@ -171,11 +172,12 @@ public class GAEBlobResource {
    */
   @GET
   @Path("{key}")
-  public Response getBlob(@NotNull @PathParam("key") String key,
+  public Response getBlob(@PathParam("key") String key,
                           @QueryParam("maxCacheAge") @DefaultValue("86400") int maxCacheAge,
                           @QueryParam("asAttachment") @DefaultValue("false") boolean asAttachment,
                           @Context HttpServletRequest request,
                           @Context HttpServletResponse response) throws IOException {
+    checkNotNull(key);
     LOGGER.debug("Get blob with key:{}", key);
 
     // make sure iOS caches the image (default 1 day)
@@ -226,7 +228,8 @@ public class GAEBlobResource {
    */
   @DELETE
   @Path("{key}")
-  public void deleteBlob(@NotNull @PathParam("key") String key) throws IOException {
+  public void deleteBlob(@PathParam("key") String key) throws IOException {
+    checkNotNull(key);
     LOGGER.debug("Delete blob with key:{}", key);
     BlobKey blobKey = new BlobKey(key);
     blobstoreService.delete(blobKey);
@@ -242,9 +245,10 @@ public class GAEBlobResource {
    */
   @GET
   @Path("latest")
-  public Response getLatestBlobByName(@NotNull @QueryParam("name") String name,
+  public Response getLatestBlobByName(@QueryParam("name") String name,
                                       @Context HttpServletRequest request,
                                       @Context HttpServletResponse response) throws IOException {
+    checkNotNull(name);
 
     if (null == name || name.isEmpty()) {
       throw new BadRequestRestException("Blob name missing");

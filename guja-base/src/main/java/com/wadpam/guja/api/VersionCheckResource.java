@@ -34,13 +34,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Check if an apps version is supported or not.
@@ -75,8 +76,10 @@ public class VersionCheckResource {
 
   @GET
   @Path("{version}/check")
-  public Response checkVersion(@NotNull @QueryParam("platform") String platform,
-                               @NotNull @PathParam("version") String version) {
+  public Response checkVersion(@QueryParam("platform") String platform,
+                               @PathParam("version") String version) {
+    checkNotNull(platform);
+    checkNotNull(version);
 
     if (predicate.isVersionSupported(platform, version)) {
       LOGGER.debug("Version supported {} {}", version, platform);
@@ -84,20 +87,40 @@ public class VersionCheckResource {
     } else {
 
       LOGGER.debug("Version not supported {} {}", version, platform);
-      ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String>builder()
-          .put("localizedMessage", localization.getMessage("updateRequired", "You must upgrade your application"));
 
+      VersionCheckResponse response = new VersionCheckResponse();
+      response.setLocalizedMessage(localization.getMessage("updateRequired", "You must upgrade your application"));
       if (null != upgradeUrls && null != upgradeUrls.get(platform)) {
-        builder.put("url", upgradeUrls.get(platform));
+        response.setUrl(upgradeUrls.get(platform));
       }
 
       return Response.status(Response.Status.GONE)
-          .entity(builder.build())
+          .entity(response)
           .build();
     }
 
   }
 
+  public static class VersionCheckResponse {
+    private String localizedMessage;
+    private String url;
+
+    public String getLocalizedMessage() {
+      return localizedMessage;
+    }
+
+    public void setLocalizedMessage(String localizedMessage) {
+      this.localizedMessage = localizedMessage;
+    }
+
+    public String getUrl() {
+      return url;
+    }
+
+    public void setUrl(String url) {
+      this.url = url;
+    }
+  }
 
   /**
    * Interface for testing if a version is supported.

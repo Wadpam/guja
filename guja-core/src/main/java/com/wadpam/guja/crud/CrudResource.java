@@ -28,8 +28,6 @@ import net.sf.mardao.dao.AbstractDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -37,6 +35,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Resource with CRUD operations backed by a Dao.
@@ -73,21 +73,18 @@ public class CrudResource<T, ID extends Serializable, D extends AbstractDao<T, I
 
   @DELETE
   @Path("{id}")
-  public Response delete(@NotNull @PathParam("id") ID id) throws IOException {
+  public Response delete(@PathParam("id") ID id) throws IOException {
+    checkNotNull(id);
     dao.delete(id);
-
     return Response.noContent().build();
   }
 
   @GET
   @Path("{id}")
-  public Response read(@NotNull @PathParam("id") ID id) throws IOException {
+  public Response read(@PathParam("id") ID id) throws IOException {
+    checkNotNull(id);
     final T entity = dao.get(id);
-
-    if (null == entity) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    }
-    return Response.ok(entity).build();
+    return null != entity ? Response.ok(entity).build() : Response.status(Response.Status.NOT_FOUND).build();
   }
 
   @GET

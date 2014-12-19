@@ -28,7 +28,6 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -46,11 +45,9 @@ public class DConnection extends AbstractLongEntity {
 
   public static final String ROLE_SEPARATOR = ",";
 
-  @NotNull
   @Basic
   private Long userId;
 
-  @NotNull
   @Basic
   private String accessToken;
 
