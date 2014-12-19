@@ -87,7 +87,10 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -148,7 +151,8 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <basePackage>com.wadpam.guja.oauth2</basePackage> <!-- To generate the i18n code change the package name -->
+                            <basePackage>com.wadpam.guja.oauth2</basePackage>
+                            <!-- To generate the i18n code change the package name -->
                             <targetFolder>${project.basedir}/src/main/java</targetFolder>
                         </configuration>
                     </plugin>
