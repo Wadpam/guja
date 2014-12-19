@@ -32,6 +32,7 @@ import com.wadpam.guja.oauth2.web.OAuth2Filter;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -87,7 +88,7 @@ public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, DOAuth2U
     } else if (!entity.getId().equals(id)) {
       throw new BadRequestRestException("User ids does not match");
     }
-    return update(entity);
+    return update(id, entity);
   }
 
 

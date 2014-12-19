@@ -40,6 +40,8 @@ import javax.ws.rs.core.Response;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 
 /**
  * Allow the box to send diagnostic information to the backend for logging.
@@ -70,7 +72,7 @@ public class DiagnosticsResource {
 
   @Inject
   public DiagnosticsResource(DiagnosticsLogger logger) {
-    this.logger = Preconditions.checkNotNull(logger);
+    this.logger = logger;
   }
 
 
@@ -116,6 +118,7 @@ public class DiagnosticsResource {
   public static class DefaultDiagnosticLogger implements DiagnosticsLogger {
     @Override
     public void log(int severity, String message) {
+      checkNotNull(message);
       // Build a structured string and write to the sever log
       if (severity == SEVERITY_ERROR) {
         LOGGER.error(message);

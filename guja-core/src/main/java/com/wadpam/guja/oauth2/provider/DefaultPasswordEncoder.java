@@ -34,6 +34,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * A password encoder built on the principles specified here:
  * https://crackstation.net/hashing-security.htm
@@ -57,6 +59,7 @@ public class DefaultPasswordEncoder implements PasswordEncoder {
 
   @Override
   public String encode(String rawPassword) {
+    checkNotNull(rawPassword);
     try {
       return createHash(rawPassword.toCharArray());
     } catch (Exception e) {
@@ -67,6 +70,8 @@ public class DefaultPasswordEncoder implements PasswordEncoder {
 
   @Override
   public boolean matches(String rawPassword, String encodedPassword) {
+    checkNotNull(rawPassword);
+    checkNotNull(encodedPassword);
     try {
       return validatePassword(rawPassword.toCharArray(), encodedPassword);
     } catch (Exception e) {

@@ -46,6 +46,8 @@ public class TemporaryTokenCache {
    * @return true of the token is still valid
    */
   public boolean validateToken(String key, String token) {
+    checkNotNull(key);
+    checkNotNull(token);
     Pair<String, Long> storedToken = (Pair<String, Long>)cache.get(key);
       return null != storedToken &&
           token.equals(storedToken.first()) &&
@@ -57,7 +59,7 @@ public class TemporaryTokenCache {
    * @param key
    */
   public void removeToken(String key) {
-    cache.remove(key);
+    cache.remove(checkNotNull(key));
   }
 
 }
