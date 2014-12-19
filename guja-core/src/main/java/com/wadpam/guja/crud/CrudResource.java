@@ -99,8 +99,8 @@ public class CrudResource<T, ID extends Serializable, D extends AbstractDao<T, I
 
   @POST
   @Path("{id}")
-  public Response update(T entity) throws URISyntaxException, IOException {
-    final ID id = dao.put(entity);
+  public Response update(@PathParam("id") ID id, T entity) throws URISyntaxException, IOException {
+    dao.put(entity);
     URI uri = new URI(id.toString());
     return Response.ok().contentLocation(uri).build();
   }

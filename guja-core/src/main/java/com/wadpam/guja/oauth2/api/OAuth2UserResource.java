@@ -88,7 +88,7 @@ public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, DOAuth2U
     } else if (!entity.getId().equals(id)) {
       throw new BadRequestRestException("User ids does not match");
     }
-    return update(entity);
+    return update(id, entity);
   }
 
 
