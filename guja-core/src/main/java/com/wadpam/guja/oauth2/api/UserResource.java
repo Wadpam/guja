@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.IOException;
@@ -85,7 +84,6 @@ public class UserResource {
 
     LOGGER.debug("Signup user {}", user.getUsername());
 
-    // TODO Change to Jersey validation
     if (null == user.getUsername() ||
         null == user.getPassword() ||
         null == user.getEmail()) {
@@ -139,7 +137,8 @@ public class UserResource {
   @GET
   @Path("{id}")
   @RolesAllowed({"ROLE_ADMIN"})
-  public Response read(@NotNull @PathParam("id") Long id) {
+  public Response read(@PathParam("id") Long id) {
+    checkNotNull(id);
     return Response.ok(userService.getById(id)).build();
   }
 
@@ -187,12 +186,10 @@ public class UserResource {
   @DELETE
   @Path("id")
   @RolesAllowed({"ROLE_ADMIN"})
-  public Response delete(@NotNull @PathParam("id") Long id) {
-
+  public Response delete(@PathParam("id") Long id) {
+    checkNotNull(id);
     userService.deleteById(id);
-
     return Response.noContent().build();
-
   }
 
 
@@ -207,10 +204,11 @@ public class UserResource {
   @POST
   @Path("{id}")
   @RolesAllowed({"ROLE_ADMIN"})
-  public Response update(@NotNull @PathParam("id") Long id,
+  public Response update(@PathParam("id") Long id,
                          @Context UriInfo uriInfo,
                          @Context SecurityContext securityContext,
                          DUser user) {
+    checkNotNull(id);
 
     user = userService.update(id, user, securityContext.isUserInRole(OAuth2UserResource.ROLE_ADMIN));
 
@@ -317,7 +315,8 @@ public class UserResource {
   @POST
   @Path("{id}/password")
   @PermitAll
-  public Response changePassword(@NotNull @PathParam("id") Long userId, Request passwordRequest) {
+  public Response changePassword(@PathParam("id") Long userId, Request passwordRequest) {
+    checkNotNull(userId);
     checkNotNull(passwordRequest.getToken());
     checkPasswordFormat(passwordRequest.newPassword);
 
@@ -355,7 +354,8 @@ public class UserResource {
   @POST
   @Path("{id}/email/confirm")
   @PermitAll
-  public Response confirmEmail(@NotNull @PathParam("id") Long userId, Request passwordRequest) {
+  public Response confirmEmail(@PathParam("id") Long userId, Request passwordRequest) {
+    checkNotNull(userId);
     checkNotNull(passwordRequest.getToken());
 
     boolean isSuccess = userService.confirmEmail(userId, passwordRequest.getToken());
@@ -371,7 +371,8 @@ public class UserResource {
   @POST
   @Path("{id}/email/resendconfirm")
   @PermitAll
-  public Response resendConfirmEmail(@NotNull @PathParam("id") Long userId) {
+  public Response resendConfirmEmail(@PathParam("id") Long userId) {
+    checkNotNull(userId);
 
     boolean isSuccess = userService.resendConfirmEmail(userId);
     return isSuccess ? Response.ok().build() : Response.status(Response.Status.BAD_REQUEST).build();
