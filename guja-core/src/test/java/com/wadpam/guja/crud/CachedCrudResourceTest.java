@@ -1,7 +1,9 @@
 package com.wadpam.guja.crud;
 
+import com.google.common.collect.ImmutableList;
 import com.wadpam.guja.cache.GuavaCacheBuilder;
 import com.wadpam.guja.cache.LoadingCacheBuilder;
+import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.AbstractDao;
 import org.junit.After;
 import org.junit.Before;
@@ -99,6 +101,35 @@ public class CachedCrudResourceTest {
                 else {
                     assertEquals("Created" + Long.toString(i), actual.getEntity());
                 }
+            }
+        }
+    }
+
+    @Test
+    public void testPageCache() {
+        String cursorKey = null;
+        for (int p = 3; p < 9; p++) {
+            CursorPage<String> page = new CursorPage<>();
+            page.setCursorKey("abc" + p);
+            ImmutableList.Builder<String> builder = ImmutableList.builder();
+            for (int i = 0; i < p; i++) {
+                builder.add(Integer.toString(p));
+            }
+            page.setItems(builder.build());
+            expect(daoMock.queryPage(p, cursorKey)).andReturn(page).once();
+            cursorKey = page.getCursorKey();
+        }
+
+        replay(daoMock);
+
+        for (int n = 0; n < 10; n++) {
+            cursorKey = null;
+            for (int p = 3; p < 9; p++) {
+                Response response = resource.readPage(p, cursorKey);
+                CursorPage<String> page = (CursorPage<String>) response.getEntity();
+                cursorKey = page.getCursorKey();
+                assertEquals(p, page.getItems().size());
+                assertEquals(Integer.toString(p), page.getItems().iterator().next());
             }
         }
     }
