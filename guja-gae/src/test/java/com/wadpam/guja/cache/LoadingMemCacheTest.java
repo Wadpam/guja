@@ -1,8 +1,9 @@
-package com.wadpam.guja.crud;
+package com.wadpam.guja.cache;
 
+import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.common.collect.ImmutableList;
-import com.wadpam.guja.cache.GuavaCacheBuilder;
-import com.wadpam.guja.cache.LoadingCacheBuilder;
+import com.wadpam.guja.crud.CachedCrudResource;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.AbstractDao;
 import org.junit.After;
@@ -10,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -20,10 +20,12 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by sosandstrom on 2014-12-19.
  */
-public class CachedCrudResourceTest {
+public class LoadingMemCacheTest {
     AbstractDao<String, Long> daoMock;
     CachedCrudResource<String, Long, AbstractDao<String, Long>> resource;
-    final LoadingCacheBuilder loadingCacheBuilder = new GuavaCacheBuilder();
+    final LoadingCacheBuilder loadingCacheBuilder = new MemCacheBuilder();
+
+    private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
 
     @Test
     public void testCrudCache() throws IOException, URISyntaxException {
@@ -136,6 +138,7 @@ public class CachedCrudResourceTest {
 
     @Before
     public void setUp() {
+        helper.setUp();
         daoMock = createMock(AbstractDao.class);
         resource = new CachedCrudResource<>(daoMock, loadingCacheBuilder, 100, getClass().getName());
     }
@@ -143,5 +146,6 @@ public class CachedCrudResourceTest {
     @After
     public void tearDown() {
         verify(daoMock);
+        helper.tearDown();
     }
 }

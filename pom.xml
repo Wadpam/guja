@@ -15,19 +15,27 @@
     <modules>
         <module>guja-core</module>
         <module>guja-base</module>
+        <module>guja-gae</module>
         <module>guja-be-war</module>
         <module>guja-be-ear</module>
     </modules>
 
     <properties>
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
-        <gae.version>1.7.5</gae.version>
+        <gae.version>1.9.10</gae.version>
         <appengine.target.version>1.9.10</appengine.target.version>
-        <mardao.version>3.0.5</mardao.version>
+        <mardao.version>3.0.6-SNAPSHOT</mardao.version>
     </properties>
         
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>guja-core</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
