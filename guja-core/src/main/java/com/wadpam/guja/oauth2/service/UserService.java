@@ -93,6 +93,16 @@ public interface UserService {
   CursorPage<DUser> findMatchingUsersByEmail(String email, int pageSize, String cursorKey);
 
   /**
+   * Find users matching partial username.
+   *
+   * @param username partial username
+   * @param pageSize  Optional. Page size
+   * @param cursorKey Optional. Cursor key.
+   * @return a page of matching users
+   */
+  CursorPage<DUser> findMatchingUsersByUserName(String username, int pageSize, String cursorKey);
+
+  /**
    * Update a user.
    *
    * @param id      unique user id

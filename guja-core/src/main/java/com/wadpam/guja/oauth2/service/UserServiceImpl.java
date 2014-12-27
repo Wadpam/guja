@@ -254,6 +254,10 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     return userDao.queryByMatchingEmail(email.toLowerCase(), pageSize, cursorKey);
   }
 
+  @Override
+  public CursorPage<DUser> findMatchingUsersByUserName(String username, int pageSize, String cursorKey) {
+    return userDao.queryByMatchingUsername(username, pageSize, cursorKey);
+  }
 
   @Override
   public DUser update(Long id, DUser user, boolean isAdmin) {

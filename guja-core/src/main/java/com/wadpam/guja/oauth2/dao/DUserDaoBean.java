@@ -64,4 +64,14 @@ public class DUserDaoBean extends GeneratedDUserDaoImpl {
         Filter.lessThan(DUserMapper.Field.EMAIL.getFieldName(), email + "\uFFFD"));
 
   }
+
+  public CursorPage<DUser> queryByMatchingUsername(String username, int pageSize, String cursorKey) {
+    return queryPage(false, pageSize, null,
+        DUserMapper.Field.USERNAME.getFieldName(), false,
+        null, false,
+        null, cursorKey,
+        Filter.greaterThanOrEquals(DUserMapper.Field.USERNAME.getFieldName(), username),
+        Filter.lessThan(DUserMapper.Field.USERNAME.getFieldName(), username + "\uFFFD"));
+  }
+
 }

@@ -159,19 +159,28 @@ public class UserResource {
   }
 
   /**
-   * Search for users with matching email.
+   * Search for users with matching email or username.
+   *
    * @param email a partial email address
+   * @param username a partial username
    * @return a page of matching users
    */
   @GET
   @Path("search")
   @RolesAllowed({"ROLE_ADMIN"})
-  public Response findByPartialEmail(@QueryParam("email") String email,
-                                     @QueryParam("pageSize") @DefaultValue("10") int pageSize,
-                                     @QueryParam("cursorKey") String cursorKey) {
-    checkNotNull(email);
+  public Response search(@QueryParam("email") String email,
+                         @QueryParam("username") String username,
+                         @QueryParam("pageSize") @DefaultValue("10") int pageSize,
+                         @QueryParam("cursorKey") String cursorKey) {
 
-    final CursorPage<DUser> page = userService.findMatchingUsersByEmail(email, pageSize, cursorKey);
+    final CursorPage<DUser> page;
+    if (null != email) {
+       page = userService.findMatchingUsersByEmail(email, pageSize, cursorKey);
+    } else if (null != username) {
+      page = userService.findMatchingUsersByUserName(username, pageSize, cursorKey);
+    } else {
+      throw new BadRequestRestException("No search key provided");
+    }
 
     return Response.ok(page).build();
 
