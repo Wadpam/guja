@@ -42,8 +42,6 @@ import net.sf.mardao.core.CursorPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -120,6 +118,9 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
       throw new InternalServerErrorRestException("Failed to encode user password");
     }
     user.setPassword(encodedPassword);
+
+    // Lowercase email to enable search
+    user.setEmail(user.getEmail().toLowerCase());
 
     user.setRoles(OAuth2UserResource.DEFAULT_ROLES_USER);
 
@@ -238,15 +239,21 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   }
 
   @Override
-  public CursorPage<DUser> readPage(String cursorKey, int pageSize) {
+  public CursorPage<DUser> readPage(int pageSize, String cursorKey) {
     return userDao.queryPage(pageSize, cursorKey);
   }
 
 
   @Override
-  public CursorPage<DUser> getFriendsWith(Long id, String cursorKey, int pageSize) {
-    return userDao.queryFriendsWith(id, pageSize, cursorKey);
+  public CursorPage<DUser> getFriendsWith(Long id, int pageSize, String cursorKey) {
+    return userDao.queryFriends(id, pageSize, cursorKey);
   }
+
+  @Override
+  public CursorPage<DUser> findMatchingUsersByEmail(String email, int pageSize, String cursorKey) {
+    return userDao.queryByMatchingEmail(email.toLowerCase(), pageSize, cursorKey);
+  }
+
 
   @Override
   public DUser update(Long id, DUser user, boolean isAdmin) {
@@ -254,7 +261,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     DUser existingUser = getById(id); // With raise 404 if not found
 
     // Only allow the user to update some properties
-    existingUser.setEmail(user.getEmail());
+    existingUser.setEmail(user.getEmail().toLowerCase());
     existingUser.setDisplayName(user.getDisplayName());
 
     if (isAdmin) {

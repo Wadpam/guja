@@ -45,7 +45,7 @@ public class DUserDaoBean extends GeneratedDUserDaoImpl {
     super(supplier);
   }
 
-  public CursorPage<DUser> queryFriendsWith(Long id, int pageSize, String cursorKey) {
+  public CursorPage<DUser> queryFriends(Long id, int pageSize, String cursorKey) {
     return queryPage(false, pageSize, null,
         DUserMapper.Field.ID.getFieldName(), false,
         null, false,
@@ -53,4 +53,15 @@ public class DUserDaoBean extends GeneratedDUserDaoImpl {
         Filter.inFilter(DUserMapper.Field.FRIENDS.getFieldName(), id));
   }
 
+  public CursorPage<DUser> queryByMatchingEmail(String email, int pageSize, String cursorKey) {
+    // GAE workaround for LIKE queries
+    // Search for emails that are equal or bigger than [email] AND smaller than [email+\uFFFD
+    return queryPage(false, pageSize, null,
+        DUserMapper.Field.EMAIL.getFieldName(), false,
+        null, false,
+        null, cursorKey,
+        Filter.greaterThanOrEquals(DUserMapper.Field.EMAIL.getFieldName(), email),
+        Filter.lessThan(DUserMapper.Field.EMAIL.getFieldName(), email + "\uFFFD"));
+
+  }
 }

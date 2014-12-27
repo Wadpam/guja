@@ -76,11 +76,21 @@ public interface UserService {
   /**
    * Get a page of users.
    *
-   * @param cursorKey Optional. Cursor key.
    * @param pageSize  Optional. Page size
+   * @param cursorKey Optional. Cursor key.
    * @return a page of user domain objects
    */
-  CursorPage<DUser> readPage(String cursorKey, int pageSize);
+  CursorPage<DUser> readPage(int pageSize, String cursorKey);
+
+  /**
+   * Find users matching partial email address.
+   *
+   * @param email partial email address
+   * @param pageSize  Optional. Page size
+   * @param cursorKey Optional. Cursor key.
+   * @return a page of matching users
+   */
+  CursorPage<DUser> findMatchingUsersByEmail(String email, int pageSize, String cursorKey);
 
   /**
    * Update a user.
@@ -128,9 +138,9 @@ public interface UserService {
   /**
    * Get users that added me to their friends list.
    * @param id current user
-   * @param cursorKey Optional. Cursor key
    * @param pageSize Optional. Page size
+   * @param cursorKey Optional. Cursor key
    * @return page of users
    */
-  CursorPage<DUser> getFriendsWith(Long id, String cursorKey, int pageSize);
+  CursorPage<DUser> getFriendsWith(Long id, int pageSize, String cursorKey);
 }

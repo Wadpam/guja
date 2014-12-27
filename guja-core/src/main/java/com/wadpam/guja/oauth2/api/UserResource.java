@@ -158,6 +158,25 @@ public class UserResource {
     return read(id);
   }
 
+  /**
+   * Search for users with matching email.
+   * @param email a partial email address
+   * @return a page of matching users
+   */
+  @GET
+  @Path("search")
+  @RolesAllowed({"ROLE_ADMIN"})
+  public Response findByPartialEmail(@QueryParam("email") String email,
+                                     @QueryParam("pageSize") @DefaultValue("10") int pageSize,
+                                     @QueryParam("cursorKey") String cursorKey) {
+    checkNotNull(email);
+
+    final CursorPage<DUser> page = userService.findMatchingUsersByEmail(email, pageSize, cursorKey);
+
+    return Response.ok(page).build();
+
+  }
+
 
   /**
    * Get a page of users.
@@ -171,7 +190,7 @@ public class UserResource {
   public Response readPage(@QueryParam("pageSize") @DefaultValue("10") int pageSize,
                            @QueryParam("cursorKey") String cursorKey) {
 
-    CursorPage<DUser> page = userService.readPage(cursorKey, pageSize);
+    CursorPage<DUser> page = userService.readPage(pageSize, cursorKey);
 
     return Response.ok(page).build();
   }
@@ -267,7 +286,7 @@ public class UserResource {
                               @QueryParam("cursorKey") String cursorKey) {
 
     Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
-    CursorPage<DUser> page = userService.getFriendsWith(id, cursorKey, pageSize);
+    CursorPage<DUser> page = userService.getFriendsWith(id, pageSize, cursorKey);
 
     // Only return basic user information about your friends
     Collection<DUser> users = new ArrayList<>();
