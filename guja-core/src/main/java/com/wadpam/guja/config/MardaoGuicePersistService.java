@@ -1,4 +1,4 @@
-package com.wadpam.guja.guice;
+package com.wadpam.guja.config;
 
 /*
  * #%L

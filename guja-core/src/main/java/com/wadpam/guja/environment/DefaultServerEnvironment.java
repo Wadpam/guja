@@ -1,8 +1,8 @@
-package com.wadpam.guja.guice;
+package com.wadpam.guja.environment;
 
 /*
  * #%L
- * guja-base
+ * guja-core
  * %%
  * Copyright (C) 2014 Wadpam
  * %%
@@ -22,23 +22,19 @@ package com.wadpam.guja.guice;
  * #L%
  */
 
-import com.google.inject.AbstractModule;
-import com.wadpam.guja.api.GAEBlobResource;
-
+import com.sun.jersey.spi.resource.Singleton;
 
 /**
- * Configure Guice module.
+ * Provide basic information about the current server environment.
  *
  * @author mattiaslevin
  */
-public class GujaGAEModule extends AbstractModule {
-
+@Singleton
+public class DefaultServerEnvironment implements ServerEnvironment {
 
   @Override
-  protected void configure() {
-
-    bind(GAEBlobResource.class);
-
+  public boolean isDevEnvironment() {
+    return false;
   }
 
 }

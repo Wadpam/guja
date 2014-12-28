@@ -1,8 +1,8 @@
-package com.wadpam.guja.guice;
+package com.wadpam.guja.environment;
 
 /*
  * #%L
- * guja-base
+ * guja-core
  * %%
  * Copyright (C) 2014 Wadpam
  * %%
@@ -22,34 +22,21 @@ package com.wadpam.guja.guice;
  * #L%
  */
 
-import com.google.inject.AbstractModule;
-import com.wadpam.guja.api.*;
-import com.wadpam.guja.readerwriter.ResponseCodeProtoMessageBodyWriter;
-
+import com.google.appengine.api.utils.SystemProperty;
+import com.sun.corba.se.spi.activation.Server;
+import com.sun.jersey.spi.resource.Singleton;
 
 /**
- * Configure Guice module.
+ * Provide basic information about the current GAE server environment.
  *
  * @author mattiaslevin
  */
-public class GujaBaseModule extends AbstractModule {
-
+@Singleton
+public class GAEServerEnvironment implements ServerEnvironment {
 
   @Override
-  protected void configure() {
-
-    bind(MonitorResource.class);
-
-    bind(DiagnosticsResource.class);
-    bind(DiagnosticsResource.DiagnosticsLogger.class).to(DiagnosticsResource.DefaultDiagnosticLogger.class);
-
-    bind(VersionCheckResource.class);
-    bind(VersionCheckResource.VersionCheckPredicate.class).to(SemanticVersionCheckPredicate.class);
-
-    bind(GAEBlobResource.class);
-
-    bind(ResponseCodeProtoMessageBodyWriter.class);
-
+  public boolean isDevEnvironment() {
+    return SystemProperty.Environment.Value.Development == SystemProperty.environment.value();
   }
 
 }

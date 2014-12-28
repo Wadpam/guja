@@ -26,6 +26,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
 import com.sun.jersey.spi.resource.Singleton;
+import com.wadpam.guja.environment.ServerEnvironment;
 import com.wadpam.guja.exceptions.ConflictRestException;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.exceptions.NotFoundRestException;

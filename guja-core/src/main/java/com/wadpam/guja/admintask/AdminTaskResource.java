@@ -22,10 +22,6 @@ package com.wadpam.guja.admintask;
  * #L%
  */
 
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.api.taskqueue.TransientFailureException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.RequestParameters;
@@ -39,7 +35,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -57,41 +52,41 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class AdminTaskResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(AdminTaskResource.class);
 
-  public static final String PATH_ADMIN_TASK = "/adm/task/%s";
-
   private final Set<AdminTask> adminTasks;
+  private final AdminTaskQueue taskQueue;
 
   @Inject
-  public AdminTaskResource(Set<AdminTask> adminTasks) {
+  public AdminTaskResource(Set<AdminTask> adminTasks, AdminTaskQueue taskQueue) {
     this.adminTasks = adminTasks;
+    this.taskQueue = taskQueue;
   }
 
+  /**
+   * Enqueue an admin task for processing.
+   * The request will return immediately and the task will be run in a separate thread.
+   * The execution model depending on the implementation of the queue.
+   *
+   * @param paramMap request parameters
+   * @param taskName task name
+   * @return
+   */
   @GET
   @Path("{taskName}")
   public Response enqueueTask(@RequestParameters Map<String, String[]> paramMap,
                               @PathParam("taskName") String taskName) {
     checkNotNull(taskName);
-
-    final Queue queue = QueueFactory.getDefaultQueue();
-    final TaskOptions options = TaskOptions.Builder.withUrl(String.format(PATH_ADMIN_TASK, taskName));
-    for (Entry<String, String[]> param : paramMap.entrySet()) {
-      for (String value : param.getValue()) {
-        options.param(param.getKey(), value);
-      }
-    }
-
-    try {
-      queue.add(options);
-    } catch (TransientFailureException tfe) {
-      LOGGER.error("Run admin task fail {} ", tfe.getMessage());
-    }
-
-    LOGGER.info("Added admin task to queue {}", taskName);
-
+    taskQueue.enqueueTask(taskName, paramMap);
     return Response.ok().build();
   }
 
 
+  /**
+   * Process an admin task.
+   * The admin taks will be processed on the requesting thread.
+   * @param paramMap request parameters
+   * @param taskName task name
+   * @return
+   */
   @POST
   @Path("{taskName}")
   public Response processTask(@RequestParameters Map<String, String[]> paramMap,
@@ -109,4 +104,3 @@ public class AdminTaskResource {
   }
 
 }
-

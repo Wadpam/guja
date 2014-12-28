@@ -1,8 +1,8 @@
-package com.wadpam.guja.oauth2.provider;
+package com.wadpam.guja.config;
 
 /*
  * #%L
- * guja-core
+ * guja-base
  * %%
  * Copyright (C) 2014 Wadpam
  * %%
@@ -22,30 +22,31 @@ package com.wadpam.guja.oauth2.provider;
  * #L%
  */
 
-import com.google.appengine.api.utils.SystemProperty;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import com.sun.jersey.spi.resource.Singleton;
+import com.google.inject.AbstractModule;
+import com.wadpam.guja.GAEAdminTaskQueue;
+import com.wadpam.guja.admintask.AdminTaskQueue;
+import com.wadpam.guja.api.GAEBlobResource;
+import com.wadpam.guja.environment.GAEServerEnvironment;
+import com.wadpam.guja.environment.ServerEnvironment;
 
-import java.util.Locale;
 
 /**
- * Provide basic information about the current server environment.
+ * Configure Guice module.
  *
  * @author mattiaslevin
  */
-@Singleton
-public class ServerEnvironment {
+public class GujaGAEModule extends AbstractModule {
 
-  private final Locale defaultLocale;
 
-  @Inject
-  public ServerEnvironment(@Named("app.locale.default") String defaultLocale) {
-    this.defaultLocale = new Locale.Builder().setLanguage(defaultLocale).build();
-  }
+  @Override
+  protected void configure() {
 
-  public boolean isDevEnvironment() {
-    return SystemProperty.Environment.Value.Development == SystemProperty.environment.value();
+    bind(ServerEnvironment.class).to(GAEServerEnvironment.class);
+
+    bind(GAEBlobResource.class);
+
+    bind(AdminTaskQueue.class).to(GAEAdminTaskQueue.class);
+
   }
 
 }

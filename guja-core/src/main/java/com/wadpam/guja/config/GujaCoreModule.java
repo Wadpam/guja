@@ -1,4 +1,4 @@
-package com.wadpam.guja.guice;
+package com.wadpam.guja.config;
 
 /*
  * #%L
@@ -31,6 +31,8 @@ import com.google.inject.persist.Transactional;
 import com.google.inject.persist.UnitOfWork;
 import com.wadpam.guja.admintask.AdminTask;
 import com.wadpam.guja.admintask.AdminTaskResource;
+import com.wadpam.guja.environment.DefaultServerEnvironment;
+import com.wadpam.guja.environment.ServerEnvironment;
 import com.wadpam.guja.exceptions.RestExceptionMapper;
 import com.wadpam.guja.i18n.*;
 import com.wadpam.guja.oauth2.api.*;
@@ -79,7 +81,6 @@ public class GujaCoreModule extends AbstractModule {
 
     bind(PasswordEncoder.class).to(DefaultPasswordEncoder.class);
     bind(TokenGenerator.class).to(DefaultTokenGenerator.class);
-    bind(ServerEnvironment.class);
     bind(TemporaryTokenCache.class);
 
     bind(OAuth2Resource.class);

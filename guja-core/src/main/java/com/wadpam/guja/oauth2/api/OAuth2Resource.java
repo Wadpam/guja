@@ -40,7 +40,7 @@ import com.wadpam.guja.oauth2.domain.DFactory;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import com.wadpam.guja.oauth2.provider.TokenGenerator;
 import com.wadpam.guja.oauth2.provider.Oauth2UserProvider;
-import com.wadpam.guja.oauth2.provider.ServerEnvironment;
+import com.wadpam.guja.environment.ServerEnvironment;
 import com.wadpam.guja.oauth2.provider.UserAuthenticationProvider;
 import com.wadpam.guja.oauth2.social.SocialProfile;
 import com.wadpam.guja.oauth2.social.SocialTemplate;
