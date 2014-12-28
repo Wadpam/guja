@@ -72,6 +72,8 @@ public class CachedCrudResource<T, ID extends Serializable, D extends AbstractDa
         return response;
     }
 
+    @DELETE
+    @Path("{id}")
     @Override
     public Response delete(@PathParam("id") ID id) throws IOException {
         final Response response = super.delete(id);
