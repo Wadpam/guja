@@ -1,7 +1,5 @@
-package com.wadpam.guja;
+package com.wadpam.guja.template;
 
-import com.wadpam.guja.template.VelocityTemplateStringWriterBuilder;
-import org.apache.velocity.VelocityContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

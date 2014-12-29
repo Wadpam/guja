@@ -40,7 +40,7 @@ import com.wadpam.guja.oauth2.domain.DFactory;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import com.wadpam.guja.oauth2.provider.TokenGenerator;
 import com.wadpam.guja.oauth2.provider.Oauth2UserProvider;
-import com.wadpam.guja.oauth2.provider.ServerEnvironment;
+import com.wadpam.guja.environment.ServerEnvironment;
 import com.wadpam.guja.oauth2.provider.UserAuthenticationProvider;
 import com.wadpam.guja.oauth2.social.SocialProfile;
 import com.wadpam.guja.oauth2.social.SocialTemplate;
@@ -513,8 +513,8 @@ public class OAuth2Resource {
 
     for (DConnection dc : connections) {
       if (providerId.equals(dc.getProviderId())) {
-        // expired?
-        if (null != dc.getExpireTime() && hasAccessTokenExpired(dc)) {
+        // expired? only remove if no refresh token
+        if (null == dc.getRefreshToken() && null != dc.getExpireTime() && hasAccessTokenExpired(dc)) {
           expiredTokens.add(dc.getId());
         }
       }

@@ -1,8 +1,8 @@
-package com.wadpam.guja.guice;
+package com.wadpam.guja.config;
 
 /*
  * #%L
- * guja-base
+ * guja-core
  * %%
  * Copyright (C) 2014 Wadpam
  * %%
@@ -22,34 +22,30 @@ package com.wadpam.guja.guice;
  * #L%
  */
 
-import com.google.inject.AbstractModule;
-import com.wadpam.guja.api.*;
-import com.wadpam.guja.readerwriter.ResponseCodeProtoMessageBodyWriter;
-
+import com.google.inject.persist.UnitOfWork;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Configure Guice module.
+ * Created with IntelliJ IDEA.
  *
- * @author mattiaslevin
+ * @author osandstrom Date: 1/19/14 Time: 8:16 PM
  */
-public class GujaBaseModule extends AbstractModule {
+public class MardaoGuiceUnitOfWork implements UnitOfWork {
+  static final Logger LOGGER = LoggerFactory.getLogger(MardaoGuiceUnitOfWork.class);
 
+  public MardaoGuiceUnitOfWork() {
+    LOGGER.debug("<init>");
+  }
 
   @Override
-  protected void configure() {
+  public void begin() {
+    LOGGER.debug("begin()");
+  }
 
-    bind(MonitorResource.class);
-
-    bind(DiagnosticsResource.class);
-    bind(DiagnosticsResource.DiagnosticsLogger.class).to(DiagnosticsResource.DefaultDiagnosticLogger.class);
-
-    bind(VersionCheckResource.class);
-    bind(VersionCheckResource.VersionCheckPredicate.class).to(SemanticVersionCheckPredicate.class);
-
-    bind(GAEBlobResource.class);
-
-    bind(ResponseCodeProtoMessageBodyWriter.class);
-
+  @Override
+  public void end() {
+    LOGGER.debug("end()");
   }
 
 }

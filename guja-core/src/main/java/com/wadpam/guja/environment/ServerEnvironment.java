@@ -1,4 +1,4 @@
-package com.wadpam.guja.guice;
+package com.wadpam.guja.environment;
 
 /*
  * #%L
@@ -22,30 +22,14 @@ package com.wadpam.guja.guice;
  * #L%
  */
 
-import com.google.inject.persist.UnitOfWork;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Created with IntelliJ IDEA.
+ * Provide basic information about the current server environment.
  *
- * @author osandstrom Date: 1/19/14 Time: 8:16 PM
+ * @author mattiaslevin
  */
-public class MardaoGuiceUnitOfWork implements UnitOfWork {
-  static final Logger LOGGER = LoggerFactory.getLogger(MardaoGuiceUnitOfWork.class);
+public interface ServerEnvironment {
 
-  public MardaoGuiceUnitOfWork() {
-    LOGGER.debug("<init>");
-  }
-
-  @Override
-  public void begin() {
-    LOGGER.debug("begin()");
-  }
-
-  @Override
-  public void end() {
-    LOGGER.debug("end()");
-  }
+   boolean isDevEnvironment();
 
 }

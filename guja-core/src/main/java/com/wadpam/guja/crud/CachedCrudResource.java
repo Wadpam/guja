@@ -3,7 +3,7 @@ package com.wadpam.guja.crud;
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.wadpam.guja.cache.LoadingCacheBuilder;
+import com.wadpam.guja.cache.CacheBuilder;
 import com.wadpam.guja.cache.PageCacheKey;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.AbstractDao;
@@ -24,7 +24,7 @@ public class CachedCrudResource<T, ID extends Serializable, D extends AbstractDa
     protected final LoadingCache<PageCacheKey, CursorPage<T>> pageCache;
     private final CacheLoader<PageCacheKey, CursorPage<T>> pageCacheLoader;
 
-    public CachedCrudResource(D dao, LoadingCacheBuilder cacheBuilder, long maximumSize, String namespace) {
+    public CachedCrudResource(D dao, CacheBuilder cacheBuilder, long maximumSize, String namespace) {
         super(dao);
 
         this.crudCacheLoader = new CacheLoader<ID, Optional<T>>() {
@@ -72,6 +72,8 @@ public class CachedCrudResource<T, ID extends Serializable, D extends AbstractDa
         return response;
     }
 
+    @DELETE
+    @Path("{id}")
     @Override
     public Response delete(@PathParam("id") ID id) throws IOException {
         final Response response = super.delete(id);

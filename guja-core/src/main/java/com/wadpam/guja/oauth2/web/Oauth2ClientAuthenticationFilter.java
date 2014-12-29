@@ -32,7 +32,7 @@ import com.wadpam.guja.oauth2.api.requests.ClientCredentials;
 import com.wadpam.guja.oauth2.dao.DFactoryDaoBean;
 import com.wadpam.guja.oauth2.dao.DFactoryMapper;
 import com.wadpam.guja.oauth2.domain.DFactory;
-import com.wadpam.guja.oauth2.provider.ServerEnvironment;
+import com.wadpam.guja.environment.ServerEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

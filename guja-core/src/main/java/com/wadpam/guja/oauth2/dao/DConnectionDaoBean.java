@@ -49,17 +49,5 @@ public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
     super(supplier);
   }
 
-  public DConnection createConnection(String providerId, String providerUserId,
-                                      String access_token, String refresh_token, Integer expiresInSeconds,
-                                      Long userId, Collection<String> roles) {
-
-    LOGGER.debug("Create connection {}", userId);
-
-    // TODO Missing implementation
-
-    return new DConnection();
-
-  }
-
 
 }
