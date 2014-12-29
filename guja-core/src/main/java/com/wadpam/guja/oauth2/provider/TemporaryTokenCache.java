@@ -48,6 +48,7 @@ public class TemporaryTokenCache {
 
   /**
    * Validate a short lived token by looking in the cache and checking the time to live.
+   * The token is removed if found and valid.
    * @param key cacheKey
    * @param token temporary token to validate
    * @return true of the token is still valid
@@ -56,12 +57,16 @@ public class TemporaryTokenCache {
     checkNotNull(key);
     checkNotNull(token);
     Pair<String, Long> storedToken = tokenCache.getIfPresent(key);
-    if (null != storedToken) {
-      tokenCache.invalidate(key);
-    }
-    return null != storedToken &&
+    boolean isValid = null != storedToken &&
         token.equals(storedToken.first()) &&
         new DateTime(storedToken.getSecond()).isAfterNow();
+
+    if (isValid) {
+      tokenCache.invalidate(key);
+    }
+
+    return isValid;
+
   }
 
   /**
