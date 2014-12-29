@@ -31,8 +31,6 @@ import com.google.inject.persist.Transactional;
 import com.google.inject.persist.UnitOfWork;
 import com.wadpam.guja.admintask.AdminTask;
 import com.wadpam.guja.admintask.AdminTaskResource;
-import com.wadpam.guja.environment.DefaultServerEnvironment;
-import com.wadpam.guja.environment.ServerEnvironment;
 import com.wadpam.guja.exceptions.RestExceptionMapper;
 import com.wadpam.guja.i18n.*;
 import com.wadpam.guja.oauth2.api.*;
@@ -44,14 +42,11 @@ import com.wadpam.guja.oauth2.provider.*;
 import com.wadpam.guja.oauth2.service.UserAdminTask;
 import com.wadpam.guja.oauth2.service.UserService;
 import com.wadpam.guja.oauth2.service.UserServiceImpl;
-import com.wadpam.guja.provider.CacheProvider;
 import com.wadpam.guja.provider.NonNullObjectMapperProvider;
 import com.wadpam.guja.service.EmailService;
 import com.wadpam.guja.service.MockEmailService;
 import com.wadpam.guja.template.RequestScopedVelocityTemplateStringWriterBuilder;
 import net.sf.mardao.dao.Supplier;
-
-import javax.cache.Cache;
 
 /**
  * Binds {@link com.google.inject.persist.UnitOfWork}, {@link com.google.inject.persist.PersistService} and {@link com.wadpam.mardao.guice.MardaoTransactionManager}.
@@ -73,8 +68,6 @@ public class GujaCoreModule extends AbstractModule {
 
     bind(Localization.class).annotatedWith(Dynamic.class).to(RequestScopedDynamicLocalization.class);
     bind(Localization.class).annotatedWith(PropertyFile.class).to(RequestScopedPropertyFileLocalization.class);
-
-    bind(Cache.class).toProvider(CacheProvider.class);
 
     bind(NonNullObjectMapperProvider.class);
     bind(ObjectMapper.class).toProvider(NonNullObjectMapperProvider.class);

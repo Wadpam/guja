@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 public class LoadingMemCacheTest {
     AbstractDao<String, Long> daoMock;
     CachedCrudResource<String, Long, AbstractDao<String, Long>> resource;
-    final LoadingCacheBuilder loadingCacheBuilder = new MemCacheBuilder();
+    final CacheBuilder loadingCacheBuilder = new MemCacheBuilder();
 
     private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
 

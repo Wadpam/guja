@@ -1,11 +1,11 @@
 package com.wadpam.guja.oauth2.provider;
 
+
 import com.google.appengine.repackaged.org.joda.time.DateTime;
+import com.google.common.cache.Cache;
 import com.google.inject.Inject;
+import com.wadpam.guja.cache.CacheBuilderProvider;
 import com.wadpam.guja.util.Pair;
-
-
-import javax.cache.Cache;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -16,25 +16,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TemporaryTokenCache {
 
-  private final Cache cache;
+  private static final int DEFAULT_TOKEN_DURATION_SECONDS = 60 * 60; // 60 minutes
   private final TokenGenerator tokenGenerator;
+  private final Cache<String, Pair<String, Long>> tokenCache;
 
   @Inject
-  public TemporaryTokenCache(Cache cache, TokenGenerator tokenGenerator) {
-    this.cache = cache;
+  public TemporaryTokenCache(TokenGenerator tokenGenerator, CacheBuilderProvider cacheBuilderProvider) {
     this.tokenGenerator = tokenGenerator;
+    
+    // TODO How to handle generics
+    this.tokenCache =  cacheBuilderProvider.get()
+        .expireAfterWrite(DEFAULT_TOKEN_DURATION_SECONDS)
+        .from(this.getClass().getName())
+        .build();
+
   }
 
   /**
    * Generate a short lived token and store in the cache.
    * @param key cache key
-   * @param timeToLive number of millis the token is valid
+   * @param secondsToLive number of seconds the token is valid
    * @return the newly generated temporary token
    */
-  public String generateTemporaryToken(String key, int timeToLive) {
+  public String generateTemporaryToken(String key, int secondsToLive) {
     checkNotNull(key);
     String token = tokenGenerator.generate();
-    cache.put(key, Pair.of(token, DateTime.now().plusMillis(timeToLive).getMillis()));
+    tokenCache.put(key, Pair.of(token, DateTime.now().plusSeconds(secondsToLive).getMillis()));
     return token;
   }
 
@@ -48,10 +55,13 @@ public class TemporaryTokenCache {
   public boolean validateToken(String key, String token) {
     checkNotNull(key);
     checkNotNull(token);
-    Pair<String, Long> storedToken = (Pair<String, Long>)cache.get(key);
-      return null != storedToken &&
-          token.equals(storedToken.first()) &&
-          new DateTime(storedToken.getSecond()).isAfterNow();
+    Pair<String, Long> storedToken = tokenCache.getIfPresent(key);
+    if (null != storedToken) {
+      tokenCache.invalidate(key);
+    }
+    return null != storedToken &&
+        token.equals(storedToken.first()) &&
+        new DateTime(storedToken.getSecond()).isAfterNow();
   }
 
   /**
@@ -59,7 +69,7 @@ public class TemporaryTokenCache {
    * @param key
    */
   public void removeToken(String key) {
-    cache.remove(checkNotNull(key));
+    tokenCache.invalidate(checkNotNull(key));
   }
 
 }

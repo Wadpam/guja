@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   private String createVerifyEmailUrl(Long userId, Locale locale) {
 
-    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 30 * 60 * 1000);
+    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 30 * 60); // token is valid 30 minutes
     String pageUrl = String.format("%s/html/verify_email.html", baseUrl); // TODO he location of the web page must be project specific
     return String.format("%s?id=%s&token=%s&language=%s", pageUrl, userId, temporaryToken, locale.getLanguage());
 
@@ -314,7 +314,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   private String createResetPasswordUrl(Long userId, Locale locale) {
 
-    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 10 * 60 * 1000);
+    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 60 * 10); // token is valid 10 minutes
     String pageUrl = String.format("%s/html/reset_password.html", baseUrl); // TODO he location of the web page must be project specific
     return String.format("%s?id=%s&token=%s&language=%s", pageUrl, userId, temporaryToken, locale.getLanguage());
 
@@ -324,7 +324,6 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   public boolean changePasswordUsingToken(Long userId, String newPassword, String token) {
 
     if (tokenCache.validateToken(userId.toString(), token)) {
-      tokenCache.removeToken(userId.toString()); // Remember to remove the token
       DUser user = getById(userId);
       user.setPassword(passwordEncoder.encode(newPassword));
       put(user);
@@ -337,7 +336,6 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Override
   public boolean confirmEmail(Long userId, String token) {
     if (tokenCache.validateToken(userId.toString(), token)) {
-      tokenCache.removeToken(userId.toString()); // Remember to remove the token
       DUser user = getById(userId);
       if (user.getState() != DUser.LOCKED_STATE) {
         // Only change state if user account is not locked

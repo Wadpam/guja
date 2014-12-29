@@ -2,7 +2,7 @@ package com.wadpam.guja.crud;
 
 import com.google.common.collect.ImmutableList;
 import com.wadpam.guja.cache.GuavaCacheBuilder;
-import com.wadpam.guja.cache.LoadingCacheBuilder;
+import com.wadpam.guja.cache.CacheBuilder;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.AbstractDao;
 import org.junit.After;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 public class CachedCrudResourceTest {
     AbstractDao<String, Long> daoMock;
     CachedCrudResource<String, Long, AbstractDao<String, Long>> resource;
-    final LoadingCacheBuilder loadingCacheBuilder = new GuavaCacheBuilder();
+    final CacheBuilder loadingCacheBuilder = new GuavaCacheBuilder();
 
     @Test
     public void testCrudCache() throws IOException, URISyntaxException {

@@ -23,11 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class LoadingMemCache<K, V> extends AbstractLoadingCache<K, V> {
   private static final Logger LOGGER = LoggerFactory.getLogger(LoadingMemCache.class);
 
-  private final Executor executor = Executors.newCachedThreadPool(ThreadManager.currentRequestThreadFactory());
-
   private final CacheLoader<K, V> cacheLoader;
   private final MemcacheService syncCache;
-  private final String namespace;
+  private final String namespace; // already used when creating the MemcacheService
   private final Expiration expiration;
 
   public LoadingMemCache(CacheLoader<K, V> cacheLoader, MemcacheService syncCache, String namespace, int secondsDelay) {
@@ -36,7 +34,6 @@ public class LoadingMemCache<K, V> extends AbstractLoadingCache<K, V> {
     this.namespace = namespace;
     this.expiration = Expiration.byDeltaSeconds(secondsDelay);
   }
-
 
   // Cache<K, V> interface implementation
 
