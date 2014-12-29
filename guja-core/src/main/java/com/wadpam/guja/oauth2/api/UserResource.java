@@ -158,6 +158,34 @@ public class UserResource {
     return read(id);
   }
 
+  /**
+   * Search for users with matching email or username.
+   *
+   * @param email a partial email address
+   * @param username a partial username
+   * @return a page of matching users
+   */
+  @GET
+  @Path("search")
+  @RolesAllowed({"ROLE_ADMIN"})
+  public Response search(@QueryParam("email") String email,
+                         @QueryParam("username") String username,
+                         @QueryParam("pageSize") @DefaultValue("10") int pageSize,
+                         @QueryParam("cursorKey") String cursorKey) {
+
+    final CursorPage<DUser> page;
+    if (null != email) {
+       page = userService.findMatchingUsersByEmail(email, pageSize, cursorKey);
+    } else if (null != username) {
+      page = userService.findMatchingUsersByUserName(username, pageSize, cursorKey);
+    } else {
+      throw new BadRequestRestException("No search key provided");
+    }
+
+    return Response.ok(page).build();
+
+  }
+
 
   /**
    * Get a page of users.
@@ -171,7 +199,7 @@ public class UserResource {
   public Response readPage(@QueryParam("pageSize") @DefaultValue("10") int pageSize,
                            @QueryParam("cursorKey") String cursorKey) {
 
-    CursorPage<DUser> page = userService.readPage(cursorKey, pageSize);
+    CursorPage<DUser> page = userService.readPage(pageSize, cursorKey);
 
     return Response.ok(page).build();
   }
@@ -267,7 +295,7 @@ public class UserResource {
                               @QueryParam("cursorKey") String cursorKey) {
 
     Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
-    CursorPage<DUser> page = userService.getFriendsWith(id, cursorKey, pageSize);
+    CursorPage<DUser> page = userService.getFriendsWith(id, pageSize, cursorKey);
 
     // Only return basic user information about your friends
     Collection<DUser> users = new ArrayList<>();

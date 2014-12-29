@@ -60,6 +60,8 @@ public class DUser extends DOAuth2User {
   @Basic
   private Collection<Long> friends;
 
+  // TODO Missing a lot of properties - name, address etc
+
 
   public String getUsername() {
     return username;

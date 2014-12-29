@@ -4,7 +4,7 @@
 
     <groupId>com.wadpam.guja</groupId>
     <artifactId>guja</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -24,7 +24,7 @@
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
         <gae.version>1.9.10</gae.version>
         <appengine.target.version>1.9.10</appengine.target.version>
-        <mardao.version>3.0.6</mardao.version>
+        <mardao.version>3.0.9-SNAPSHOT</mardao.version>
     </properties>
         
     <dependencyManagement>
