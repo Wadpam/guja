@@ -1,6 +1,6 @@
 package com.wadpam.guja.cache;
 
-import com.google.appengine.api.ThreadManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.memcache.Expiration;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.common.cache.AbstractLoadingCache;
@@ -9,11 +9,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.wadpam.guja.GAEAdminTaskQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -117,6 +120,11 @@ public class LoadingMemCache<K, V> extends AbstractLoadingCache<K, V> {
 
   @Override
   public void refresh(K key) {
+    // TODO Change to using admin task (not so easy)
+    refreshCacheValueTask(key);
+  }
+
+  public void refreshCacheValueTask(K key) {
     V value = getIfPresent(key);
     if (null == value) {
       try {
@@ -129,7 +137,6 @@ public class LoadingMemCache<K, V> extends AbstractLoadingCache<K, V> {
     } else {
       try {
         ListenableFuture<V> task = cacheLoader.reload(key, value);
-        // TODO This will block the current thread, consider creating a GAE task
         value = task.get(5, TimeUnit.SECONDS);
         put(key, value);
       } catch (Exception e) {
