@@ -1,5 +1,6 @@
 package com.wadpam.guja.oauth2.provider;
 
+import com.wadpam.guja.cache.GuavaCacheBuilder;
 import com.wadpam.guja.cache.GuavaCacheBuilderProvider;
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +26,7 @@ public class TemporaryTokenCacheTest {
   @Before
   public void setUp() throws Exception {
     mockGenerator = createMock(TokenGenerator.class);
-    tokenCache = new TemporaryTokenCache(mockGenerator, new GuavaCacheBuilderProvider());
+    tokenCache = new TemporaryTokenCache(mockGenerator, new GuavaCacheBuilder());
   }
 
   @After
