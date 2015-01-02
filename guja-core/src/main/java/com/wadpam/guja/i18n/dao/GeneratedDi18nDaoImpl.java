@@ -20,7 +20,7 @@ import com.wadpam.guja.i18n.domain.Di18n;
 /**
  * The Di18n domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2014-12-16T11:10:07.408+0100.
+ * Generated on 2015-01-02T18:17:29.812+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDi18nDaoImpl
@@ -104,7 +104,10 @@ public class GeneratedDi18nDaoImpl
   }
 
 
-// ----------------------- query methods -------------------------------
+// ----------------------- Di18n builder -------------------------------
 
+  public static Di18nMapper.Builder newBuilder() {
+    return Di18nMapper.newBuilder();
+  }
 
 }

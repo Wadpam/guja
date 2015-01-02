@@ -65,7 +65,7 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
 
     // Objects such as parentKey cannot be properly JSONed:
     final Object parentKey = parentDao.getKey(parentId);
-    //dao.setParentKey(entity, parentKey);
+    dao.setParentKey(entity, parentKey);
 
     final ID id = dao.put(entity);
     URI uri = new URI(id.toString());

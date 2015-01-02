@@ -143,18 +143,28 @@
                         <version>${mardao.version}</version>
                         <executions>
                             <execution>
-                                <id>generate-daos</id>
+                                <id>generate-daos-i18n</id>
                                 <phase>process-sources</phase>
                                 <goals>
                                     <goal>process-classes</goal>
                                 </goals>
+                                <configuration>
+                                    <basePackage>com.wadpam.guja.i18n</basePackage>
+                                    <targetFolder>${project.basedir}/src/main/java</targetFolder>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-daos-oauth2</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>process-classes</goal>
+                                </goals>
+                                <configuration>
+                                    <basePackage>com.wadpam.guja.oauth2</basePackage>
+                                    <targetFolder>${project.basedir}/src/main/java</targetFolder>
+                                </configuration>
                             </execution>
                         </executions>
-                        <configuration>
-                            <basePackage>com.wadpam.guja.oauth2</basePackage>
-                            <!-- To generate the i18n code change the package name -->
-                            <targetFolder>${project.basedir}/src/main/java</targetFolder>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
