@@ -4,6 +4,7 @@
         <artifactId>guja</artifactId>
         <groupId>com.wadpam.guja</groupId>
         <version>0.0.4-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -39,9 +40,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.wadpam.guja</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>guja-be-war</artifactId>
-            <version>0.0.4-SNAPSHOT</version>
             <type>war</type>
         </dependency>
     </dependencies>
