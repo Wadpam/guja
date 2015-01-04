@@ -2,6 +2,7 @@ package com.wadpam.guja.oauth2.dao;
 
 import java.util.Collection;
 import java.util.Date;
+import java.nio.ByteBuffer;
 
 import net.sf.mardao.dao.Mapper;
 import net.sf.mardao.dao.Supplier;
@@ -11,7 +12,7 @@ import com.wadpam.guja.oauth2.domain.DFactory;
 /**
  * The DFactory domain-object specific mapping methods go here.
  *
- * Generated on 2014-12-16T11:27:40.160+0100.
+ * Generated on 2015-01-02T18:17:30.242+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DFactoryMapper
@@ -139,49 +140,55 @@ public class DFactoryMapper
     return value;
   }
 
-  public static DFactoryBuilder newBuilder() {
-    return new DFactoryBuilder();
+  public static Builder newBuilder() {
+    return new Builder();
   }
 
-  public static class DFactoryBuilder extends AbstractEntityBuilder<DFactory> {
+  public static class Builder extends AbstractEntityBuilder<DFactory> {
 
-    @Override
-    protected DFactory newInstance() {
-      return new DFactory();
+    protected Builder() {
+      super(new DFactory());
     }
 
-    public DFactoryBuilder id(String id) {
+    public Builder id(String id) {
       entity.setId(id);
       return this;
     }
 
-    public DFactoryBuilder baseUrl(String baseUrl) {
+    public Builder baseUrl(String baseUrl) {
       entity.setBaseUrl(baseUrl);
       return this;
     }
-    public DFactoryBuilder clientId(String clientId) {
+
+    public Builder clientId(String clientId) {
       entity.setClientId(clientId);
       return this;
     }
-    public DFactoryBuilder clientSecret(String clientSecret) {
+
+    public Builder clientSecret(String clientSecret) {
       entity.setClientSecret(clientSecret);
       return this;
     }
-    public DFactoryBuilder createdBy(String createdBy) {
+
+    public Builder createdBy(String createdBy) {
       entity.setCreatedBy(createdBy);
       return this;
     }
-    public DFactoryBuilder createdDate(Date createdDate) {
+
+    public Builder createdDate(Date createdDate) {
       entity.setCreatedDate(createdDate);
       return this;
     }
-    public DFactoryBuilder updatedBy(String updatedBy) {
+
+    public Builder updatedBy(String updatedBy) {
       entity.setUpdatedBy(updatedBy);
       return this;
     }
-    public DFactoryBuilder updatedDate(Date updatedDate) {
+
+    public Builder updatedDate(Date updatedDate) {
       entity.setUpdatedDate(updatedDate);
       return this;
     }
+
   }
 }

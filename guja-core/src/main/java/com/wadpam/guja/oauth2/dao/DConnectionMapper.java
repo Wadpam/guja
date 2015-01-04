@@ -2,6 +2,7 @@ package com.wadpam.guja.oauth2.dao;
 
 import java.util.Collection;
 import java.util.Date;
+import java.nio.ByteBuffer;
 
 import net.sf.mardao.dao.Mapper;
 import net.sf.mardao.dao.Supplier;
@@ -11,7 +12,7 @@ import com.wadpam.guja.oauth2.domain.DConnection;
 /**
  * The DConnection domain-object specific mapping methods go here.
  *
- * Generated on 2014-12-16T11:27:40.160+0100.
+ * Generated on 2015-01-02T18:17:30.242+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DConnectionMapper
@@ -166,85 +167,100 @@ public class DConnectionMapper
     return value;
   }
 
-  public static DConnectionBuilder newBuilder() {
-    return new DConnectionBuilder();
+  public static Builder newBuilder() {
+    return new Builder();
   }
 
-  public static class DConnectionBuilder extends AbstractEntityBuilder<DConnection> {
+  public static class Builder extends AbstractEntityBuilder<DConnection> {
 
-    @Override
-    protected DConnection newInstance() {
-      return new DConnection();
+    protected Builder() {
+      super(new DConnection());
     }
 
-    public DConnectionBuilder id(Long id) {
+    public Builder id(Long id) {
       entity.setId(id);
       return this;
     }
 
-    public DConnectionBuilder accessToken(String accessToken) {
+    public Builder accessToken(String accessToken) {
       entity.setAccessToken(accessToken);
       return this;
     }
-    public DConnectionBuilder appArg0(String appArg0) {
+
+    public Builder appArg0(String appArg0) {
       entity.setAppArg0(appArg0);
       return this;
     }
-    public DConnectionBuilder createdBy(String createdBy) {
+
+    public Builder createdBy(String createdBy) {
       entity.setCreatedBy(createdBy);
       return this;
     }
-    public DConnectionBuilder createdDate(Date createdDate) {
+
+    public Builder createdDate(Date createdDate) {
       entity.setCreatedDate(createdDate);
       return this;
     }
-    public DConnectionBuilder displayName(String displayName) {
+
+    public Builder displayName(String displayName) {
       entity.setDisplayName(displayName);
       return this;
     }
-    public DConnectionBuilder expireTime(Date expireTime) {
+
+    public Builder expireTime(Date expireTime) {
       entity.setExpireTime(expireTime);
       return this;
     }
-    public DConnectionBuilder imageUrl(String imageUrl) {
+
+    public Builder imageUrl(String imageUrl) {
       entity.setImageUrl(imageUrl);
       return this;
     }
-    public DConnectionBuilder profileUrl(String profileUrl) {
+
+    public Builder profileUrl(String profileUrl) {
       entity.setProfileUrl(profileUrl);
       return this;
     }
-    public DConnectionBuilder providerId(String providerId) {
+
+    public Builder providerId(String providerId) {
       entity.setProviderId(providerId);
       return this;
     }
-    public DConnectionBuilder providerUserId(String providerUserId) {
+
+    public Builder providerUserId(String providerUserId) {
       entity.setProviderUserId(providerUserId);
       return this;
     }
-    public DConnectionBuilder refreshToken(String refreshToken) {
+
+    public Builder refreshToken(String refreshToken) {
       entity.setRefreshToken(refreshToken);
       return this;
     }
-    public DConnectionBuilder secret(String secret) {
+
+    public Builder secret(String secret) {
       entity.setSecret(secret);
       return this;
     }
-    public DConnectionBuilder updatedBy(String updatedBy) {
+
+    public Builder updatedBy(String updatedBy) {
       entity.setUpdatedBy(updatedBy);
       return this;
     }
-    public DConnectionBuilder updatedDate(Date updatedDate) {
+
+    public Builder updatedDate(Date updatedDate) {
       entity.setUpdatedDate(updatedDate);
       return this;
     }
-    public DConnectionBuilder userId(Long userId) {
+
+    public Builder userId(Long userId) {
       entity.setUserId(userId);
       return this;
     }
-    public DConnectionBuilder userRoles(String userRoles) {
+
+    public Builder userRoles(String userRoles) {
       entity.setUserRoles(userRoles);
       return this;
     }
+
   }
 }

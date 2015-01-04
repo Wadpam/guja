@@ -2,6 +2,7 @@ package com.wadpam.guja.oauth2.dao;
 
 import java.util.Collection;
 import java.util.Date;
+import java.nio.ByteBuffer;
 
 import net.sf.mardao.dao.Mapper;
 import net.sf.mardao.dao.Supplier;
@@ -11,7 +12,7 @@ import com.wadpam.guja.oauth2.domain.DUser;
 /**
  * The DUser domain-object specific mapping methods go here.
  *
- * Generated on 2014-12-16T11:27:40.160+0100.
+ * Generated on 2015-01-02T18:17:30.242+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DUserMapper
@@ -157,73 +158,85 @@ public class DUserMapper
     return value;
   }
 
-  public static DUserBuilder newBuilder() {
-    return new DUserBuilder();
+  public static Builder newBuilder() {
+    return new Builder();
   }
 
-  public static class DUserBuilder extends AbstractEntityBuilder<DUser> {
+  public static class Builder extends AbstractEntityBuilder<DUser> {
 
-    @Override
-    protected DUser newInstance() {
-      return new DUser();
+    protected Builder() {
+      super(new DUser());
     }
 
-    public DUserBuilder id(Long id) {
+    public Builder id(Long id) {
       entity.setId(id);
       return this;
     }
 
-    public DUserBuilder createdBy(String createdBy) {
+    public Builder createdBy(String createdBy) {
       entity.setCreatedBy(createdBy);
       return this;
     }
-    public DUserBuilder createdDate(Date createdDate) {
+
+    public Builder createdDate(Date createdDate) {
       entity.setCreatedDate(createdDate);
       return this;
     }
-    public DUserBuilder displayName(String displayName) {
+
+    public Builder displayName(String displayName) {
       entity.setDisplayName(displayName);
       return this;
     }
-    public DUserBuilder email(String email) {
+
+    public Builder email(String email) {
       entity.setEmail(email);
       return this;
     }
-    public DUserBuilder friends(Collection friends) {
+
+    public Builder friends(Collection friends) {
       entity.setFriends(friends);
       return this;
     }
-    public DUserBuilder password(String password) {
+
+    public Builder password(String password) {
       entity.setPassword(password);
       return this;
     }
-    public DUserBuilder profileLink(String profileLink) {
+
+    public Builder profileLink(String profileLink) {
       entity.setProfileLink(profileLink);
       return this;
     }
-    public DUserBuilder roles(Collection roles) {
+
+    public Builder roles(Collection roles) {
       entity.setRoles(roles);
       return this;
     }
-    public DUserBuilder state(Integer state) {
+
+    public Builder state(Integer state) {
       entity.setState(state);
       return this;
     }
-    public DUserBuilder thumbnailUrl(String thumbnailUrl) {
+
+    public Builder thumbnailUrl(String thumbnailUrl) {
       entity.setThumbnailUrl(thumbnailUrl);
       return this;
     }
-    public DUserBuilder updatedBy(String updatedBy) {
+
+    public Builder updatedBy(String updatedBy) {
       entity.setUpdatedBy(updatedBy);
       return this;
     }
-    public DUserBuilder updatedDate(Date updatedDate) {
+
+    public Builder updatedDate(Date updatedDate) {
       entity.setUpdatedDate(updatedDate);
       return this;
     }
-    public DUserBuilder username(String username) {
+
+    public Builder username(String username) {
       entity.setUsername(username);
       return this;
     }
+
   }
 }

@@ -20,7 +20,7 @@ import com.wadpam.guja.oauth2.domain.DOAuth2User;
 /**
  * The DOAuth2User domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2014-12-16T11:27:40.160+0100.
+ * Generated on 2015-01-02T18:17:30.242+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDOAuth2UserDaoImpl
@@ -122,7 +122,10 @@ public class GeneratedDOAuth2UserDaoImpl
   }
 
 
-// ----------------------- query methods -------------------------------
+// ----------------------- DOAuth2User builder -------------------------------
 
+  public static DOAuth2UserMapper.Builder newBuilder() {
+    return DOAuth2UserMapper.newBuilder();
+  }
 
 }

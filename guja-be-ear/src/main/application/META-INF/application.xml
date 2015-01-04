@@ -26,7 +26,7 @@
   <module>
     <web>
       <web-uri>guja-be-war-0.0.4-SNAPSHOT.war</web-uri>
-      <context-root>/guja-be-war</context-root>
+      <context-root>/guja-be-wacom.wadpam.gujar</context-root>
     </web>
   </module>
   <library-directory>lib</library-directory>

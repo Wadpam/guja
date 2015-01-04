@@ -20,7 +20,7 @@ import com.wadpam.guja.oauth2.domain.DFactory;
 /**
  * The DFactory domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2014-12-16T11:27:40.160+0100.
+ * Generated on 2015-01-02T18:17:30.242+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDFactoryDaoImpl
@@ -95,7 +95,10 @@ public class GeneratedDFactoryDaoImpl
   }
 
 
-// ----------------------- query methods -------------------------------
+// ----------------------- DFactory builder -------------------------------
 
+  public static DFactoryMapper.Builder newBuilder() {
+    return DFactoryMapper.newBuilder();
+  }
 
 }

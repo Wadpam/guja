@@ -2,6 +2,7 @@ package com.wadpam.guja.i18n.dao;
 
 import java.util.Collection;
 import java.util.Date;
+import java.nio.ByteBuffer;
 
 import net.sf.mardao.dao.Mapper;
 import net.sf.mardao.dao.Supplier;
@@ -11,7 +12,7 @@ import com.wadpam.guja.i18n.domain.Di18n;
 /**
  * The Di18n domain-object specific mapping methods go here.
  *
- * Generated on 2014-12-16T11:10:07.408+0100.
+ * Generated on 2015-01-02T18:17:29.812+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class Di18nMapper
@@ -142,53 +143,60 @@ public class Di18nMapper
     return value;
   }
 
-  public static Di18nBuilder newBuilder() {
-    return new Di18nBuilder();
+  public static Builder newBuilder() {
+    return new Builder();
   }
 
-  public static class Di18nBuilder extends AbstractEntityBuilder<Di18n> {
+  public static class Builder extends AbstractEntityBuilder<Di18n> {
 
-    @Override
-    protected Di18n newInstance() {
-      return new Di18n();
+    protected Builder() {
+      super(new Di18n());
     }
 
-    public Di18nBuilder id(Long id) {
+    public Builder id(Long id) {
       entity.setId(id);
       return this;
     }
 
-    public Di18nBuilder baseBundle(String baseBundle) {
+    public Builder baseBundle(String baseBundle) {
       entity.setBaseBundle(baseBundle);
       return this;
     }
-    public Di18nBuilder createdBy(String createdBy) {
+
+    public Builder createdBy(String createdBy) {
       entity.setCreatedBy(createdBy);
       return this;
     }
-    public Di18nBuilder createdDate(Date createdDate) {
+
+    public Builder createdDate(Date createdDate) {
       entity.setCreatedDate(createdDate);
       return this;
     }
-    public Di18nBuilder key(String key) {
+
+    public Builder key(String key) {
       entity.setKey(key);
       return this;
     }
-    public Di18nBuilder locale(String locale) {
+
+    public Builder locale(String locale) {
       entity.setLocale(locale);
       return this;
     }
-    public Di18nBuilder localizedMessage(String localizedMessage) {
+
+    public Builder localizedMessage(String localizedMessage) {
       entity.setLocalizedMessage(localizedMessage);
       return this;
     }
-    public Di18nBuilder updatedBy(String updatedBy) {
+
+    public Builder updatedBy(String updatedBy) {
       entity.setUpdatedBy(updatedBy);
       return this;
     }
-    public Di18nBuilder updatedDate(Date updatedDate) {
+
+    public Builder updatedDate(Date updatedDate) {
       entity.setUpdatedDate(updatedDate);
       return this;
     }
+
   }
 }
