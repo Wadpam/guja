@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.wadpam.guja.cache.CacheBuilder;
+import com.wadpam.guja.cache.CacheBuilderProvider;
 import com.wadpam.guja.cache.PageCacheKey;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.AbstractDao;
@@ -24,7 +25,7 @@ public class CachedCrudResource<T, ID extends Serializable, D extends AbstractDa
     protected final LoadingCache<PageCacheKey, CursorPage<T>> pageCache;
     private final CacheLoader<PageCacheKey, CursorPage<T>> pageCacheLoader;
 
-    public CachedCrudResource(D dao, CacheBuilder cacheBuilder, long maximumSize, String namespace) {
+    public CachedCrudResource(D dao, CacheBuilderProvider cacheBuilderProvider, long maximumSize, String namespace) {
         super(dao);
 
         this.crudCacheLoader = new CacheLoader<ID, Optional<T>>() {
@@ -34,7 +35,7 @@ public class CachedCrudResource<T, ID extends Serializable, D extends AbstractDa
                 return null != entity ? Optional.of(entity) : Optional.<T>absent();
             }
         };
-        this.crudCache = cacheBuilder.from(namespace).maximumSize(maximumSize).build(crudCacheLoader);
+        this.crudCache = cacheBuilderProvider.get().from(namespace).maximumSize(maximumSize).build(crudCacheLoader);
 
         this.pageCacheLoader = new CacheLoader<PageCacheKey, CursorPage<T>>() {
             @Override
@@ -42,7 +43,7 @@ public class CachedCrudResource<T, ID extends Serializable, D extends AbstractDa
                 return (CursorPage<T>) CachedCrudResource.super.readPage(pageCacheKey.pageSize, pageCacheKey.cursorKey).getEntity();
             }
         };
-        this.pageCache = cacheBuilder.from(namespace).expireAfterWrite(5*60).build(pageCacheLoader);
+        this.pageCache = cacheBuilderProvider.get().from(namespace).expireAfterWrite(5*60).build(pageCacheLoader);
     }
 
     @Override

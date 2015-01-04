@@ -4,8 +4,9 @@ package com.wadpam.guja.oauth2.provider;
 import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.google.common.cache.Cache;
 import com.google.inject.Inject;
-import com.wadpam.guja.cache.CacheBuilder;
+import com.wadpam.guja.cache.CacheBuilderProvider;
 import com.wadpam.guja.util.Pair;
+
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -21,11 +22,11 @@ public class TemporaryTokenCache {
   private final Cache<String, Pair<String, Long>> tokenCache;
 
   @Inject
-  public TemporaryTokenCache(TokenGenerator tokenGenerator, CacheBuilder cacheBuilder) {
+  public TemporaryTokenCache(TokenGenerator tokenGenerator, CacheBuilderProvider cacheBuilderProvider) {
     this.tokenGenerator = tokenGenerator;
     
     // TODO How to handle generics
-    this.tokenCache =  cacheBuilder
+    this.tokenCache =  cacheBuilderProvider.get()
         .expireAfterWrite(DEFAULT_TOKEN_DURATION_SECONDS)
         .from(this.getClass().getName())
         .build();

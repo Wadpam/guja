@@ -1,6 +1,5 @@
 package com.wadpam.guja.cache;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.memcache.Expiration;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.common.cache.AbstractLoadingCache;
@@ -9,7 +8,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.wadpam.guja.GAEAdminTaskQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
