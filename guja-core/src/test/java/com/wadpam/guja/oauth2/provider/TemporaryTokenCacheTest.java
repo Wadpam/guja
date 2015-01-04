@@ -8,9 +8,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 public class TemporaryTokenCacheTest {
@@ -26,12 +24,12 @@ public class TemporaryTokenCacheTest {
   @Before
   public void setUp() throws Exception {
     mockGenerator = createMock(TokenGenerator.class);
-    tokenCache = new TemporaryTokenCache(mockGenerator, new GuavaCacheBuilder());
+    tokenCache = new TemporaryTokenCache(mockGenerator, new GuavaCacheBuilderProvider());
   }
 
   @After
   public void tearDown() throws Exception {
-
+    verify(mockGenerator);
   }
 
   @Test

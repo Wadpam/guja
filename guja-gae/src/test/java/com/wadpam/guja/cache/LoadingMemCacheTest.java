@@ -2,7 +2,6 @@ package com.wadpam.guja.cache;
 
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
@@ -35,7 +34,7 @@ public class LoadingMemCacheTest {
 
   AbstractDao<String, Long> daoMock;
   CachedCrudResource<String, Long, AbstractDao<String, Long>> resource;
-  final CacheBuilder<Long, String> cacheBuilder = new MemCacheBuilder();
+  final CacheBuilderProvider cacheBuilderProvider = new MemCacheBuilderProvider();
 
   private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
 
@@ -151,7 +150,7 @@ public class LoadingMemCacheTest {
     expect(daoMock.get(1L)).andReturn("1").once();
     replay(daoMock);
 
-    LoadingCache<Long, String> loadingCache = cacheBuilder.build(new CacheLoader<Long, String>() {
+    LoadingCache<Long, String> loadingCache = cacheBuilderProvider.get().build(new CacheLoader<Long, String>() {
       @Override
       public String load(Long key) throws Exception {
         return daoMock.get(key);
@@ -169,7 +168,7 @@ public class LoadingMemCacheTest {
   public void setUp() {
     helper.setUp();
     daoMock = createMock(AbstractDao.class);
-    resource = new CachedCrudResource<>(daoMock, cacheBuilder, 100, getClass().getName());
+    resource = new CachedCrudResource<>(daoMock, cacheBuilderProvider, 100, getClass().getName());
   }
 
   @After

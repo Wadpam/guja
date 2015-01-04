@@ -24,6 +24,8 @@ package com.wadpam.guja.i18n.dao;
 
 
 import com.google.inject.Inject;
+import com.wadpam.guja.i18n.domain.Di18n;
+import net.sf.mardao.core.filter.Filter;
 import net.sf.mardao.dao.Supplier;
 
 /**
@@ -45,9 +47,15 @@ public class Di18nDaoBean
 
   public String find(String key, String baseBundle, String language) {
 
-    // TODO
+    Iterable<Di18n> iterator = queryIterable(false, 0,
+        1, null,
+        Di18nMapper.Field.KEY.getFieldName(), false,
+        null, false,
+        Filter.equalsFilter(Di18nMapper.Field.KEY.getFieldName(), key),
+        Filter.equalsFilter(Di18nMapper.Field.BASEBUNDLE.getFieldName(), baseBundle),
+        Filter.equalsFilter(Di18nMapper.Field.LOCALE.getFieldName(), language));
 
-    return null;
+    return iterator.iterator().hasNext() ? iterator.iterator().next().getLocalizedMessage() : null;
 
   }
 
