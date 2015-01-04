@@ -3,6 +3,7 @@ package com.wadpam.guja.cache;
 import com.google.common.collect.ImmutableList;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.Cached;
+import net.sf.mardao.dao.Crud;
 import net.sf.mardao.dao.CrudDao;
 
 import java.io.IOException;
@@ -14,21 +15,29 @@ import java.io.IOException;
 @Cached
 public class MockCrudDao implements CrudDao<String, Long> {
 
+  @Cached
+  @Crud
   @Override
   public Long put(String s) throws IOException {
     return Long.parseLong(s);
   }
 
+  @Cached
+  @Crud
   @Override
   public String get(Long aLong) throws IOException {
     return aLong.toString();
   }
 
+  @Cached
+  @Crud
   @Override
   public void delete(Long aLong) throws IOException {
     // Do nothing
   }
 
+  @Cached
+  @Crud
   @Override
   public CursorPage<String> queryPage(int i, String s) {
 
