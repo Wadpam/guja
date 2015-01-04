@@ -95,7 +95,7 @@ public class CacheMethodInterceptor implements MethodInterceptor {
       return id;
 
     }
-    else if (method.equals(deleteMethod)) {
+    else if (DELETE_METHOD_NAME.equals(method.getName())) {
       LOGGER.info("   delete");
 
       invocation.proceed();
@@ -105,7 +105,7 @@ public class CacheMethodInterceptor implements MethodInterceptor {
       return null;
 
     }
-    else if (DELETE_METHOD_NAME.equals(method.getName())) {
+    else if (pageMethod.equals(method)) {
       LOGGER.info("   page");
 
       Integer pageSize = (Integer) args[0];

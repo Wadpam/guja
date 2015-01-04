@@ -41,30 +41,10 @@ public class CacheMethodInterceptorTest {
 
   @After
   public void tearDown() throws Exception {
-
   }
 
   @Test
-  public void testGetWithNoHit() throws Exception {
-    LOGGER.info("Cache GET");
-
-    MockCrudDao dao = injector.getInstance(MockCrudDao.class);
-    MockCrudDao mockDao = dao.getMockDelegate();
-
-    expect(mockDao.get(1L)).andReturn("1").once();
-
-    replay(mockDao);
-
-    String value = dao.get(1L);
-
-    assertTrue(value.equals("1"));
-
-    verify(mockDao);
-
-  }
-
-  @Test
-  public void testGetWithHit() throws Exception {
+  public void testGet() throws Exception {
 
     MockCrudDao dao = injector.getInstance(MockCrudDao.class);
     MockCrudDao mockDao = dao.getMockDelegate();
@@ -107,8 +87,46 @@ public class CacheMethodInterceptorTest {
 
     verify(mockDao);
 
+  }
+
+
+  @Test
+  public void testDelete() throws Exception {
+    LOGGER.info("Cache PUT");
+
+    MockCrudDao dao = injector.getInstance(MockCrudDao.class);
+    MockCrudDao mockDao = dao.getMockDelegate();
+
+    expect(mockDao.put("1")).andReturn(1L).once();
+    mockDao.delete(1L);
+    expect(mockDao.get(1L)).andReturn(null).once();
+    expect(mockDao.put("1")).andReturn(1L).once();
+
+    replay(mockDao);
+
+    Long id = dao.put("1");
+    assertTrue(id.equals(1L));
+
+    String value = dao.get(1L);
+    assertTrue("1".equals(value));
+
+    dao.delete(1L);
+
+    value = dao.get(1L);
+    assertTrue(null == value);
+
+    id = dao.put("1");
+    assertTrue(id.equals(1L));
+
+    value = dao.get(1L);
+    assertTrue("1".equals(value));
+
+
+    verify(mockDao);
 
   }
+
+
 
 
 }
