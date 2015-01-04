@@ -2,17 +2,16 @@ package com.wadpam.guja.crud;
 
 import com.google.common.collect.ImmutableList;
 import com.wadpam.guja.cache.CacheBuilderProvider;
-import com.wadpam.guja.cache.GuavaCacheBuilder;
-import com.wadpam.guja.cache.CacheBuilder;
 import com.wadpam.guja.cache.GuavaCacheBuilderProvider;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.AbstractDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -23,6 +22,8 @@ import static org.junit.Assert.assertEquals;
  * Created by sosandstrom on 2014-12-19.
  */
 public class CachedCrudResourceTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CachedCrudResourceTest.class);
+
     AbstractDao<String, Long> daoMock;
     CachedCrudResource<String, Long, AbstractDao<String, Long>> resource;
     final CacheBuilderProvider cacheBuilderProvider = new GuavaCacheBuilderProvider();
@@ -122,11 +123,17 @@ public class CachedCrudResourceTest {
             cursorKey = page.getCursorKey();
         }
 
+        expect(daoMock.getKind()).andReturn("kind").anyTimes();
+        checkOrder(daoMock, false);
+
         replay(daoMock);
 
         for (int n = 0; n < 10; n++) {
             cursorKey = null;
             for (int p = 3; p < 9; p++) {
+
+                LOGGER.info("readPage {}", p);
+
                 Response response = resource.readPage(p, cursorKey);
                 CursorPage<String> page = (CursorPage<String>) response.getEntity();
                 cursorKey = page.getCursorKey();

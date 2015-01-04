@@ -130,6 +130,9 @@ public class LoadingMemCacheTest {
       cursorKey = page.getCursorKey();
     }
 
+    expect(daoMock.getKind()).andReturn("kind").anyTimes();
+    checkOrder(daoMock, false);
+
     replay(daoMock);
 
     for (int n = 0; n < 10; n++) {
