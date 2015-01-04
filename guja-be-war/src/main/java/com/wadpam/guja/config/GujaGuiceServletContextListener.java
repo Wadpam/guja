@@ -26,12 +26,15 @@ package com.wadpam.guja.config;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+import com.wadpam.guja.cache.CacheMethodInterceptor;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
+import net.sf.mardao.dao.Cached;
 import net.sf.mardao.dao.DatastoreSupplier;
 import net.sf.mardao.dao.Supplier;
 import org.slf4j.Logger;
@@ -75,6 +78,11 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
 
           @Override
           protected void configureServlets() {
+
+              // Cached annotation
+              CacheMethodInterceptor cacheMethodInterceptor = new CacheMethodInterceptor();
+              requestInjection(cacheMethodInterceptor);
+              bindInterceptor(Matchers.annotatedWith(Cached.class), Matchers.annotatedWith(Cached.class), cacheMethodInterceptor);
 
             // Bindings
             bindProperties();

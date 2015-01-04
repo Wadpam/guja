@@ -84,7 +84,7 @@ public class CachedCrudResource<T, ID extends Serializable, D extends AbstractDa
     @GET
     @Override
     public Response readPage(@QueryParam("pageSize") @DefaultValue("10") int pageSize, @QueryParam("cursorKey") String cursorKey) {
-        CursorPage<T> page = pageCache.getUnchecked(new PageCacheKey(pageSize, cursorKey));
+        CursorPage<T> page = pageCache.getUnchecked(new PageCacheKey(dao.getKind(), pageSize, cursorKey));
         return Response.ok(page).build();
     }
 }

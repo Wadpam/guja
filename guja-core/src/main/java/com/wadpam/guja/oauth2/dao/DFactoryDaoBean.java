@@ -24,6 +24,7 @@ package com.wadpam.guja.oauth2.dao;
 
 
 import com.google.inject.Inject;
+import net.sf.mardao.dao.Cached;
 import net.sf.mardao.dao.Supplier;
 
 /**
@@ -35,8 +36,9 @@ import net.sf.mardao.dao.Supplier;
  *
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
+@Cached
 public class DFactoryDaoBean
-    extends GeneratedDFactoryDaoImpl {
+    extends GeneratedDFactoryDaoImpl{
 
   @Inject
   public DFactoryDaoBean(Supplier supplier) {
