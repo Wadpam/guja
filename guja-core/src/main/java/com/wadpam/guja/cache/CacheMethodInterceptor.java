@@ -5,6 +5,7 @@ import com.google.common.cache.Cache;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import net.sf.mardao.dao.AbstractDao;
 import net.sf.mardao.dao.Cached;
+import net.sf.mardao.dao.CrudDao;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
@@ -29,20 +30,25 @@ public class CacheMethodInterceptor implements MethodInterceptor {
   static final Logger LOGGER = LoggerFactory.getLogger(CacheMethodInterceptor.class);
 
   private final Map<String, Cache<? extends Serializable, ?>> namespaces = new HashMap<>();
-  private final Provider<CacheBuilder> cacheBuilderProvider;
 
+  private final Provider<CacheBuilder> cacheBuilderProvider;
   public CacheMethodInterceptor(Provider<CacheBuilder> cacheBuilderProvider) {
     this.cacheBuilderProvider = cacheBuilderProvider;
   }
+
+  private static final String GET_METHOD_NAME = "get";
+  private static final String PUT_METHOD_NAME = "put";
+  private static final String DELETE_METHOD_NAME = "delete";
 
   static Method readMethod, putMethod, deleteMethod, pageMethod;
 
   static {
     try {
-      readMethod = AbstractDao.class.getMethod("get", Serializable.class);
-      putMethod = AbstractDao.class.getMethod("put", Object.class);
-      deleteMethod = AbstractDao.class.getMethod("delete", Serializable.class);
-      pageMethod = AbstractDao.class.getMethod("queryPage", int.class, String.class);
+      // TODO read, put, delete does not work with equals, not sure why
+      //readMethod = CrudDao.class.getMethod("get", Serializable.class);
+      //putMethod = CrudDao.class.getMethod("put", Object.class);
+      //deleteMethod = CrudDao.class.getMethod("delete", Serializable.class);
+      pageMethod = CrudDao.class.getMethod("queryPage", int.class, String.class);
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
     }
@@ -58,7 +64,7 @@ public class CacheMethodInterceptor implements MethodInterceptor {
     final Method method = invocation.getMethod();
     LOGGER.info("invoking on {}, isAnnotated {}", method, method.isAnnotationPresent(Cached.class));
 
-    if (method.equals(readMethod)) {
+    if (GET_METHOD_NAME.equals(method.getName())) {
       LOGGER.info("   get");
 
       final Object id = invocation.getArguments()[0];
@@ -78,7 +84,7 @@ public class CacheMethodInterceptor implements MethodInterceptor {
       return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
 
     }
-    else if (method.equals(putMethod)) {
+    else if (PUT_METHOD_NAME.equals(method.getName())) {
       LOGGER.info("   put");
 
       final Object id = invocation.proceed();
@@ -99,7 +105,7 @@ public class CacheMethodInterceptor implements MethodInterceptor {
       return null;
 
     }
-    else if (method.equals(pageMethod)) {
+    else if (DELETE_METHOD_NAME.equals(method.getName())) {
       LOGGER.info("   page");
 
       Integer pageSize = (Integer) args[0];

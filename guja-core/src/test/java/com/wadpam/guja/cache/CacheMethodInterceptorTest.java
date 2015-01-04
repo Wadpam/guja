@@ -1,13 +1,10 @@
 package com.wadpam.guja.cache;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.LoadingCache;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.matcher.Matchers;
-import com.wadpam.guja.crud.MockCacheBuilderProvider;
 import net.sf.mardao.dao.Cached;
 import org.junit.After;
 import org.junit.Before;
@@ -15,8 +12,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertTrue;
 
 public class CacheMethodInterceptorTest {
@@ -24,16 +20,9 @@ public class CacheMethodInterceptorTest {
 
   private Injector injector;
 
-  private MockCacheBuilderProvider cacheBuilderProvider;
-  private LoadingCache mockLoadingCache;
-  private Cache mockCache;
 
   @Before
   public void setUp() throws Exception {
-
-    cacheBuilderProvider = new MockCacheBuilderProvider();
-    mockLoadingCache = cacheBuilderProvider.getMockLoadingCache();
-    mockCache = cacheBuilderProvider.getMockCache();
 
     injector = Guice.createInjector(new Module() {
       @Override
@@ -44,7 +33,7 @@ public class CacheMethodInterceptorTest {
         binder.bindInterceptor(
             Matchers.annotatedWith(Cached.class),
             Matchers.annotatedWith(Cached.class),
-            new CacheMethodInterceptor(new MockCacheBuilderProvider()));
+            new CacheMethodInterceptor(new GuavaCacheBuilderProvider()));
       }
     });
 
@@ -52,19 +41,71 @@ public class CacheMethodInterceptorTest {
 
   @After
   public void tearDown() throws Exception {
-    verify(mockLoadingCache, mockCache);
+
   }
 
   @Test
-  public void testGet() throws Exception {
+  public void testGetWithNoHit() throws Exception {
     LOGGER.info("Cache GET");
 
-    replay(mockLoadingCache, mockCache);
-
     MockCrudDao dao = injector.getInstance(MockCrudDao.class);
+    MockCrudDao mockDao = dao.getMockDelegate();
+
+    expect(mockDao.get(1L)).andReturn("1").once();
+
+    replay(mockDao);
+
     String value = dao.get(1L);
 
     assertTrue(value.equals("1"));
+
+    verify(mockDao);
+
+  }
+
+  @Test
+  public void testGetWithHit() throws Exception {
+
+    MockCrudDao dao = injector.getInstance(MockCrudDao.class);
+    MockCrudDao mockDao = dao.getMockDelegate();
+
+    expect(mockDao.get(1L)).andReturn("1").once();
+    expect(mockDao.get(2L)).andReturn("2").once();
+
+    replay(mockDao);
+
+    String value = dao.get(1L);
+    assertTrue("1".equals(value));
+
+    value = dao.get(1L);
+    assertTrue("1".equals(value));
+
+    value = dao.get(2L);
+    assertTrue("2".equals(value));
+
+    verify(mockDao);
+
+  }
+
+  @Test
+  public void testPut() throws Exception {
+    LOGGER.info("Cache PUT");
+
+
+    MockCrudDao dao = injector.getInstance(MockCrudDao.class);
+    MockCrudDao mockDao = dao.getMockDelegate();
+
+    expect(mockDao.put("1")).andReturn(1L).once();
+
+    replay(mockDao);
+
+    Long id = dao.put("1");
+    assertTrue(id.equals(1L));
+
+    String value = dao.get(1L);
+    assertTrue("1".equals(value));
+
+    verify(mockDao);
 
 
   }

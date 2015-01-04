@@ -1,12 +1,15 @@
 package com.wadpam.guja.cache;
 
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.Cached;
 import net.sf.mardao.dao.Crud;
 import net.sf.mardao.dao.CrudDao;
 
 import java.io.IOException;
+
+import static org.easymock.EasyMock.createMock;
 
 /**
  * CrudDao for unit testing.
@@ -15,37 +18,42 @@ import java.io.IOException;
 @Cached
 public class MockCrudDao implements CrudDao<String, Long> {
 
+  final private MockCrudDao mockDelegate;
+
+  @Inject
+  public MockCrudDao() {
+    this.mockDelegate = createMock(MockCrudDao.class);
+  }
+
   @Cached
   @Crud
   @Override
   public Long put(String s) throws IOException {
-    return Long.parseLong(s);
+    return mockDelegate.put(s);
   }
 
   @Cached
   @Crud
   @Override
   public String get(Long aLong) throws IOException {
-    return aLong.toString();
+    return mockDelegate.get(aLong);
   }
 
   @Cached
   @Crud
   @Override
   public void delete(Long aLong) throws IOException {
-    // Do nothing
+    mockDelegate.delete(aLong);
   }
 
   @Cached
   @Crud
   @Override
   public CursorPage<String> queryPage(int i, String s) {
+    return mockDelegate.queryPage(i, s);
+  }
 
-    CursorPage<String> page = new CursorPage<>();
-    page.setTotalSize(2);
-    page.setCursorKey(null);
-    page.setItems(ImmutableList.of("1", "1"));
-
-    return page;
+  public MockCrudDao getMockDelegate() {
+    return mockDelegate;
   }
 }
