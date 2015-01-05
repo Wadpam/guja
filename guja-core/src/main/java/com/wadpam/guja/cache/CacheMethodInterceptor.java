@@ -64,27 +64,28 @@ public class CacheMethodInterceptor implements MethodInterceptor {
     final Method method = invocation.getMethod();
     LOGGER.info("invoking on {}, isAnnotated {}", method, method.isAnnotationPresent(Cached.class));
 
-    if (GET_METHOD_NAME.equals(method.getName())) {
-      LOGGER.info("   get");
-
-      final Object id = invocation.getArguments()[0];
-      checkNotNull(id);
-      final Optional<?> optionalEntity = (Optional<?>)cache.get(id, new Callable() {
-        @Override
-        public Object call() throws Exception {
-          try {
-            final Object entity = invocation.proceed();
-            return null != entity ? Optional.of(entity) : Optional.absent();
-          } catch (Throwable throwable) {
-            LOGGER.error("Failed to populate cache {} {}", clazz.getName(), throwable);
-            return null;
-          }
-        }
-      });
-      return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
-
-    }
-    else if (PUT_METHOD_NAME.equals(method.getName())) {
+//    if (GET_METHOD_NAME.equals(method.getName())) {
+//      LOGGER.info("   get");
+//
+//      final Object id = invocation.getArguments()[0];
+//      checkNotNull(id);
+//      final Optional<?> optionalEntity = (Optional<?>)cache.get(id, new Callable() {
+//        @Override
+//        public Object call() throws Exception {
+//          try {
+//            final Object entity = invocation.proceed();
+//            return null != entity ? Optional.of(entity) : Optional.absent();
+//          } catch (Throwable throwable) {
+//            LOGGER.error("Failed to populate cache {} {}", clazz.getName(), throwable);
+//            return null;
+//          }
+//        }
+//      });
+//      return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
+//
+//    }
+//    else
+    if (PUT_METHOD_NAME.equals(method.getName())) {
       LOGGER.info("   put");
 
       final Object id = invocation.proceed();
@@ -105,19 +106,32 @@ public class CacheMethodInterceptor implements MethodInterceptor {
       return null;
 
     }
-    else if (pageMethod.equals(method)) {
-      LOGGER.info("   page");
-
-      Integer pageSize = (Integer) args[0];
-      String cursorString = (String) args[1];
-
-      // TODO Missing implementation
-
-      return null;
-
-    } else {
-      // Let everything else pass through unmodified
-      return invocation.proceed();
+//    else if (pageMethod.equals(method)) {
+//      LOGGER.info("   page");
+//
+//      Integer pageSize = (Integer) args[0];
+//      String cursorString = (String) args[1];
+//
+//      // TODO Missing implementation
+//
+//      return null;
+//
+//    }
+    else {
+      final Optional<?> optionalEntity = (Optional<?>)cache.get(args, new Callable() {
+        @Override
+        public Object call() throws Exception {
+          LOGGER.info("Loading for {}({})", method.getName(), args);
+          try {
+            final Object entity = invocation.proceed();
+            return null != entity ? Optional.of(entity) : Optional.absent();
+          } catch (Throwable throwable) {
+            LOGGER.error("Failed to populate cache {} {}", clazz.getName(), throwable);
+            return null;
+          }
+        }
+      });
+      return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
     }
 
   }

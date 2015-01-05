@@ -27,6 +27,7 @@ import com.wadpam.guja.GAEAdminTaskQueue;
 import com.wadpam.guja.admintask.AdminTaskQueue;
 import com.wadpam.guja.api.GAEBlobResource;
 import com.wadpam.guja.cache.CacheBuilder;
+import com.wadpam.guja.cache.CacheBuilderProvider;
 import com.wadpam.guja.cache.MemCacheBuilderProvider;
 import com.wadpam.guja.environment.GAEServerEnvironment;
 import com.wadpam.guja.environment.ServerEnvironment;
@@ -43,6 +44,7 @@ public class GujaGAEModule extends AbstractModule {
   @Override
   protected void configure() {
 
+    bind(CacheBuilderProvider.class).to(MemCacheBuilderProvider.class);
     bind(CacheBuilder.class).toProvider(MemCacheBuilderProvider.class);
 
     bind(ServerEnvironment.class).to(GAEServerEnvironment.class);
