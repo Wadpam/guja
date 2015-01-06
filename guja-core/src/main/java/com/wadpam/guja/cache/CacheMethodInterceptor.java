@@ -5,6 +5,7 @@ import com.google.common.cache.Cache;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import net.sf.mardao.dao.AbstractDao;
 import net.sf.mardao.dao.Cached;
+import net.sf.mardao.dao.Crud;
 import net.sf.mardao.dao.CrudDao;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -16,7 +17,9 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CacheMethodInterceptor implements MethodInterceptor {
   static final Logger LOGGER = LoggerFactory.getLogger(CacheMethodInterceptor.class);
 
-  private final Map<String, Cache<? extends Serializable, ?>> namespaces = new HashMap<>();
+  private final Map<String, Cache<Triple, Optional<?>>> namespaces = new HashMap<>();
 
   private final Provider<CacheBuilder> cacheBuilderProvider;
   public CacheMethodInterceptor(Provider<CacheBuilder> cacheBuilderProvider) {
@@ -48,7 +51,7 @@ public class CacheMethodInterceptor implements MethodInterceptor {
       //readMethod = CrudDao.class.getMethod("get", Serializable.class);
       //putMethod = CrudDao.class.getMethod("put", Object.class);
       //deleteMethod = CrudDao.class.getMethod("delete", Serializable.class);
-      pageMethod = CrudDao.class.getMethod("queryPage", int.class, String.class);
+      pageMethod = CrudDao.class.getMethod("queryPage", Object.class, int.class, String.class);
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
     }
@@ -58,92 +61,58 @@ public class CacheMethodInterceptor implements MethodInterceptor {
   public Object invoke(final MethodInvocation invocation) throws Throwable {
 
     final Class clazz = getClass(invocation);
-    Cache cache = getCacheInstance(clazz);
+    Cache<Triple, Optional<?>> cache = getCacheInstance(clazz);
 
     final Object[] args = invocation.getArguments();
+    final Triple triple = new Triple(args);
     final Method method = invocation.getMethod();
-    LOGGER.info("invoking on {}, isAnnotated {}", method, method.isAnnotationPresent(Cached.class));
+    LOGGER.trace("invoking on {}, isAnnotated {}", method, method.isAnnotationPresent(Cached.class));
 
-//    if (GET_METHOD_NAME.equals(method.getName())) {
-//      LOGGER.info("   get");
-//
-//      final Object id = invocation.getArguments()[0];
-//      checkNotNull(id);
-//      final Optional<?> optionalEntity = (Optional<?>)cache.get(id, new Callable() {
-//        @Override
-//        public Object call() throws Exception {
-//          try {
-//            final Object entity = invocation.proceed();
-//            return null != entity ? Optional.of(entity) : Optional.absent();
-//          } catch (Throwable throwable) {
-//            LOGGER.error("Failed to populate cache {} {}", clazz.getName(), throwable);
-//            return null;
-//          }
-//        }
-//      });
-//      return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
-//
-//    }
-//    else
-    if (PUT_METHOD_NAME.equals(method.getName())) {
-      LOGGER.info("   put");
-
+    if (PUT_METHOD_NAME.equals(method.getName()) && method.isAnnotationPresent(Crud.class)) {
+      LOGGER.trace("   put");
       final Object id = invocation.proceed();
-      final Object entity = invocation.getArguments()[0];
+      args[1] = id;
+      final Object entity = args[2];
+      args[2] = null;
       checkNotNull(id);
       checkNotNull(entity);
-      cache.put(id, Optional.of(entity));
+      cache.put(new Triple(args), Optional.of(entity));
       return id;
-
     }
-    else if (DELETE_METHOD_NAME.equals(method.getName())) {
+
+    if (DELETE_METHOD_NAME.equals(method.getName()) && method.isAnnotationPresent(Crud.class)) {
       LOGGER.info("   delete");
-
       invocation.proceed();
-      final Object id = invocation.getArguments()[0];
+      final Object id = args[1];
       checkNotNull(id);
-      cache.invalidate(id);
+      cache.put(triple, Optional.absent());
       return null;
-
     }
-//    else if (pageMethod.equals(method)) {
-//      LOGGER.info("   page");
-//
-//      Integer pageSize = (Integer) args[0];
-//      String cursorString = (String) args[1];
-//
-//      // TODO Missing implementation
-//
-//      return null;
-//
-//    }
-    else {
-      final Optional<?> optionalEntity = (Optional<?>)cache.get(args, new Callable() {
-        @Override
-        public Object call() throws Exception {
-          LOGGER.info("Loading for {}({})", method.getName(), args);
-          try {
-            final Object entity = invocation.proceed();
-            return null != entity ? Optional.of(entity) : Optional.absent();
-          } catch (Throwable throwable) {
-            LOGGER.error("Failed to populate cache {} {}", clazz.getName(), throwable);
-            return null;
-          }
+
+    final Optional<?> optionalEntity = cache.get(triple, new Callable<Optional<?>>() {
+      @Override
+      public Optional<?> call() throws Exception {
+        LOGGER.trace("Loading for {}({})", method.getName(), triple);
+        try {
+          final Object entity = invocation.proceed();
+          return null != entity ? Optional.of(entity) : Optional.absent();
+        } catch (Throwable throwable) {
+          LOGGER.error("Failed to populate cache {} {}", clazz.getName(), throwable);
+          throw new ExecutionException("During invocation: ", throwable);
         }
-      });
-      return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
-    }
-
+      }
+    });
+    return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
   }
 
-  private Cache getCacheInstance(Class clazz) {
+  private Cache<Triple, Optional<?>> getCacheInstance(Class clazz) {
     final String className = clazz.getName();
 
-    Cache cache = namespaces.get(className);
+    Cache<Triple, Optional<?>> cache = namespaces.get(className);
     if (null == cache) {
       final Cached annotation = (Cached) clazz.getAnnotation(Cached.class);
       LOGGER.debug("Build new dao cache for {}", className);
-      CacheBuilder<? extends Serializable, Optional<?>> cacheBuilder = cacheBuilderProvider.get();
+      CacheBuilder<Triple, Optional<?>> cacheBuilder = cacheBuilderProvider.get();
       if (null != annotation.from() || "".equals(annotation.from())) {
         cacheBuilder.from(annotation.from());
       } else {
@@ -164,7 +133,7 @@ public class CacheMethodInterceptor implements MethodInterceptor {
 
   private Class getClass(MethodInvocation invocation) {
     Class clazz = invocation.getThis().getClass();
-    if (!clazz.isAnnotationPresent(Cached.class)) { // TODO Check te actual class name
+    if (clazz.getName().contains("$$EnhancerByGuice$$")) {
       // Workaround for Guice adding some kind of enhancer object before the actual DAO
       // Check the superclass
       clazz = clazz.getSuperclass();
@@ -175,4 +144,45 @@ public class CacheMethodInterceptor implements MethodInterceptor {
     return clazz;
   }
 
+  public static class Triple implements Serializable {
+    protected final Object first, second, third;
+
+    Triple(Object[] args) {
+      this.first = 0 < args.length ? args[0] : null;
+      this.second = 1 < args.length ? args[1] : null;
+      this.third = 2 < args.length ? args[2] : null;
+    }
+
+    Triple(Object first, Object second, Object third) {
+      this.first = first;
+      this.second = second;
+      this.third = third;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o instanceof Triple) {
+        Triple other = (Triple) o;
+        if (!Objects.equals(this.first, other.first)) {
+          return false;
+        }
+        if (!Objects.equals(this.second, other.second)) {
+          return false;
+        }
+        return Objects.equals(this.third, other.third);
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return (31 * (31 * (null != first ? first.hashCode() : 0)) + (null != second ? second.hashCode() : 0)) +
+              (null != third ? third.hashCode() : 0);
+    }
+
+    @Override
+    public String toString() {
+      return "Triple[" + first + ',' + second + ',' + third + ']';
+    }
+  }
 }
