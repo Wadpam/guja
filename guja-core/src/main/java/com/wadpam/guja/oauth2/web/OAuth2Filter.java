@@ -140,7 +140,7 @@ public class OAuth2Filter implements Filter {
       }
     }
 
-    return null;
+    return accessToken;
   }
 
   public static Long getUserId(HttpServletRequest request) {
@@ -149,6 +149,7 @@ public class OAuth2Filter implements Filter {
 
   private DConnection verifyAccessToken(String accessToken) {
     final DConnection conn = connectionDaoProvider.get().findByAccessToken(accessToken);
+    LOGGER.info("verify for {} gives conn {}", accessToken, conn);
     if (null == conn) {
       LOGGER.debug("No such access_token {}", accessToken);
       return null;

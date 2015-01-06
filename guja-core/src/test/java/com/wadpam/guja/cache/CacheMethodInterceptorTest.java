@@ -3,6 +3,7 @@ package com.wadpam.guja.cache;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.*;
 import com.google.inject.matcher.Matchers;
+import com.wadpam.guja.crud.DelegatingCrudDao;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.Cached;
 import net.sf.mardao.dao.CrudDao;
@@ -21,7 +22,7 @@ public class CacheMethodInterceptorTest {
 
   private Injector injector;
 
-  MockCrudDao dao;
+  DelegatingCrudDao dao;
   CrudDao<String, Long> mockDao;
 
   @Before
@@ -33,7 +34,7 @@ public class CacheMethodInterceptorTest {
       @Override
       public void configure(Binder binder) {
 
-        binder.bind(MockCrudDao.class);
+        binder.bind(DelegatingCrudDao.class);
         binder.bind(new TypeLiteral<CrudDao<String, Long>>() {}).toInstance(mockDao);
 
         binder.bindInterceptor(
@@ -43,7 +44,7 @@ public class CacheMethodInterceptorTest {
       }
     });
 
-    dao = injector.getInstance(MockCrudDao.class);
+    dao = injector.getInstance(DelegatingCrudDao.class);
   }
 
   @After

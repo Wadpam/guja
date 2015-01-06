@@ -51,12 +51,10 @@ public class CacheMethodInterceptor implements MethodInterceptor {
     final Triplet triple = Triplet.fromArray(args);
     final Method method = invocation.getMethod();
 
-    if (!method.isAnnotationPresent(Crud.class)) {
-      throw new InternalServerErrorRestException("Could not find Cached annotation");
-    }
     LOGGER.trace("invoking on {}", method);
 
-    if (PUT_METHOD_NAME.equals(method.getName())) {
+    // required to be the @Crud put(parentKey, id, entity) invocation
+    if (PUT_METHOD_NAME.equals(method.getName()) && method.isAnnotationPresent(Crud.class)) {
       LOGGER.trace("   put");
       final Object id = invocation.proceed();
       args[1] = id;
@@ -68,8 +66,9 @@ public class CacheMethodInterceptor implements MethodInterceptor {
       return id;
     }
 
-    if (DELETE_METHOD_NAME.equals(method.getName())) {
-      LOGGER.info("   delete");
+    // required to be the @Crud delete(parentKey, id) invocation
+    if (DELETE_METHOD_NAME.equals(method.getName()) && method.isAnnotationPresent(Crud.class)) {
+      LOGGER.trace("   delete");
       invocation.proceed();
       final Object id = args[1];
       checkNotNull(id);
@@ -77,8 +76,8 @@ public class CacheMethodInterceptor implements MethodInterceptor {
       return null;
     }
 
-    if (GET_METHOD_NAME.equals(method.getName()) ||
-        (QUERY_PAGE_METHOD_NAME.equals(method.getName()) && shouldCachePages(clazz))) {
+    // either cachePages enabled, or different @Cached method
+    if (!QUERY_PAGE_METHOD_NAME.equals(method.getName()) || shouldCachePages(clazz)) {
 
       final Optional<?> optionalEntity = cache.get(triple, new Callable<Optional<?>>() {
         @Override
@@ -93,15 +92,15 @@ public class CacheMethodInterceptor implements MethodInterceptor {
           }
         }
       });
-      return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
 
+      return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
     }
 
     // Do nothing, pass through
     return invocation.proceed();
   }
 
-  private boolean shouldCachePages(Class clazz) {
+  private static boolean shouldCachePages(Class clazz) {
     return ((Cached)clazz.getAnnotation(Cached.class)).cachePages();
   }
 
