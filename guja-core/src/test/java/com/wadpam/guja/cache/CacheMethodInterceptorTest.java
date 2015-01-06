@@ -1,5 +1,6 @@
 package com.wadpam.guja.cache;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.*;
 import com.google.inject.matcher.Matchers;
 import net.sf.mardao.core.CursorPage;
@@ -31,6 +32,7 @@ public class CacheMethodInterceptorTest {
     injector = Guice.createInjector(new Module() {
       @Override
       public void configure(Binder binder) {
+
         binder.bind(MockCrudDao.class);
         binder.bind(new TypeLiteral<CrudDao<String, Long>>() {}).toInstance(mockDao);
 
@@ -41,7 +43,6 @@ public class CacheMethodInterceptorTest {
       }
     });
 
-//    dao = new MockCrudDao(mockDao);
     dao = injector.getInstance(MockCrudDao.class);
   }
 
@@ -134,6 +135,73 @@ public class CacheMethodInterceptorTest {
 
     value = dao.get(parentKey, 1L);
     assertTrue("1".equals(value));
+  }
+
+  @Test
+  public void testQueryPageNoCache() throws Exception {
+    LOGGER.info("Cache queryPage");
+    final String parentKey = null;
+
+    // Caching is disabled by default
+
+    CursorPage<String> page = new CursorPage<>();
+    page.setCursorKey(null);
+    page.setTotalSize(3);
+    page.setItems(ImmutableList.of("1", "2", "3"));
+
+    expect(mockDao.queryPage(parentKey, 10, null)).andReturn(page).times(2);
+
+    replay(mockDao);
+
+    CursorPage<String> result = dao.queryPage(parentKey, 10, null);
+    assertTrue(result.getItems().equals(page.getItems()));
+
+    // second call should skip the cache
+    result = dao.queryPage(parentKey, 10, null);
+    assertTrue(result.getItems().equals(page.getItems()));
+
+  }
+
+  @Test
+  public void testQueryPage() throws Exception {
+
+    mockDao = createMock(CrudDao.class);
+
+    // Create a crud dao with page caching enabled
+    injector = Guice.createInjector(new Module() {
+      @Override
+      public void configure(Binder binder) {
+
+        binder.bind(PagedCachedMockCrudDao.class);
+        binder.bind(new TypeLiteral<CrudDao<String, Long>>() {}).toInstance(mockDao);
+
+        binder.bindInterceptor(
+            Matchers.annotatedWith(Cached.class),
+            Matchers.annotatedWith(Cached.class),
+            new CacheMethodInterceptor(new GuavaCacheBuilderProvider()));
+      }
+    });
+
+    dao = injector.getInstance(PagedCachedMockCrudDao.class);
+
+    final String parentKey = null;
+
+    CursorPage<String> page = new CursorPage<>();
+    page.setCursorKey(null);
+    page.setTotalSize(3);
+    page.setItems(ImmutableList.of("1", "2", "3"));
+
+    expect(mockDao.queryPage(parentKey, 10, null)).andReturn(page).once();
+
+    replay(mockDao);
+
+    CursorPage<String> result = dao.queryPage(parentKey, 10, null);
+    assertTrue(result.getItems().equals(page.getItems()));
+
+    // second call should hit the cache
+    result = dao.queryPage(parentKey, 10, null);
+    assertTrue(result.getItems().equals(page.getItems()));
+
   }
 
 }

@@ -56,7 +56,7 @@ public class TripletTest {
 
     otherArray[1] = null;
     assertFalse(Triplet.fromArray(array).equals(Triplet.fromArray(otherArray)));
-    
+
   }
 
 }

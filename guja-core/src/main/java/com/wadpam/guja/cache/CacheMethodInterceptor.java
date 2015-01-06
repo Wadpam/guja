@@ -4,21 +4,15 @@ import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.util.Triplet;
-import net.sf.mardao.dao.AbstractDao;
 import net.sf.mardao.dao.Cached;
 import net.sf.mardao.dao.Crud;
-import net.sf.mardao.dao.CrudDao;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Provider;
-import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -45,7 +39,7 @@ public class CacheMethodInterceptor implements MethodInterceptor {
   private static final String PUT_METHOD_NAME = "put";
   private static final String DELETE_METHOD_NAME = "delete";
   private static final String GET_METHOD_NAME = "get";
-  private static final String GET_PAGE_METHOD_NAME = "queryPage";
+  private static final String QUERY_PAGE_METHOD_NAME = "queryPage";
 
   @Override
   public Object invoke(final MethodInvocation invocation) throws Throwable {
@@ -56,9 +50,13 @@ public class CacheMethodInterceptor implements MethodInterceptor {
     final Object[] args = invocation.getArguments();
     final Triplet triple = Triplet.fromArray(args);
     final Method method = invocation.getMethod();
-    LOGGER.trace("invoking on {}, isAnnotated {}", method, method.isAnnotationPresent(Cached.class));
 
-    if (PUT_METHOD_NAME.equals(method.getName()) && method.isAnnotationPresent(Crud.class)) {
+    if (!method.isAnnotationPresent(Crud.class)) {
+      throw new InternalServerErrorRestException("Could not find Cached annotation");
+    }
+    LOGGER.trace("invoking on {}", method);
+
+    if (PUT_METHOD_NAME.equals(method.getName())) {
       LOGGER.trace("   put");
       final Object id = invocation.proceed();
       args[1] = id;
@@ -70,7 +68,7 @@ public class CacheMethodInterceptor implements MethodInterceptor {
       return id;
     }
 
-    if (DELETE_METHOD_NAME.equals(method.getName()) && method.isAnnotationPresent(Crud.class)) {
+    if (DELETE_METHOD_NAME.equals(method.getName())) {
       LOGGER.info("   delete");
       invocation.proceed();
       final Object id = args[1];
@@ -79,20 +77,32 @@ public class CacheMethodInterceptor implements MethodInterceptor {
       return null;
     }
 
-    final Optional<?> optionalEntity = cache.get(triple, new Callable<Optional<?>>() {
-      @Override
-      public Optional<?> call() throws Exception {
-        LOGGER.trace("Loading for {}({})", method.getName(), triple);
-        try {
-          final Object entity = invocation.proceed();
-          return null != entity ? Optional.of(entity) : Optional.absent();
-        } catch (Throwable throwable) {
-          LOGGER.error("Failed to populate cache {} {}", clazz.getName(), throwable);
-          throw new ExecutionException("During invocation: ", throwable);
+    if (GET_METHOD_NAME.equals(method.getName()) ||
+        (QUERY_PAGE_METHOD_NAME.equals(method.getName()) && shouldCachePages(clazz))) {
+
+      final Optional<?> optionalEntity = cache.get(triple, new Callable<Optional<?>>() {
+        @Override
+        public Optional<?> call() throws Exception {
+          LOGGER.trace("Loading for {}({})", method.getName(), triple);
+          try {
+            final Object entity = invocation.proceed();
+            return null != entity ? Optional.of(entity) : Optional.absent();
+          } catch (Throwable throwable) {
+            LOGGER.error("Failed to populate cache {} {}", clazz.getName(), throwable);
+            throw new ExecutionException("During invocation: ", throwable);
+          }
         }
-      }
-    });
-    return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
+      });
+      return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
+
+    }
+
+    // Do nothing, pass through
+    return invocation.proceed();
+  }
+
+  private boolean shouldCachePages(Class clazz) {
+    return ((Cached)clazz.getAnnotation(Cached.class)).cachePages();
   }
 
   private Cache<Triplet, Optional<?>> getCacheInstance(Class clazz) {
