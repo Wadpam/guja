@@ -56,7 +56,6 @@ public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
   @Crud
   @Override
   public DConnection findByAccessToken(String accessToken) {
-    LOGGER.info("calling for {}", accessToken);
     return super.findByAccessToken(accessToken);
   }
 }
