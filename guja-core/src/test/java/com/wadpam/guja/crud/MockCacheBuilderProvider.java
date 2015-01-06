@@ -18,7 +18,6 @@ import static org.easymock.EasyMock.createMock;
 public class MockCacheBuilderProvider implements CacheBuilderProvider {
   private static final Logger LOGGER = LoggerFactory.getLogger(MockCacheBuilderProvider.class);
 
-
   private LoadingCache mockLoadingCache;
   private Cache mockCache;
 

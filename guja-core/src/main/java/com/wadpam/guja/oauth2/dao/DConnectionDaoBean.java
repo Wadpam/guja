@@ -25,6 +25,7 @@ package com.wadpam.guja.oauth2.dao;
 
 import com.google.inject.Inject;
 import com.wadpam.guja.oauth2.domain.DConnection;
+import net.sf.mardao.dao.Cached;
 import net.sf.mardao.dao.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import java.util.Collection;
  *
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
+@Cached
 public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
   private static final Logger LOGGER = LoggerFactory.getLogger(DConnectionDaoBean.class);
 
