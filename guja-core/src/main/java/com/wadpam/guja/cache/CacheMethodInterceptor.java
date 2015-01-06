@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -32,30 +34,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CacheMethodInterceptor implements MethodInterceptor {
   static final Logger LOGGER = LoggerFactory.getLogger(CacheMethodInterceptor.class);
 
-  private final Map<String, Cache<Triple, Optional<?>>> namespaces = new HashMap<>();
+  private final ConcurrentMap<String, Cache<Triple, Optional<?>>> namespaces = new ConcurrentHashMap<>();
 
   private final Provider<CacheBuilder> cacheBuilderProvider;
   public CacheMethodInterceptor(Provider<CacheBuilder> cacheBuilderProvider) {
     this.cacheBuilderProvider = cacheBuilderProvider;
   }
 
-  private static final String GET_METHOD_NAME = "get";
   private static final String PUT_METHOD_NAME = "put";
   private static final String DELETE_METHOD_NAME = "delete";
-
-  static Method readMethod, putMethod, deleteMethod, pageMethod;
-
-  static {
-    try {
-      // TODO read, put, delete does not work with equals, not sure why
-      //readMethod = CrudDao.class.getMethod("get", Serializable.class);
-      //putMethod = CrudDao.class.getMethod("put", Object.class);
-      //deleteMethod = CrudDao.class.getMethod("delete", Serializable.class);
-      pageMethod = CrudDao.class.getMethod("queryPage", Object.class, int.class, String.class);
-    } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-    }
-  }
+  private static final String GET_METHOD_NAME = "get";
+  private static final String GET_PAGE_METHOD_NAME = "queryPage";
 
   @Override
   public Object invoke(final MethodInvocation invocation) throws Throwable {
@@ -125,7 +114,10 @@ public class CacheMethodInterceptor implements MethodInterceptor {
         cacheBuilder.expireAfterWrite(annotation.expiresAfterSeconds());
       }
       cache = cacheBuilder.build();
-      namespaces.put(className, cache);
+      Cache<Triple, Optional<?>> existingCache = namespaces.putIfAbsent(className, cache);
+      if (null != existingCache) {
+        cache = existingCache;
+      }
     }
 
     return cache;
