@@ -26,6 +26,7 @@ package com.wadpam.guja.oauth2.dao;
 import com.google.inject.Inject;
 import com.wadpam.guja.oauth2.domain.DConnection;
 import net.sf.mardao.dao.Cached;
+import net.sf.mardao.dao.Crud;
 import net.sf.mardao.dao.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,5 +52,10 @@ public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
     super(supplier);
   }
 
-
+  @Cached
+  @Crud
+  @Override
+  public DConnection findByAccessToken(String accessToken) {
+    return super.findByAccessToken(accessToken);
+  }
 }

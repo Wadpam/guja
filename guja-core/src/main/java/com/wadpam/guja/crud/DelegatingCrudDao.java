@@ -1,4 +1,4 @@
-package com.wadpam.guja.cache;
+package com.wadpam.guja.crud;
 
 import com.google.inject.Inject;
 import net.sf.mardao.core.CursorPage;
@@ -8,39 +8,37 @@ import net.sf.mardao.dao.CrudDao;
 
 import java.io.IOException;
 
-import static org.easymock.EasyMock.createMock;
-
 /**
  * CrudDao for unit testing.
  * @author mattiaslevin
  */
 @Cached
-public class MockCrudDao implements CrudDao<String, Long> {
+public class DelegatingCrudDao implements CrudDao<String, Long> {
 
-  final private CrudDao<String, Long> mockDelegate;
+  final private CrudDao<String, Long> delegateDao;
 
   @Inject
-  public MockCrudDao(CrudDao<String, Long> mock) {
-    this.mockDelegate = mock;
+  public DelegatingCrudDao(CrudDao<String, Long> mock) {
+    this.delegateDao = mock;
   }
 
   @Override
   public int count(Object o) {
-    return mockDelegate.count(o);
+    return delegateDao.count(o);
   }
 
   @Cached
   @Crud
   @Override
   public Long put(Object parentKey, Long aLong, String s) throws IOException {
-    return mockDelegate.put(parentKey, aLong, s);
+    return delegateDao.put(parentKey, aLong, s);
   }
 
   @Cached
   @Crud
   @Override
   public String get(Object parentKey, Long aLong) throws IOException {
-    return mockDelegate.get(parentKey, aLong);
+    return delegateDao.get(parentKey, aLong);
   }
 
   public String get(Long aLong) throws IOException {
@@ -51,7 +49,7 @@ public class MockCrudDao implements CrudDao<String, Long> {
   @Crud
   @Override
   public void delete(Object parentKey, Long aLong) throws IOException {
-    mockDelegate.delete(parentKey, aLong);
+    delegateDao.delete(parentKey, aLong);
   }
 
   public void delete(Long aLong) throws IOException {
@@ -62,14 +60,11 @@ public class MockCrudDao implements CrudDao<String, Long> {
   @Crud
   @Override
   public CursorPage<String> queryPage(Object ancestorKey, int i, String s) {
-    return mockDelegate.queryPage(ancestorKey, i, s);
+    return delegateDao.queryPage(ancestorKey, i, s);
   }
 
   public CursorPage<String> queryPage(int i, String s) {
     return queryPage(null, i, s);
   }
 
-//  public MockCrudDao getMockDelegate() {
-//    return mockDelegate;
-//  }
 }
