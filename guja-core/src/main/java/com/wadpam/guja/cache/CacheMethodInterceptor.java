@@ -3,6 +3,7 @@ package com.wadpam.guja.cache;
 import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
+import com.wadpam.guja.util.Triplet;
 import net.sf.mardao.dao.AbstractDao;
 import net.sf.mardao.dao.Cached;
 import net.sf.mardao.dao.Crud;
@@ -34,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CacheMethodInterceptor implements MethodInterceptor {
   static final Logger LOGGER = LoggerFactory.getLogger(CacheMethodInterceptor.class);
 
-  private final ConcurrentMap<String, Cache<Triple, Optional<?>>> namespaces = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Cache<Triplet, Optional<?>>> namespaces = new ConcurrentHashMap<>();
 
   private final Provider<CacheBuilder> cacheBuilderProvider;
   public CacheMethodInterceptor(Provider<CacheBuilder> cacheBuilderProvider) {
@@ -50,10 +51,10 @@ public class CacheMethodInterceptor implements MethodInterceptor {
   public Object invoke(final MethodInvocation invocation) throws Throwable {
 
     final Class clazz = getClass(invocation);
-    Cache<Triple, Optional<?>> cache = getCacheInstance(clazz);
+    Cache<Triplet, Optional<?>> cache = getCacheInstance(clazz);
 
     final Object[] args = invocation.getArguments();
-    final Triple triple = new Triple(args);
+    final Triplet triple = Triplet.fromArray(args);
     final Method method = invocation.getMethod();
     LOGGER.trace("invoking on {}, isAnnotated {}", method, method.isAnnotationPresent(Cached.class));
 
@@ -65,7 +66,7 @@ public class CacheMethodInterceptor implements MethodInterceptor {
       args[2] = null;
       checkNotNull(id);
       checkNotNull(entity);
-      cache.put(new Triple(args), Optional.of(entity));
+      cache.put(Triplet.fromArray(args), Optional.of(entity));
       return id;
     }
 
@@ -94,14 +95,14 @@ public class CacheMethodInterceptor implements MethodInterceptor {
     return null != optionalEntity && optionalEntity.isPresent() ? optionalEntity.get() : null;
   }
 
-  private Cache<Triple, Optional<?>> getCacheInstance(Class clazz) {
+  private Cache<Triplet, Optional<?>> getCacheInstance(Class clazz) {
     final String className = clazz.getName();
 
-    Cache<Triple, Optional<?>> cache = namespaces.get(className);
+    Cache<Triplet, Optional<?>> cache = namespaces.get(className);
     if (null == cache) {
       final Cached annotation = (Cached) clazz.getAnnotation(Cached.class);
       LOGGER.debug("Build new dao cache for {}", className);
-      CacheBuilder<Triple, Optional<?>> cacheBuilder = cacheBuilderProvider.get();
+      CacheBuilder<Triplet, Optional<?>> cacheBuilder = cacheBuilderProvider.get();
       if (null != annotation.from() || "".equals(annotation.from())) {
         cacheBuilder.from(annotation.from());
       } else {
@@ -114,7 +115,7 @@ public class CacheMethodInterceptor implements MethodInterceptor {
         cacheBuilder.expireAfterWrite(annotation.expiresAfterSeconds());
       }
       cache = cacheBuilder.build();
-      Cache<Triple, Optional<?>> existingCache = namespaces.putIfAbsent(className, cache);
+      Cache<Triplet, Optional<?>> existingCache = namespaces.putIfAbsent(className, cache);
       if (null != existingCache) {
         cache = existingCache;
       }
@@ -136,45 +137,4 @@ public class CacheMethodInterceptor implements MethodInterceptor {
     return clazz;
   }
 
-  public static class Triple implements Serializable {
-    protected final Object first, second, third;
-
-    Triple(Object[] args) {
-      this.first = 0 < args.length ? args[0] : null;
-      this.second = 1 < args.length ? args[1] : null;
-      this.third = 2 < args.length ? args[2] : null;
-    }
-
-    Triple(Object first, Object second, Object third) {
-      this.first = first;
-      this.second = second;
-      this.third = third;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (o instanceof Triple) {
-        Triple other = (Triple) o;
-        if (!Objects.equals(this.first, other.first)) {
-          return false;
-        }
-        if (!Objects.equals(this.second, other.second)) {
-          return false;
-        }
-        return Objects.equals(this.third, other.third);
-      }
-      return false;
-    }
-
-    @Override
-    public int hashCode() {
-      return (31 * (31 * (null != first ? first.hashCode() : 0)) + (null != second ? second.hashCode() : 0)) +
-              (null != third ? third.hashCode() : 0);
-    }
-
-    @Override
-    public String toString() {
-      return "Triple[" + first + ',' + second + ',' + third + ']';
-    }
-  }
 }

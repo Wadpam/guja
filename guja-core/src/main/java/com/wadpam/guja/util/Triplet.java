@@ -22,12 +22,17 @@ package com.wadpam.guja.util;
  * #L%
  */
 
+import java.io.Serializable;
+import java.util.Objects;
+
+
 /**
  * Triplet tuple implementation
  *
  * @author mattiaslevin
+ * @author osandstrom
  */
-public class Triplet<A, B, C> {
+public class Triplet<A, B, C> implements Serializable {
 
   private final A first;
   private final B second;
@@ -37,10 +42,39 @@ public class Triplet<A, B, C> {
     return new Triplet<>(first, second, third);
   }
 
+  public static <A> Triplet<A, A, A> fromArray(A[] array) {
+    return new Triplet<>(0 < array.length ? array[0] : null,
+        1 < array.length ? array[1] : null,
+        2 < array.length ? array[2] : null);
+  }
+
   public Triplet(A first, B second, C third) {
     this.first = first;
     this.second = second;
     this.third = third;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof Triplet) {
+      Triplet other = (Triplet) o;
+        return Objects.equals(this.first, other.first) &&
+            Objects.equals(this.second, other.second) &&
+            Objects.equals(this.third, other.third);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return (31 * (31 * (null != first ? first.hashCode() : 0)) +
+        (null != second ? second.hashCode() : 0)) +
+        (null != third ? third.hashCode() : 0);
+  }
+
+  @Override
+  public String toString() {
+    return "Triple[" + first + ',' + second + ',' + third + ']';
   }
 
   public A first() {
