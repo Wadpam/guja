@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -63,9 +64,14 @@ public class RestExceptionMapper implements ExceptionMapper<RestException> {
     errorMessage.put("responseCode", String.valueOf(exception.getStatus().getStatusCode()));
 
     return Response.status(exception.getStatus())
-        .entity(errorMessage.build())
-        .type(httpHeaders.getAcceptableMediaTypes().get(0))
-        .build();
+            .entity(errorMessage.build())
+            // Throws exception if type is MediaType.WILDCARD_TYPE
+            .type(getAcceptableMediaTypeNotWildcard())
+            .build();
   }
 
+  private MediaType getAcceptableMediaTypeNotWildcard() {
+    MediaType type = httpHeaders.getAcceptableMediaTypes().get(0);
+    return MediaType.WILDCARD_TYPE.equals(type) ? null : type;
+  }
 }
