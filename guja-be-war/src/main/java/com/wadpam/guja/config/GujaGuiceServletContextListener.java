@@ -52,62 +52,60 @@ import java.util.Properties;
  */
 public class GujaGuiceServletContextListener extends GuiceServletContextListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GujaGuiceServletContextListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GujaGuiceServletContextListener.class);
 
-  private static final String APP_CONFIG_PROPERTY_FILE = "/WEB-INF/app.properties";
+    private static final String APP_CONFIG_PROPERTY_FILE = "/WEB-INF/app.properties";
 
-  @Override
-  protected Injector getInjector() {
+    @Override
+    protected Injector getInjector() {
 
-    return Guice.createInjector(
-        new GujaCoreModule(),
-        new GujaBaseModule(),
-        new GujaGAEModule(),
-        new JerseyServletModule() {
+        return Guice.createInjector(
+                new GujaCoreModule(),
+                new GujaBaseModule(),
+                new GujaGAEModule(),
+                new JerseyServletModule() {
+                    private Properties bindProperties() {
+                        LOGGER.info("Bind application properties");
 
-          private void bindProperties() {
-            LOGGER.info("Bind application properties");
+                        Properties properties = new Properties();
+                        try {
+                            properties.load(getServletContext().getResourceAsStream(APP_CONFIG_PROPERTY_FILE));
+                            Names.bindProperties(binder(), properties);
+                        } catch (IOException e) {
+                            LOGGER.error("Failed to load app properties from resource file {} with error {}", APP_CONFIG_PROPERTY_FILE, e);
+                        }
+                        return properties;
+                    }
 
-            try {
-              Properties properties = new Properties();
-              properties.load(getServletContext().getResourceAsStream(APP_CONFIG_PROPERTY_FILE));
-              Names.bindProperties(binder(), properties);
-            } catch (IOException e) {
-              LOGGER.error("Failed to load app properties from resource file {} with error {}", APP_CONFIG_PROPERTY_FILE, e);
-            }
+                    @Override
+                    protected void configureServlets() {
 
-          }
+                        // Bindings
+                        Properties props = bindProperties();
+                        // Cached annotation
+                        bindInterceptor(Matchers.annotatedWith(Cached.class),
+                                Matchers.annotatedWith(Cached.class),
+                                new CacheMethodInterceptor(getProvider(CacheBuilder.class)));
 
-          @Override
-          protected void configureServlets() {
+                        // Filters
+                        //filter("/*").through(PersistFilter.class);
+                        filter("/api/*").through(OAuth2Filter.class);
+                        filter("/oauth/authorize", "/oauth/refresh", "/oauth/revoke", "/oauth/tokeninfo").through(Oauth2ClientAuthenticationFilter.class);
 
-            // Cached annotation
-            bindInterceptor(Matchers.annotatedWith(Cached.class),
-                Matchers.annotatedWith(Cached.class),
-                new CacheMethodInterceptor(getProvider(CacheBuilder.class)));
+                        bind(Supplier.class).to(DatastoreSupplier.class);
 
-            // Bindings
-            bindProperties();
+                        // Servlets
+                        serve("/*").with(GuiceContainer.class, ImmutableMap.of(
+                                "jersey.config.server.tracing.type", "ALL",
+                                "com.sun.jersey.spi.container.ContainerResponseFilters", "com.wadpam.guja.filter.ProtoWrapperFilter",
+                                "com.sun.jersey.spi.container.ResourceFilters", "com.sun.jersey.api.container.filter.RolesAllowedResourceFilterFactory"
+                        ));
 
-            bind(Supplier.class).to(DatastoreSupplier.class);
-
-            // Filters
-            //filter("/*").through(PersistFilter.class);
-            filter("/api/*").through(OAuth2Filter.class);
-            filter("/oauth/*").through(Oauth2ClientAuthenticationFilter.class);
-
-            // Servlets
-            serve("/*").with(GuiceContainer.class, ImmutableMap.of(
-                "jersey.config.server.tracing.type", "ALL",
-                "com.sun.jersey.spi.container.ContainerResponseFilters", "com.wadpam.guja.filter.ProtoWrapperFilter",
-                "com.sun.jersey.spi.container.ResourceFilters", "com.sun.jersey.api.container.filter.RolesAllowedResourceFilterFactory"
-            ));
-
-            // TODO Find a better way to configure Jersey filters (Guice integration does not support Jersey filter configuration here)
-          }
-        }
-    );
-  }
+                        // TODO Find a better way to configure Jersey filters (Guice integration does not support Jersey filter configuration here)
+                    }
+                }
+        );
+    }
 }
 
 

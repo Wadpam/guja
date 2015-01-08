@@ -51,7 +51,7 @@ import java.util.Collection;
  * @author mattiaslevin
  */
 @Path("api/oauth2user")
-@Produces(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 @RolesAllowed({"ROLE_ADMIN"})
 public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, DOAuth2UserDaoBean> {
 
@@ -73,6 +73,7 @@ public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, DOAuth2U
   @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
   public Response readMe(@Context HttpServletRequest request) throws IOException {
     Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
+    LOGGER.debug("user id = {}", id);
     return read(id);
   }
 

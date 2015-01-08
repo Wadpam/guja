@@ -45,7 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @Path("path/{parentId}/path").
  */
 @Consumes(value = {MediaType.APPLICATION_JSON})
-@Produces(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ParentedCrudResource<PT, PID extends Serializable, P extends AbstractDao<PT, PID>, T, ID extends Serializable,
     D extends AbstractDao<T, ID>> {
 
