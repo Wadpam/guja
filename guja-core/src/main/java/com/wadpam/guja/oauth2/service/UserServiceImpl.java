@@ -142,8 +142,11 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   private boolean sendConfirmEmail(DUser user) {
 
-    String subject = localizationProvider.get().getMessage("verifyEmailAddress", "Verify email address"); // TODO provide translation
-    String verifyUrl = createVerifyEmailUrl(user.getId(), localizationProvider.get().getLocale());
+    // TODO GAE does not support ResourceBundle
+    //String subject = localizationProvider.get().getMessage("verifyEmailAddress", "Verify email address"); // TODO provide translation
+    //String verifyUrl = createVerifyEmailUrl(user.getId(), localizationProvider.get().getLocale());
+    String subject = "Verify email address TODO Translation";
+    String verifyUrl = createVerifyEmailUrl(user.getId(), Locale.getDefault());
 
     String body = templateProvider.get()
         .templateName(VELOCITY_TEMPLATE_VERIFY_EMAIL)
@@ -298,8 +301,11 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
     DUser user = getByEmail(email); // Throw 404 if not found
 
-    String subject = localizationProvider.get().getMessage("restPassword", "Reset password"); // TODO Provide translations
-    String resetUrl = createResetPasswordUrl(user.getId(), localizationProvider.get().getLocale());
+    // TODO GAE does not support ResourceBundle
+    //String subject = localizationProvider.get().getMessage("restPassword", "Reset password"); // TODO Provide translations
+    //String resetUrl = createResetPasswordUrl(user.getId(), localizationProvider.get().getLocale());
+    String subject = "Reset password (TODO localization)";
+    String resetUrl = createResetPasswordUrl(user.getId(), Locale.getDefault());
 
     String body = templateProvider.get()
         .templateName(VELOCITY_TEMPLATE_RESET_PASSWORD)
