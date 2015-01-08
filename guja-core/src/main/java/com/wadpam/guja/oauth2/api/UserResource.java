@@ -53,7 +53,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Path("api/user")
 @Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class UserResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserResource.class);
 

@@ -51,7 +51,7 @@ import java.util.Collection;
  * @author mattiaslevin
  */
 @Path("api/oauth2user")
-@Produces(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 @RolesAllowed({"ROLE_ADMIN"})
 public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, DOAuth2UserDaoBean> {
 

@@ -68,10 +68,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * This flow is typically used by trusted client that my touch the resource owners (user) credentials.
  *
  * @author mattiaslevin
+ * @author sosandstrom
  */
 @Path("oauth")
 @Singleton
 @PermitAll
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class OAuth2Resource {
   private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2Resource.class);
 
@@ -128,8 +131,6 @@ public class OAuth2Resource {
    * Failure response http://tools.ietf.org/html/rfc6749#section-5.2
    */
   @POST
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
   @Path("authorize")
   public Response authorize(UserCredentials credentials) {
     // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
@@ -231,8 +232,6 @@ public class OAuth2Resource {
    */
   @POST
   @Path("refresh")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
   public Response refreshAccessToken(RefreshTokenRequest refreshToken) {
     // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
@@ -276,7 +275,6 @@ public class OAuth2Resource {
    */
   @GET
   @Path("revoke")
-  @Consumes(MediaType.APPLICATION_JSON)
   public Response revoke(@QueryParam("token") String token) {
     // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
@@ -320,7 +318,6 @@ public class OAuth2Resource {
    */
   @GET
   @Path("tokeninfo")
-  @Consumes(MediaType.APPLICATION_JSON)
   public Response validate(@QueryParam("access_token") String access_token) {
     checkNotNull(access_token);
 
@@ -372,7 +369,6 @@ public class OAuth2Resource {
    */
   @GET
   @Path("federated")
-  @Produces(MediaType.APPLICATION_JSON)
   public Response registerFederatedGet(
       @QueryParam("providerId") String providerId,
       @QueryParam("providerUserId") String providerUserId,
@@ -399,7 +395,6 @@ public class OAuth2Resource {
    */
   @GET
   @Path("federated/{providerId}")
-  @Produces(MediaType.APPLICATION_JSON)
   public Response registerFederatedGetPath(
       @PathParam("providerId") String providerId,
       @QueryParam("providerUserId") String providerUserId,
@@ -562,7 +557,6 @@ public class OAuth2Resource {
 
   @Path("ping")
   @GET
-  @Produces(MediaType.APPLICATION_JSON)
   public String ping() {
     return "PONG";
   }
