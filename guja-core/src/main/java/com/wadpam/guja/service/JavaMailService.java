@@ -74,19 +74,24 @@ public class JavaMailService implements EmailService {
                                 String toEmail, String toName,
                                 String subject,
                                 String body, boolean asHtml) {
-
         checkNotNull(fromEmail);
-        checkNotNull(fromName);
         checkNotNull(toEmail);
-        checkNotNull(toName);
 
-        LOGGER.debug("Send email to:{}, subject:{}", toEmail, subject);
+        //LOGGER.debug("from email {} name {}", fromEmail, fromName);
+        //LOGGER.debug("to email {} name {}", toEmail, toName);
+        //LOGGER.debug("subject {} body {}", subject, body);
+        LOGGER.debug("Send simple email to:{}, subject:{}", toEmail, subject);
 
         final Session session = Session.getDefaultInstance(new Properties(), null);
         try {
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(fromEmail, fromName));
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(toEmail, toName));
+
+            InternetAddress address = new InternetAddress(fromEmail, fromName);
+            msg.setFrom(address);
+
+            address = new InternetAddress(toEmail, toName);
+            msg.addRecipient(Message.RecipientType.TO, address);
+
             msg.setSubject(subject);
 
             // Check if plain text or multi-part message
@@ -94,10 +99,8 @@ public class JavaMailService implements EmailService {
                 // Plain text
                 msg.setText(body);
             } else {
-                // Multi-part message
-                final Multipart mp = new MimeMultipart();
-
                 // Add body as html
+                final Multipart mp = new MimeMultipart();
                 final MimeBodyPart htmlPart = new MimeBodyPart();
                 htmlPart.setContent(body, "text/html");
                 mp.addBodyPart(htmlPart);
@@ -105,11 +108,13 @@ public class JavaMailService implements EmailService {
             }
 
             msg.setText(body);
+
             Transport.send(msg);
             return true;
+
         } catch (Exception e) {
             // Catch all exceptions and just log an error, do not interrupt flow
-            LOGGER.error("Not possible to send email with reason:{}", e.getMessage());
+            LOGGER.error("Not possible to send email with reason: {}", e);
             return false;
         }
 
@@ -125,46 +130,44 @@ public class JavaMailService implements EmailService {
                                 byte[] attachment, String filename, String contentType) {
 
         checkNotNull(fromAddress);
-        checkNotNull(fromName);
-        checkNotNull(toAddresses);
+        if (null == toAddresses && null == ccAddresses && null == bccAddresses) {
+            LOGGER.warn("One of to, cc or bcc address must be provided to send email");
+            return false;
+        }
 
-        LOGGER.info("Send email to:{}, subject:{}", toAddresses, subject);
+        LOGGER.info("Send complex email to:{}, subject:{}", toAddresses, subject);
 
         final Session session = Session.getDefaultInstance(new Properties(), null);
         try {
             // Build message
             final Message msg = new MimeMessage(session);
 
-            // Set from address
-            final InternetAddress from = new InternetAddress(fromAddress, fromName);
-            msg.setFrom(from);
+            msg.setFrom(new InternetAddress(fromAddress, fromName));
+
             // Set to address
-            if (toAddresses != null) {
+            if (null != toAddresses) {
                 for (String toAddress : toAddresses) {
                     final InternetAddress to = new InternetAddress(toAddress, null);
                     msg.addRecipient(Message.RecipientType.TO, to);
                 }
             }
 
-            if (null == toAddresses && null == ccAddresses && null == bccAddresses) {
-                LOGGER.warn("One of to, cc or bcc address must be provided to send email");
-                return false;
-            }
-
             // Set cc address
-            if (ccAddresses != null) {
+            if (null != ccAddresses) {
                 for (String ccAddress : ccAddresses) {
                     final InternetAddress cc = new InternetAddress(ccAddress, null);
                     msg.addRecipient(Message.RecipientType.CC, cc);
                 }
             }
+
             // Set bcc address
-            if (bccAddresses != null) {
+            if (null != bccAddresses) {
                 for (String bccAddress : bccAddresses) {
                     final InternetAddress bcc = new InternetAddress(bccAddress, null);
                     msg.addRecipient(Message.RecipientType.BCC, bcc);
                 }
             }
+
             // Subject
             msg.setSubject(subject);
 
@@ -173,10 +176,8 @@ public class JavaMailService implements EmailService {
                 // Plain text
                 msg.setText(body);
             } else {
-                // Multi-part message
-                final Multipart mp = new MimeMultipart();
-
                 // Add body as html
+                final Multipart mp = new MimeMultipart();
                 final MimeBodyPart htmlPart = new MimeBodyPart();
                 htmlPart.setContent(body, "text/html");
                 mp.addBodyPart(htmlPart);
@@ -194,11 +195,12 @@ public class JavaMailService implements EmailService {
             msg.saveChanges();
             Transport.send(msg);
             return true;
+
         } catch (UnsupportedEncodingException ex) {
             LOGGER.warn("Cannot create InternetAddress when sending email:{}", ex);
             return false;
         } catch (MessagingException me) {
-            LOGGER.warn("Cannot send email with reason:{}", me);
+            LOGGER.warn("Cannot send email with reason: {}", me);
             return false;
         }
     }

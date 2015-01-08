@@ -45,6 +45,7 @@ import com.wadpam.guja.oauth2.service.UserServiceImpl;
 import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
 import com.wadpam.guja.provider.NonNullObjectMapperProvider;
 import com.wadpam.guja.service.EmailService;
+import com.wadpam.guja.service.JavaMailService;
 import com.wadpam.guja.service.MockEmailService;
 import com.wadpam.guja.template.RequestScopedVelocityTemplateStringWriterBuilder;
 import net.sf.mardao.dao.Supplier;
@@ -90,7 +91,7 @@ public class GujaCoreModule extends AbstractModule {
 
     bind(RequestScopedVelocityTemplateStringWriterBuilder.class);
 
-    bind(EmailService.class).to(MockEmailService.class); // TODO Using mock email service
+    bind(EmailService.class).to(JavaMailService.class);
 
     bind(UserResource.class);
     bind(UserService.class).to(UserServiceImpl.class);
