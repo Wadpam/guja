@@ -191,7 +191,7 @@
                                     </docletArtifact>
                                     <reportOutputDirectory>${project.build.directory}/${project.build.finalName}</reportOutputDirectory>
                                     <useStandardDocletOptions>false</useStandardDocletOptions>
-                                    <additionalparam>-apiVersion 1 -docBasePath http://feeder-stage.appspot.com/guja/apidocs -apiBasePath http://feeder-stage.appspot.com/guja/apidocs</additionalparam>
+                                    <additionalparam>-apiVersion 1 -docBasePath http://feeder-stage.appspot.com/apidocs/guja/apidocs -apiBasePath http://feeder-stage.appspot.com/apidics/guja/apidocs</additionalparam>
                                 </configuration>
                                 <goals>
                                     <goal>javadoc</goal>
