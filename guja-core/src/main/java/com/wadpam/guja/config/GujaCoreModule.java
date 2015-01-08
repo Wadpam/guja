@@ -42,6 +42,7 @@ import com.wadpam.guja.oauth2.provider.*;
 import com.wadpam.guja.oauth2.service.UserAdminTask;
 import com.wadpam.guja.oauth2.service.UserService;
 import com.wadpam.guja.oauth2.service.UserServiceImpl;
+import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
 import com.wadpam.guja.provider.NonNullObjectMapperProvider;
 import com.wadpam.guja.service.EmailService;
 import com.wadpam.guja.service.MockEmailService;
@@ -102,6 +103,7 @@ public class GujaCoreModule extends AbstractModule {
 
     Multibinder<AdminTask> adminTaskBinder = Multibinder.newSetBinder(binder(), AdminTask.class);
     adminTaskBinder.addBinding().to(UserAdminTask.class);
+    adminTaskBinder.addBinding().to(Oauth2ClientAuthenticationFilter.class);
 
     MardaoTransactionManager transactionManager = new MardaoTransactionManager(getProvider(Supplier.class));
     requestInjection(transactionManager);

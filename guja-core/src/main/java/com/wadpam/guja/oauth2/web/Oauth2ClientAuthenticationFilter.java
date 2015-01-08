@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.repackaged.com.google.common.io.BaseEncoding;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.wadpam.guja.admintask.AdminTask;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.oauth2.api.FactoryResource;
 import com.wadpam.guja.oauth2.api.requests.ClientCredentials;
@@ -40,6 +41,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * A Oauth2 client authentication filter.
@@ -48,7 +50,7 @@ import java.io.IOException;
  * @author mattiaslevin
  */
 @Singleton
-public class Oauth2ClientAuthenticationFilter implements Filter {
+public class Oauth2ClientAuthenticationFilter implements Filter, AdminTask {
   public static final Logger LOGGER = LoggerFactory.getLogger(Oauth2ClientAuthenticationFilter.class);
 
   public static final String PREFIX_BASIC_AUTHENTICATION = "Basic ";
@@ -67,19 +69,23 @@ public class Oauth2ClientAuthenticationFilter implements Filter {
     this.factoryDao = factoryDaoBean;
 
     if (serverEnvironment.isDevEnvironment()) {
-      try {
+        createDefaultFactory();
+    }
 
-        // TODO Move values to a property file
-        factoryDao.put(DFactoryMapper.newBuilder()
-            .id(FactoryResource.PROVIDER_ID_SELF)
-            .baseUrl("https://wwww.self.com")
-            .clientId("12345")
-            .clientSecret("9876")
-            .build());
+  }
 
-      } catch (IOException e) {
-        LOGGER.error("populating factory", e);
-      }
+  private void createDefaultFactory() {
+    try {
+      // TODO Move values to a property file
+      // Overwrite any existing record
+      factoryDao.put(DFactoryMapper.newBuilder()
+          .id(FactoryResource.PROVIDER_ID_SELF)
+          .baseUrl("https://wwww.self.com")
+          .clientId("12345")
+          .clientSecret("9876")
+          .build());
+    } catch (IOException e) {
+      LOGGER.error("Failed populating factory", e);
     }
   }
 
@@ -165,6 +171,17 @@ public class Oauth2ClientAuthenticationFilter implements Filter {
   @Override
   public void destroy() {
     // Do nothing
+  }
+
+
+  @Override
+  public Object processTask(String taskName, Map<String, String[]> parameterMap) {
+
+    if ("createFactory".equalsIgnoreCase(taskName)) {
+      createDefaultFactory();
+    }
+
+    return null;
   }
 
 }
