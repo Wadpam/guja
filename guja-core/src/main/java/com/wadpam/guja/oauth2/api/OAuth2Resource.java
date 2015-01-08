@@ -38,10 +38,10 @@ import com.wadpam.guja.oauth2.dao.DFactoryMapper;
 import com.wadpam.guja.oauth2.domain.DConnection;
 import com.wadpam.guja.oauth2.domain.DFactory;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
-import com.wadpam.guja.oauth2.providers.AccessTokenGenerator;
-import com.wadpam.guja.oauth2.providers.Oauth2UserProvider;
-import com.wadpam.guja.oauth2.providers.ServerEnvironmentProvider;
-import com.wadpam.guja.oauth2.providers.UserAuthenticationProvider;
+import com.wadpam.guja.oauth2.provider.TokenGenerator;
+import com.wadpam.guja.oauth2.provider.Oauth2UserProvider;
+import com.wadpam.guja.environment.ServerEnvironment;
+import com.wadpam.guja.oauth2.provider.UserAuthenticationProvider;
 import com.wadpam.guja.oauth2.social.SocialProfile;
 import com.wadpam.guja.oauth2.social.SocialTemplate;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
@@ -59,6 +59,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An oauth2 implementation support the Resource Owner Password Credential Grant flow.
@@ -80,15 +82,15 @@ public class OAuth2Resource {
   private final DFactoryDaoBean factoryDao;
 
   private final Oauth2UserProvider userProvider;
-  private final AccessTokenGenerator accessTokenGenerator;
+  private final TokenGenerator accessTokenGenerator;
   private final UserAuthenticationProvider authenticationProvider;
 
 
   @Inject
   public OAuth2Resource(UserAuthenticationProvider authenticationProvider,
-                        AccessTokenGenerator accessTokenGenerator,
+                        TokenGenerator accessTokenGenerator,
                         Oauth2UserProvider userProvider,
-                        ServerEnvironmentProvider serverEnvironment,
+                        ServerEnvironment serverEnvironment,
                         DConnectionDaoBean connectionDao,
                         DFactoryDaoBean factoryDao) {
 
@@ -130,6 +132,7 @@ public class OAuth2Resource {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("authorize")
   public Response authorize(UserCredentials credentials) {
+    // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
     // The client has been authenticated already in the interceptor
 
@@ -231,6 +234,7 @@ public class OAuth2Resource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   public Response refreshAccessToken(RefreshTokenRequest refreshToken) {
+    // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
     if (null == refreshToken.getRefresh_token() ||
         null == refreshToken.getGrant_type()) {
@@ -274,6 +278,7 @@ public class OAuth2Resource {
   @Path("revoke")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response revoke(@QueryParam("token") String token) {
+    // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
     if (null != token) {
 
@@ -310,17 +315,14 @@ public class OAuth2Resource {
    * Validate an access_token.
    * The Oauth2 specification does not specify how this should be done. Do similar to what Google does
    *
-   * @param access_token access token to validate
+   * @param access_token access token to validate. Be careful about using url safe tokens or use url encoding.
    * @return http 200 if success and some basic info about the access_token
    */
   @GET
   @Path("tokeninfo")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response validate(@QueryParam("access_token") String access_token) {
-
-    if (null == access_token) {
-      throw new BadRequestRestException("Missing access_token in request");
-    }
+    checkNotNull(access_token);
 
     DConnection connection = connectionDao.findByAccessToken(access_token);
     LOGGER.debug("Connection {}", connection);
@@ -418,6 +420,9 @@ public class OAuth2Resource {
       String secret,
       Integer expiresInSeconds,
       String appArg0) throws IOException {
+
+    checkNotNull(access_token);
+    checkNotNull(providerId);
 
     if (null == expiresInSeconds) {
       expiresInSeconds = DEFAULT_EXPIRES_IN;
@@ -522,8 +527,8 @@ public class OAuth2Resource {
 
     for (DConnection dc : connections) {
       if (providerId.equals(dc.getProviderId())) {
-        // expired?
-        if (null != dc.getExpireTime() && hasAccessTokenExpired(dc)) {
+        // expired? only remove if no refresh token
+        if (null == dc.getRefreshToken() && null != dc.getExpireTime() && hasAccessTokenExpired(dc)) {
           expiredTokens.add(dc.getId());
         }
       }

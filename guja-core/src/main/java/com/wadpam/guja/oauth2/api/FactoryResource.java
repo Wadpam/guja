@@ -41,7 +41,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * @author osandstrom
  */
-@Path("_adm/factories")
+@Path("_adm/factory")
 @Produces(MediaType.APPLICATION_JSON)
 @PermitAll // This resource is protected in web.xml. Must be GAE app developer to access this resource.
 public class FactoryResource extends CrudResource<DFactory, String, DFactoryDaoBean> {

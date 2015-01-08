@@ -41,7 +41,6 @@ import java.util.Collection;
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"username"}))
 public class DUser extends DOAuth2User {
 
-
   /**
    * A unique user name
    */
@@ -60,6 +59,8 @@ public class DUser extends DOAuth2User {
    */
   @Basic
   private Collection<Long> friends;
+
+  // TODO Missing a lot of properties - name, address etc
 
 
   public String getUsername() {

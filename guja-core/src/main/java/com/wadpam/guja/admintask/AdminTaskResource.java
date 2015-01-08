@@ -22,11 +22,8 @@ package com.wadpam.guja.admintask;
  * #L%
  */
 
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.api.taskqueue.TransientFailureException;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.RequestParameters;
 import org.slf4j.Logger;
@@ -39,7 +36,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -51,56 +47,57 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author osandstrom
  * @author mattiaslevin
  */
-@Path("adm/task")
+@Path("_adm/task")
 @Singleton
 @PermitAll // Protected by container security
 public class AdminTaskResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(AdminTaskResource.class);
 
-  public static final String PATH_ADMIN_TASK = "/adm/task/%s";
-
   private final Set<AdminTask> adminTasks;
+  private final AdminTaskQueue taskQueue;
+
+  @Inject @RequestParameters
+  private Provider<Map<String, String[]>> requestParamsProvider;
 
   @Inject
-  public AdminTaskResource(Set<AdminTask> adminTasks) {
+  public AdminTaskResource(Set<AdminTask> adminTasks, AdminTaskQueue taskQueue) {
     this.adminTasks = adminTasks;
+    this.taskQueue = taskQueue;
   }
 
+  /**
+   * Enqueue an admin task for processing.
+   * The request will return immediately and the task will be run in a separate thread.
+   * The execution model depending on the implementation of the queue.
+   *
+   * @param taskName task name
+   * @return
+   */
   @GET
   @Path("{taskName}")
-  public Response enqueueTask(@RequestParameters Map<String, String[]> paramMap,
-                              @PathParam("taskName") String taskName) {
-
-    final Queue queue = QueueFactory.getDefaultQueue();
-    final TaskOptions options = TaskOptions.Builder.withUrl(String.format(PATH_ADMIN_TASK, checkNotNull(taskName)));
-    for (Entry<String, String[]> param : paramMap.entrySet()) {
-      for (String value : param.getValue()) {
-        options.param(param.getKey(), value);
-      }
-    }
-
-    try {
-      queue.add(options);
-    } catch (TransientFailureException tfe) {
-      LOGGER.error("Run admin task fail {} ", tfe.getMessage());
-    }
-
-    LOGGER.info("Added admin task to queue {}", taskName);
-
+  public Response enqueueTask(@PathParam("taskName") String taskName) {
+    checkNotNull(taskName);
+    taskQueue.enqueueTask(taskName, requestParamsProvider.get());
     return Response.ok().build();
   }
 
 
+  /**
+   * Process an admin task.
+   * The admin task will be processed on the requesting thread.
+   *
+   * @param taskName task name
+   * @return
+   */
   @POST
   @Path("{taskName}")
-  public Response processTask(@RequestParameters Map<String, String[]> paramMap,
-                              @PathParam("taskName") String taskName) {
+  public Response processTask(@PathParam("taskName") String taskName) {
+    checkNotNull(requestParamsProvider.get());
     checkNotNull(taskName);
-    checkNotNull(paramMap);
 
     LOGGER.info("Processing task for {}...", taskName);
     for (AdminTask adminTask : adminTasks) {
-      final Object body = adminTask.processTask(taskName, paramMap);
+      final Object body = adminTask.processTask(taskName, requestParamsProvider.get());
       LOGGER.info("Processed tasks for {}: {}", taskName, body);
     }
 
@@ -108,4 +105,3 @@ public class AdminTaskResource {
   }
 
 }
-

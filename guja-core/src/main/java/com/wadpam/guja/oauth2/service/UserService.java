@@ -22,6 +22,7 @@ package com.wadpam.guja.oauth2.service;
  * #L%
  */
 
+import com.wadpam.guja.oauth2.api.UserResource;
 import com.wadpam.guja.oauth2.domain.DUser;
 import net.sf.mardao.core.CursorPage;
 
@@ -43,6 +44,21 @@ public interface UserService {
   DUser signup(DUser user);
 
   /**
+   * Let the user confirm their email address.
+   * @param userId unique user id
+   * @param token temporary generated token
+   * @return true if the email was confirmed
+   */
+  boolean confirmEmail(Long userId, String token);
+
+  /**
+   * Resend email confirmation email.
+   * @param userId unique user id
+   * @return true of the email was sent
+   */
+  boolean resendConfirmEmail(Long userId);
+
+  /**
    * Get user by user id.
    *
    * @param id unique user id
@@ -60,11 +76,31 @@ public interface UserService {
   /**
    * Get a page of users.
    *
-   * @param cursorKey Optional. Cursor key.
    * @param pageSize  Optional. Page size
+   * @param cursorKey Optional. Cursor key.
    * @return a page of user domain objects
    */
-  CursorPage<DUser> readPage(String cursorKey, int pageSize);
+  CursorPage<DUser> readPage(int pageSize, String cursorKey);
+
+  /**
+   * Find users matching partial email address.
+   *
+   * @param email partial email address
+   * @param pageSize  Optional. Page size
+   * @param cursorKey Optional. Cursor key.
+   * @return a page of matching users
+   */
+  CursorPage<DUser> findMatchingUsersByEmail(String email, int pageSize, String cursorKey);
+
+  /**
+   * Find users matching partial username.
+   *
+   * @param username partial username
+   * @param pageSize  Optional. Page size
+   * @param cursorKey Optional. Cursor key.
+   * @return a page of matching users
+   */
+  CursorPage<DUser> findMatchingUsersByUserName(String username, int pageSize, String cursorKey);
 
   /**
    * Update a user.
@@ -86,20 +122,35 @@ public interface UserService {
   void changePassword(Long id, String oldPassword, String newPassword);
 
   /**
+   * Reset a users password by sending an password reset email.
+   *
+   * @param email unique user email
+   */
+  void resetPassword(String email);
+
+  /**
+   * Change password using a short lived temporary token (part of the password reset flow)
+   * @param userId unique user id
+   * @param newPassword new password
+   * @param token temporary password
+   * @return true if the password was successfully changed
+   */
+  boolean changePasswordUsingToken(Long userId, String newPassword, String token);
+
+  /**
    * Create a default admin account.
    * This account should be deleted in productions environment after the system has been configured.
    *
-   * @return
+   * @return the create admin user
    */
   DUser createDefaultAdmin();
-
 
   /**
    * Get users that added me to their friends list.
    * @param id current user
-   * @param cursorKey Optional. Cursor key
    * @param pageSize Optional. Page size
+   * @param cursorKey Optional. Cursor key
    * @return page of users
    */
-  CursorPage<DUser> getFriendsWith(Long id, String cursorKey, int pageSize);
+  CursorPage<DUser> getFriendsWith(Long id, int pageSize, String cursorKey);
 }

@@ -36,6 +36,8 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Map this Resource with a
  *
@@ -59,9 +61,11 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
   @POST
   @Transactional
   public Response create(@PathParam("parentId") PID parentId, T entity) throws URISyntaxException, IOException {
+    checkNotNull(parentId);
+
     // Objects such as parentKey cannot be properly JSONed:
     final Object parentKey = parentDao.getKey(parentId);
-    //dao.setParentKey(entity, parentKey);
+    dao.setParentKey(entity, parentKey);
 
     final ID id = dao.put(entity);
     URI uri = new URI(id.toString());
@@ -70,7 +74,11 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
 
   @DELETE
   @Path("{id}")
-  public Response delete(@PathParam("parentId") PID parentId, @PathParam("id") ID id) throws IOException {
+  public Response delete(@PathParam("parentId") PID parentId,
+                         @PathParam("id") ID id) throws IOException {
+    checkNotNull(parentId);
+    checkNotNull(id);
+
     final Object parentKey = parentDao.getKey(null, parentId);
     dao.delete(parentKey, id);
 
@@ -79,7 +87,11 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
 
   @GET
   @Path("{id}")
-  public Response read(@PathParam("parentId") PID parentId, @PathParam("id") ID id) throws IOException {
+  public Response read(@PathParam("parentId") PID parentId,
+                       @PathParam("id") ID id) throws IOException {
+    checkNotNull(parentId);
+    checkNotNull(id);
+
     final Object parentKey = parentDao.getKey(null, parentId);
     final T entity = dao.get(parentKey, id);
     if (null == entity) {
@@ -92,14 +104,20 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
   public Response readPage(@PathParam("parentId") PID parentId,
                            @QueryParam("pageSize") @DefaultValue("10") int pageSize,
                            @QueryParam("cursorKey") String cursorKey) {
-        final Object parentKey = parentDao.getKey(null, parentId);
-        final CursorPage<T> page = dao.queryPage(parentKey, pageSize, cursorKey);
-        return Response.ok(page).build();
+    checkNotNull(parentId);
+
+    final Object parentKey = parentDao.getKey(null, parentId);
+    final CursorPage<T> page = dao.queryPage(parentKey, pageSize, cursorKey);
+    return Response.ok(page).build();
   }
 
   @POST
   @Path("{id}")
-  public Response update(@PathParam("parentId") PID parentId, @PathParam("id") ID id, T entity) throws URISyntaxException, IOException {
+  public Response update(@PathParam("parentId") PID parentId,
+                         @PathParam("id") ID id, T entity) throws URISyntaxException, IOException {
+    checkNotNull(parentId);
+    checkNotNull(id);
+
     // Objects such as parentKey cannot be properly JSONed:
     final Object parentKey = parentDao.getKey(null, parentId);
     dao.setParentKey(entity, parentKey);
@@ -112,4 +130,5 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
     URI uri = new URI(id.toString());
     return Response.ok().contentLocation(uri).build();
   }
+
 }

@@ -63,9 +63,10 @@ public class VersionCheckResource {
   public VersionCheckResource(@Named("app.versions.upgradeUrls") String upgradeUrls,
                               VersionCheckPredicate predicate,
                               @PropertyFile Localization localization) {
-    this.predicate = checkNotNull(predicate);
-    this.localization = checkNotNull(localization);
-    this.upgradeUrls = parsePropertyMap(checkNotNull(upgradeUrls));
+
+    this.predicate = predicate;
+    this.localization = localization;
+    this.upgradeUrls = parsePropertyMap(upgradeUrls);
 
   }
 
@@ -86,20 +87,40 @@ public class VersionCheckResource {
     } else {
 
       LOGGER.debug("Version not supported {} {}", version, platform);
-      ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String>builder()
-          .put("localizedMessage", localization.getMessage("updateRequired", "You must upgrade your application"));
 
+      VersionCheckResponse response = new VersionCheckResponse();
+      response.setLocalizedMessage(localization.getMessage("updateRequired", "You must upgrade your application"));
       if (null != upgradeUrls && null != upgradeUrls.get(platform)) {
-        builder.put("url", upgradeUrls.get(platform));
+        response.setUrl(upgradeUrls.get(platform));
       }
 
       return Response.status(Response.Status.GONE)
-          .entity(builder.build())
+          .entity(response)
           .build();
     }
 
   }
 
+  public static class VersionCheckResponse {
+    private String localizedMessage;
+    private String url;
+
+    public String getLocalizedMessage() {
+      return localizedMessage;
+    }
+
+    public void setLocalizedMessage(String localizedMessage) {
+      this.localizedMessage = localizedMessage;
+    }
+
+    public String getUrl() {
+      return url;
+    }
+
+    public void setUrl(String url) {
+      this.url = url;
+    }
+  }
 
   /**
    * Interface for testing if a version is supported.

@@ -3,6 +3,7 @@ package com.wadpam.guja.template;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.ResourceNotFoundException;
 
 import java.io.StringWriter;
 import java.util.Locale;
@@ -12,7 +13,7 @@ import java.util.Properties;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Generate localised string writers based on velocity templates and velocity contexts.
+ * Generate localised string writers based on velocity templates, locale and velocity contexts.
  *
  * @mattiaslevin
  */
@@ -27,24 +28,33 @@ public class VelocityTemplateStringWriterBuilder {
     Velocity.init(p);
   }
 
-  final private String templateName;
-  final private VelocityContext vc;
+  private String templateName;
   private Locale locale;
+  private VelocityContext vc;
 
 
-  public static VelocityTemplateStringWriterBuilder withTemplate(String name) {
-    return new VelocityTemplateStringWriterBuilder(name, new VelocityContext(), Locale.getDefault());
+  public static VelocityTemplateStringWriterBuilder withTemplate(String templateName) {
+    return new VelocityTemplateStringWriterBuilder(templateName, null, new VelocityContext());
   }
 
-
-  private VelocityTemplateStringWriterBuilder(String templateName, VelocityContext vc, Locale locale) {
+  public VelocityTemplateStringWriterBuilder(String templateName, Locale locale, VelocityContext vc) {
     this.templateName = templateName;
-    this.vc = vc;
     this.locale = locale;
+    this.vc = vc;
+  }
+
+  public VelocityTemplateStringWriterBuilder templateName(String name) {
+    this.templateName = name;
+    return this;
   }
 
   public VelocityTemplateStringWriterBuilder locale(Locale locale) {
     this.locale = locale;
+    return this;
+  }
+
+  public VelocityTemplateStringWriterBuilder velocityContext(VelocityContext vc) {
+    this.vc = vc;
     return this;
   }
 
@@ -63,10 +73,12 @@ public class VelocityTemplateStringWriterBuilder {
   }
 
   public StringWriter build() {
+    checkNotNull(templateName);
+    checkNotNull(vc);
 
     // Load template based on locale
     // Will trow exception if template is not found
-    Template template = Velocity.getTemplate(localizedTemplateName(templateName, locale));
+    Template template = getTemplate(templateName);
 
     // Merge template and context
     StringWriter writer = new StringWriter();
@@ -75,8 +87,19 @@ public class VelocityTemplateStringWriterBuilder {
     return writer;
   }
 
+  private Template getTemplate(String templateName) {
+
+    try {
+      return Velocity.getTemplate(localizedTemplateName(templateName, locale));
+    } catch (ResourceNotFoundException e) {
+      // Fall back to default template name without any local postfix
+      // If this also fails let the exception propagate
+      return Velocity.getTemplate(templateName);
+    }
+
+  }
+
   private static String localizedTemplateName(String templateName, Locale locale) {
-    checkNotNull(templateName);
 
     if (null == locale) {
       return templateName;

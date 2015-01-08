@@ -3,7 +3,8 @@
     <parent>
         <artifactId>guja</artifactId>
         <groupId>com.wadpam.guja</groupId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>0.0.4-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -27,14 +28,20 @@
                 <artifactId>appengine-maven-plugin</artifactId>
                 <version>${appengine.target.version}</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
     <dependencies>
         <dependency>
-            <groupId>com.wadpam.guja</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>guja-be-war</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
             <type>war</type>
         </dependency>
     </dependencies>

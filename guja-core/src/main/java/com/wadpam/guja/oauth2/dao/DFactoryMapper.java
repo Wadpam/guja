@@ -1,29 +1,8 @@
 package com.wadpam.guja.oauth2.dao;
 
-/*
- * #%L
- * guja-core
- * %%
- * Copyright (C) 2014 Wadpam
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
 import java.util.Collection;
 import java.util.Date;
+import java.nio.ByteBuffer;
 
 import net.sf.mardao.dao.Mapper;
 import net.sf.mardao.dao.Supplier;
@@ -33,7 +12,7 @@ import com.wadpam.guja.oauth2.domain.DFactory;
 /**
  * The DFactory domain-object specific mapping methods go here.
  *
- * Generated on 2014-12-14T21:20:34.275+0100.
+ * Generated on 2015-01-02T18:17:30.242+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DFactoryMapper
@@ -161,49 +140,55 @@ public class DFactoryMapper
     return value;
   }
 
-  public static DFactoryBuilder newBuilder() {
-    return new DFactoryBuilder();
+  public static Builder newBuilder() {
+    return new Builder();
   }
 
-  public static class DFactoryBuilder extends AbstractEntityBuilder<DFactory> {
+  public static class Builder extends AbstractEntityBuilder<DFactory> {
 
-    @Override
-    protected DFactory newInstance() {
-      return new DFactory();
+    protected Builder() {
+      super(new DFactory());
     }
 
-    public DFactoryBuilder id(String id) {
+    public Builder id(String id) {
       entity.setId(id);
       return this;
     }
 
-    public DFactoryBuilder baseUrl(String baseUrl) {
+    public Builder baseUrl(String baseUrl) {
       entity.setBaseUrl(baseUrl);
       return this;
     }
-    public DFactoryBuilder clientId(String clientId) {
+
+    public Builder clientId(String clientId) {
       entity.setClientId(clientId);
       return this;
     }
-    public DFactoryBuilder clientSecret(String clientSecret) {
+
+    public Builder clientSecret(String clientSecret) {
       entity.setClientSecret(clientSecret);
       return this;
     }
-    public DFactoryBuilder createdBy(String createdBy) {
+
+    public Builder createdBy(String createdBy) {
       entity.setCreatedBy(createdBy);
       return this;
     }
-    public DFactoryBuilder createdDate(Date createdDate) {
+
+    public Builder createdDate(Date createdDate) {
       entity.setCreatedDate(createdDate);
       return this;
     }
-    public DFactoryBuilder updatedBy(String updatedBy) {
+
+    public Builder updatedBy(String updatedBy) {
       entity.setUpdatedBy(updatedBy);
       return this;
     }
-    public DFactoryBuilder updatedDate(Date updatedDate) {
+
+    public Builder updatedDate(Date updatedDate) {
       entity.setUpdatedDate(updatedDate);
       return this;
     }
+
   }
 }

@@ -26,13 +26,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.repackaged.com.google.common.io.BaseEncoding;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.wadpam.guja.admintask.AdminTask;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.oauth2.api.FactoryResource;
 import com.wadpam.guja.oauth2.api.requests.ClientCredentials;
 import com.wadpam.guja.oauth2.dao.DFactoryDaoBean;
 import com.wadpam.guja.oauth2.dao.DFactoryMapper;
 import com.wadpam.guja.oauth2.domain.DFactory;
-import com.wadpam.guja.oauth2.providers.ServerEnvironmentProvider;
+import com.wadpam.guja.environment.ServerEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * A Oauth2 client authentication filter.
@@ -48,7 +50,7 @@ import java.io.IOException;
  * @author mattiaslevin
  */
 @Singleton
-public class Oauth2ClientAuthenticationFilter implements Filter {
+public class Oauth2ClientAuthenticationFilter implements Filter, AdminTask {
   public static final Logger LOGGER = LoggerFactory.getLogger(Oauth2ClientAuthenticationFilter.class);
 
   public static final String PREFIX_BASIC_AUTHENTICATION = "Basic ";
@@ -61,25 +63,29 @@ public class Oauth2ClientAuthenticationFilter implements Filter {
 
   @Inject
   public Oauth2ClientAuthenticationFilter(
-      ObjectMapper objectMapper, DFactoryDaoBean factoryDaoBean, ServerEnvironmentProvider serverEnvironment) {
+      ObjectMapper objectMapper, DFactoryDaoBean factoryDaoBean, ServerEnvironment serverEnvironment) {
 
     this.objectMapper = objectMapper;
     this.factoryDao = factoryDaoBean;
 
     if (serverEnvironment.isDevEnvironment()) {
-      try {
+        createDefaultFactory();
+    }
 
-        // TODO Move values to a property file
-        factoryDao.put(DFactoryMapper.newBuilder()
-            .id(FactoryResource.PROVIDER_ID_SELF)
-            .baseUrl("https://wwww.self.com")
-            .clientId("12345")
-            .clientSecret("9876")
-            .build());
+  }
 
-      } catch (IOException e) {
-        LOGGER.error("populating factory", e);
-      }
+  private void createDefaultFactory() {
+    try {
+      // TODO Move values to a property file
+      // Overwrite any existing record
+      factoryDao.put(DFactoryMapper.newBuilder()
+          .id(FactoryResource.PROVIDER_ID_SELF)
+          .baseUrl("https://wwww.self.com")
+          .clientId("12345")
+          .clientSecret("9876")
+          .build());
+    } catch (IOException e) {
+      LOGGER.error("Failed populating factory", e);
     }
   }
 
@@ -105,18 +111,20 @@ public class Oauth2ClientAuthenticationFilter implements Filter {
       int beginIndex = auth.indexOf(PREFIX_BASIC_AUTHENTICATION);
       if (-1 < beginIndex) {
         String baString = auth.substring(beginIndex + PREFIX_BASIC_AUTHENTICATION.length());
-        if (!baString.equals(getBasicAuthenticationString())) {
+        String storedBaString = getBasicAuthenticationString();
+        LOGGER.debug("{} equals? {}", baString, storedBaString);
+        if (!baString.equals(storedBaString)) {
           LOGGER.info("Unauthorized");
           response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
           return;
         }
       }
 
-    } else {
+    } else if (request.getContentLength() > 0) {
       // Check JSON
       BodyRequestWrapper wrappedRequest = new BodyRequestWrapper(request);
       ClientCredentials credentials = objectMapper.readValue(wrappedRequest.getBody(), ClientCredentials.class);
-      //LOGGER.debug(String.format("%s: %s, %s", PREFIX_BASIC_AUTHENTICATION, credentials.getClient_id(), credentials.getClient_secret()));
+      LOGGER.debug(String.format("%s: %s, %s", PREFIX_BASIC_AUTHENTICATION, credentials.getClient_id(), credentials.getClient_secret()));
       if (null == credentials ||
           null == credentials.getClient_id() ||
           null == credentials.getClient_secret() ||
@@ -127,6 +135,10 @@ public class Oauth2ClientAuthenticationFilter implements Filter {
       }
 
       request = wrappedRequest;
+
+    } else {
+      LOGGER.info("Unauthorized (no body)");
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     chain.doFilter(request, response);
@@ -159,6 +171,17 @@ public class Oauth2ClientAuthenticationFilter implements Filter {
   @Override
   public void destroy() {
     // Do nothing
+  }
+
+
+  @Override
+  public Object processTask(String taskName, Map<String, String[]> parameterMap) {
+
+    if ("createFactory".equalsIgnoreCase(taskName)) {
+      createDefaultFactory();
+    }
+
+    return null;
   }
 
 }

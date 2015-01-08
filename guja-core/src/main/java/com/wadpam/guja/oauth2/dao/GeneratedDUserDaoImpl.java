@@ -1,27 +1,5 @@
 package com.wadpam.guja.oauth2.dao;
 
-/*
- * #%L
- * guja-core
- * %%
- * Copyright (C) 2014 Wadpam
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,7 +20,7 @@ import com.wadpam.guja.oauth2.domain.DUser;
 /**
  * The DUser domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2014-12-14T21:20:34.275+0100.
+ * Generated on 2015-01-02T18:17:30.242+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDUserDaoImpl
@@ -81,12 +59,12 @@ public class GeneratedDUserDaoImpl
   }
 
   /**
-   * query-by method for field email
-   * @param email the specified attribute
-   * @return an Iterable of DUsers for the specified email
+   * find-by method for unique field email
+   * @param email the unique attribute
+   * @return the unique DUser for the specified email
    */
-  public Iterable<DUser> queryByEmail(java.lang.String email) {
-    return queryByField(null, DUserMapper.Field.EMAIL.getFieldName(), email);
+  public DUser findByEmail(java.lang.String email) {
+    return queryUniqueByField(null, DUserMapper.Field.EMAIL.getFieldName(), email);
   }
 
   /**
@@ -171,7 +149,10 @@ public class GeneratedDUserDaoImpl
   }
 
 
-// ----------------------- query methods -------------------------------
+// ----------------------- DUser builder -------------------------------
 
+  public static DUserMapper.Builder newBuilder() {
+    return DUserMapper.newBuilder();
+  }
 
 }

@@ -98,6 +98,7 @@ public class OAuth2Filter implements Filter {
 
       } else {
         LOGGER.info("Unauthorised");
+        // TODO Should be return 401 or allow the user to continue as anonymous?
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         return;
       }
@@ -139,7 +140,7 @@ public class OAuth2Filter implements Filter {
       }
     }
 
-    return null;
+    return accessToken;
   }
 
   public static Long getUserId(HttpServletRequest request) {
@@ -148,6 +149,7 @@ public class OAuth2Filter implements Filter {
 
   private DConnection verifyAccessToken(String accessToken) {
     final DConnection conn = connectionDaoProvider.get().findByAccessToken(accessToken);
+    LOGGER.info("verify for {} gives conn {}", accessToken, conn);
     if (null == conn) {
       LOGGER.debug("No such access_token {}", accessToken);
       return null;

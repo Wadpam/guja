@@ -26,14 +26,17 @@ package com.wadpam.guja.config;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
-import com.wadpam.guja.guice.GujaBaseModule;
-import com.wadpam.guja.guice.GujaCoreModule;
+import com.wadpam.guja.cache.CacheBuilder;
+import com.wadpam.guja.cache.CacheBuilderProvider;
+import com.wadpam.guja.cache.CacheMethodInterceptor;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
+import net.sf.mardao.dao.Cached;
 import net.sf.mardao.dao.DatastoreSupplier;
 import net.sf.mardao.dao.Supplier;
 import org.slf4j.Logger;
@@ -44,13 +47,14 @@ import java.util.Properties;
 
 /**
  * Configure Guice modules and the web context.
+ *
  * @author mattiaslevin
  */
 public class GujaGuiceServletContextListener extends GuiceServletContextListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GujaGuiceServletContextListener.class);
 
-    private static final String APP_CONFIG_PROPERTY_FILE ="/WEB-INF/app.properties";
+    private static final String APP_CONFIG_PROPERTY_FILE = "/WEB-INF/app.properties";
 
     @Override
     protected Injector getInjector() {
@@ -58,8 +62,8 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
         return Guice.createInjector(
                 new GujaCoreModule(),
                 new GujaBaseModule(),
+                new GujaGAEModule(),
                 new JerseyServletModule() {
-
                     private Properties bindProperties() {
                         LOGGER.info("Bind application properties");
 
@@ -78,13 +82,17 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
 
                         // Bindings
                         Properties props = bindProperties();
-
-                        bind(Supplier.class).to(DatastoreSupplier.class);
+                        // Cached annotation
+                        bindInterceptor(Matchers.annotatedWith(Cached.class),
+                                Matchers.annotatedWith(Cached.class),
+                                new CacheMethodInterceptor(getProvider(CacheBuilder.class)));
 
                         // Filters
                         //filter("/*").through(PersistFilter.class);
                         filter("/api/*").through(OAuth2Filter.class);
                         filter("/oauth/authorize", "/oauth/refresh", "/oauth/revoke", "/oauth/tokeninfo").through(Oauth2ClientAuthenticationFilter.class);
+
+                        bind(Supplier.class).to(DatastoreSupplier.class);
 
                         // Servlets
                         serve("/*").with(GuiceContainer.class, ImmutableMap.of(

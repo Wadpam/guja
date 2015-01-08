@@ -22,7 +22,7 @@ package com.wadpam.guja.oauth2.domain;
  * #L%
  */
 
-import net.sf.mardao.core.domain.AbstractLongEntity;
+import net.sf.mardao.domain.AbstractLongEntity;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;

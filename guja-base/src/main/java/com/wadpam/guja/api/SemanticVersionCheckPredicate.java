@@ -48,7 +48,7 @@ public class SemanticVersionCheckPredicate implements VersionCheckResource.Versi
 
   @Inject
   public SemanticVersionCheckPredicate(@Named("app.versions.allowed") String allowedVersions) {
-    this(parsePropertyMap(checkNotNull(allowedVersions)));
+    this(parsePropertyMap(allowedVersions));
   }
 
   public SemanticVersionCheckPredicate(Map<String, String> platformMap) {
@@ -62,6 +62,8 @@ public class SemanticVersionCheckPredicate implements VersionCheckResource.Versi
 
   @Override
   public boolean isVersionSupported(String platform, String version) {
+    checkNotNull(platform);
+    checkNotNull(version);
 
     // get the semantic version expression for the platform
     String expression = platformMap.get(platform);

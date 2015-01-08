@@ -25,6 +25,8 @@ package com.wadpam.guja.oauth2.dao;
 
 import com.google.inject.Inject;
 import com.wadpam.guja.oauth2.domain.DConnection;
+import net.sf.mardao.dao.Cached;
+import net.sf.mardao.dao.Crud;
 import net.sf.mardao.dao.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,7 @@ import java.util.Collection;
  *
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
+@Cached
 public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
   private static final Logger LOGGER = LoggerFactory.getLogger(DConnectionDaoBean.class);
 
@@ -49,17 +52,10 @@ public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
     super(supplier);
   }
 
-  public DConnection createConnection(String providerId, String providerUserId,
-                                      String access_token, String refresh_token, Integer expiresInSeconds,
-                                      Long userId, Collection<String> roles) {
-
-    LOGGER.debug("Create connection {}", userId);
-
-    // TODO Missing implementation
-
-    return new DConnection();
-
+  @Cached
+  @Crud
+  @Override
+  public DConnection findByAccessToken(String accessToken) {
+    return super.findByAccessToken(accessToken);
   }
-
-
 }
