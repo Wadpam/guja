@@ -29,6 +29,7 @@ package com.wadpam.guja.oauth2.web;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.wadpam.guja.oauth2.api.FactoryResource;
 import com.wadpam.guja.oauth2.api.OAuth2UserResource;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
 import com.wadpam.guja.oauth2.dao.DOAuth2UserDaoBean;
@@ -83,28 +84,30 @@ public class OAuth2Filter implements Filter {
       request.setAttribute(NAME_ACCESS_TOKEN, accessToken);
 
       final DConnection conn = verifyAccessToken(accessToken);
-      if (null != conn) {
-        LOGGER.info("Authenticated");
-        LOGGER.debug(" userId = {} roles {}", conn.getUserId(), conn.getRoles());
+
+      // access_token used here for app authentication must be issued by self:
+      if (null != conn && FactoryResource.PROVIDER_ID_SELF.equals(conn.getProviderId())) {
+        LOGGER.debug("Authenticated. userId={}, roles {}, displayName={}", new Object[] {
+                conn.getUserId(), conn.getRoles(), conn.getDisplayName()});
+
+        AbstractDao.setPrincipalName(null != conn.getUserId() ? conn.getUserId().toString() : null);
+
+        request = new SecurityContextRequestWrapper(request, conn);
 
         // User is authenticated
         request.setAttribute(NAME_CONNECTION, conn);
         request.setAttribute(NAME_USER_ID, conn.getUserId());
         request.setAttribute(NAME_ROLES, conn.getRoles());
 
-        AbstractDao.setPrincipalName(null != conn.getUserId() ? conn.getUserId().toString() : null);
-
-        request = new SecurityContextRequestWrapper(request, conn);
-
       } else {
-        LOGGER.info("Unauthorised");
+        LOGGER.debug("Unauthorised");
         // TODO Should be return 401 or allow the user to continue as anonymous?
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         return;
       }
 
     } else {
-      LOGGER.info("Anonymous");
+      LOGGER.debug("Anonymous");
       request.setAttribute(NAME_ROLES, OAuth2UserResource.ROLE_ANONYMOUS);
       request = new SecurityContextRequestWrapper(request);
 
@@ -132,7 +135,6 @@ public class OAuth2Filter implements Filter {
 
     // check for cookie:
     if (null == accessToken && null != request.getCookies()) {
-      LOGGER.debug("Look for cookie");
       for (Cookie c : request.getCookies()) {
         if (NAME_ACCESS_TOKEN.equals(c.getName())) {
           return c.getValue();
@@ -149,7 +151,6 @@ public class OAuth2Filter implements Filter {
 
   private DConnection verifyAccessToken(String accessToken) {
     final DConnection conn = connectionDaoProvider.get().findByAccessToken(accessToken);
-    LOGGER.info("verify for {} gives conn {}", accessToken, conn);
     if (null == conn) {
       LOGGER.debug("No such access_token {}", accessToken);
       return null;

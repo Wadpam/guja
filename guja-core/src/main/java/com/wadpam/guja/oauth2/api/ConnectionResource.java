@@ -40,7 +40,6 @@ import javax.ws.rs.core.MediaType;
  *         Date: 1/18/14 Time: 8:07 PM
  */
 @Path("_adm/connection")
-@Produces(MediaType.APPLICATION_JSON)
 @PermitAll // This resource is protected in web.xml. Must be GAE app developer to access this resource.
 public class ConnectionResource extends CrudResource<DConnection, Long, DConnectionDaoBean> {
 
