@@ -23,6 +23,7 @@ package com.wadpam.guja.admintask;
  */
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.RequestParameters;
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author osandstrom
  * @author mattiaslevin
  */
-@Path("adm/task")
+@Path("_adm/task")
 @Singleton
 @PermitAll // Protected by container security
 public class AdminTaskResource {
@@ -54,6 +55,9 @@ public class AdminTaskResource {
 
   private final Set<AdminTask> adminTasks;
   private final AdminTaskQueue taskQueue;
+
+  @Inject @RequestParameters
+  private Provider<Map<String, String[]>> requestParamsProvider;
 
   @Inject
   public AdminTaskResource(Set<AdminTask> adminTasks, AdminTaskQueue taskQueue) {
@@ -66,37 +70,34 @@ public class AdminTaskResource {
    * The request will return immediately and the task will be run in a separate thread.
    * The execution model depending on the implementation of the queue.
    *
-   * @param paramMap request parameters
    * @param taskName task name
    * @return
    */
   @GET
   @Path("{taskName}")
-  public Response enqueueTask(@RequestParameters Map<String, String[]> paramMap,
-                              @PathParam("taskName") String taskName) {
+  public Response enqueueTask(@PathParam("taskName") String taskName) {
     checkNotNull(taskName);
-    taskQueue.enqueueTask(taskName, paramMap);
+    taskQueue.enqueueTask(taskName, requestParamsProvider.get());
     return Response.ok().build();
   }
 
 
   /**
    * Process an admin task.
-   * The admin taks will be processed on the requesting thread.
-   * @param paramMap request parameters
+   * The admin task will be processed on the requesting thread.
+   *
    * @param taskName task name
    * @return
    */
   @POST
   @Path("{taskName}")
-  public Response processTask(@RequestParameters Map<String, String[]> paramMap,
-                              @PathParam("taskName") String taskName) {
-    checkNotNull(paramMap);
+  public Response processTask(@PathParam("taskName") String taskName) {
+    checkNotNull(requestParamsProvider.get());
     checkNotNull(taskName);
 
     LOGGER.info("Processing task for {}...", taskName);
     for (AdminTask adminTask : adminTasks) {
-      final Object body = adminTask.processTask(taskName, paramMap);
+      final Object body = adminTask.processTask(taskName, requestParamsProvider.get());
       LOGGER.info("Processed tasks for {}: {}", taskName, body);
     }
 

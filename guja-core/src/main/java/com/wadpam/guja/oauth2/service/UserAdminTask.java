@@ -49,8 +49,7 @@ public class UserAdminTask implements AdminTask {
 
 
   /**
-   * Create a default admin.
-   * The admin will only be created of no users exist in the datastore.
+   * Create a default admin in the datastore.
    */
   @Override
   public Object processTask(String taskName, Map<String, String[]> parameterMap) {

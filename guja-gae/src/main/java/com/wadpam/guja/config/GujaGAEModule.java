@@ -23,7 +23,7 @@ package com.wadpam.guja.config;
  */
 
 import com.google.inject.AbstractModule;
-import com.wadpam.guja.GAEAdminTaskQueue;
+import com.wadpam.guja.admintask.GAEAdminTaskQueue;
 import com.wadpam.guja.admintask.AdminTaskQueue;
 import com.wadpam.guja.api.GAEBlobResource;
 import com.wadpam.guja.cache.CacheBuilder;

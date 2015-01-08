@@ -1,10 +1,9 @@
-package com.wadpam.guja;
+package com.wadpam.guja.admintask;
 
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.taskqueue.TransientFailureException;
-import com.wadpam.guja.admintask.AdminTaskQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class GAEAdminTaskQueue implements AdminTaskQueue {
   private static final Logger LOGGER = LoggerFactory.getLogger(GAEAdminTaskQueue.class);
 
-  public static final String PATH_ADMIN_TASK = "/adm/task/%s";
+  public static final String PATH_ADMIN_TASK = "/_adm/task/%s";
 
 
   @Override

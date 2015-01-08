@@ -174,7 +174,6 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Override
   public DUser createDefaultAdmin() {
 
-    // Only create the default admin if no users already exists
     DUser admin = userDao.findByUsername(DEFAULT_ADMIN_USERNAME);
     if (null == admin) {
 
