@@ -56,7 +56,7 @@ public class OAuth2Filter implements Filter {
   public static final String NAME_CONNECTION = "oauth2connection";
   public static final String NAME_ROLES = "oauth2user.roles";
   public static final String HEADER_AUTHORIZATION = "Authorization";
-  public static final String PREFIX_OAUTH = "OAuth ";
+  public static final String PREFIX_BEARER = "Bearer ";
 
   static final Logger LOGGER = LoggerFactory.getLogger(OAuth2Filter.class);
 
@@ -127,9 +127,9 @@ public class OAuth2Filter implements Filter {
     if (null == accessToken && null != request.getHeader(HEADER_AUTHORIZATION)) {
       String auth = request.getHeader(HEADER_AUTHORIZATION);
       LOGGER.debug("{}: {}", HEADER_AUTHORIZATION, auth);
-      int beginIndex = auth.indexOf(PREFIX_OAUTH);
+      int beginIndex = auth.indexOf(PREFIX_BEARER);
       if (-1 < beginIndex) {
-        return auth.substring(beginIndex + PREFIX_OAUTH.length());
+        return auth.substring(beginIndex + PREFIX_BEARER.length());
       }
     }
 
