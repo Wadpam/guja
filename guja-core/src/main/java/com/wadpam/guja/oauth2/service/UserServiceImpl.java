@@ -24,15 +24,14 @@ package com.wadpam.guja.oauth2.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import com.sun.jersey.spi.resource.Singleton;
 import com.wadpam.guja.environment.ServerEnvironment;
 import com.wadpam.guja.exceptions.ConflictRestException;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.exceptions.NotFoundRestException;
 import com.wadpam.guja.exceptions.UnauthorizedRestException;
 import com.wadpam.guja.i18n.Localization;
-import com.wadpam.guja.i18n.PropertyFileLocalization;
 import com.wadpam.guja.i18n.PropertyFileLocalizationBuilder;
 import com.wadpam.guja.oauth2.api.OAuth2UserResource;
 import com.wadpam.guja.oauth2.dao.DUserDaoBean;
@@ -108,14 +107,26 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Override
   public DUser signup(DUser user) {
 
+    // TODO Consider only have a unique constraint on username (will have impact in other places)
+
     // Check if username already exists
-    if (null != userDao.findByUsername(user.getUsername())) { // Would be good if we can change to async request
+    DUser existingUser = userDao.findByUsername(user.getUsername()); // Would be good if we can change to async request
+    if (null != existingUser && existingUser.getState() == DUser.UNVERIFIED_STATE) {
+      user.setId(existingUser.getId());
+    } else if (null != existingUser) {
       LOGGER.info("Username already taken {}", user.getUsername());
       throw new ConflictRestException("Username already taken");
     }
 
     // Check if email already exists
-    if (null != userDao.findByEmail(user.getEmail())) { // Would be good if we can change to async request
+    existingUser = userDao.findByEmail(user.getEmail()); // Would be good if we can change to async request
+    if (null != existingUser && existingUser.getState() == DUser.UNVERIFIED_STATE &&
+        (null == user.getId() || user.getId().equals(existingUser.getId()))) {
+      // Either no match when finding by username or make sure the email belong to the same user as found when finding by username
+
+      user.setId(existingUser.getId());
+
+    } else if (null != existingUser) {
       LOGGER.info("Email already taken {}", user.getEmail());
       throw new ConflictRestException("Email already taken");
     }
