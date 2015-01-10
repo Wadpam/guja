@@ -32,11 +32,11 @@ import java.util.ResourceBundle;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Request build localization provider.
+ * Property file based localization builder.
  *
  * @author mattiaslevin
  */
-public class PropertyFileLocalization implements Localization {
+public class PropertyFileLocalization extends AbstractLocalization {
   private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFileLocalization.class);
 
   private ResourceBundle resourceBundle;
@@ -51,7 +51,6 @@ public class PropertyFileLocalization implements Localization {
     }
 
   }
-
 
   @Override
   public String getMessage(String key, String defaultMessage, Object... parameters) {

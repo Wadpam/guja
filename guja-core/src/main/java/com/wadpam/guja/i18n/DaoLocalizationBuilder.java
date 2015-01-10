@@ -11,7 +11,7 @@ import java.util.Locale;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Build a dao based localization.
+ * Dao based localization builder.
  *
  * @author mattiaslevin
  */

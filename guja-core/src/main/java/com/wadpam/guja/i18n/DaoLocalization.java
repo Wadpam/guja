@@ -33,7 +33,7 @@ import java.util.Locale;
  *
  * @author mattiaslevin
  */
-public class DaoLocalization implements Localization {
+public class DaoLocalization extends AbstractLocalization {
 
   private final Locale locale;
   private final String bundleName;
