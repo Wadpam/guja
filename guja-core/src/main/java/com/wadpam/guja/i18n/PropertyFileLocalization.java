@@ -39,18 +39,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class PropertyFileLocalization implements Localization {
   private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFileLocalization.class);
 
-
   private ResourceBundle resourceBundle;
-  private final Locale locale;
-
 
   public PropertyFileLocalization(String bundleName, Locale locale) {
-    this.locale = locale;
 
     try {
-      resourceBundle = ResourceBundle.getBundle(checkNotNull(bundleName),
-          checkNotNull(locale),
-          ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES));
+      resourceBundle = ResourceBundle.getBundle(checkNotNull(bundleName), locale);
     } catch (MissingResourceException e) {
       LOGGER.warn("Resource bundle {} not found", bundleName);
       resourceBundle = null;
@@ -82,7 +76,7 @@ public class PropertyFileLocalization implements Localization {
 
   @Override
   public Locale getLocale() {
-    return locale;
+    return null != resourceBundle ? resourceBundle.getLocale() : Locale.getDefault();
   }
 
 }

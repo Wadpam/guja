@@ -31,7 +31,9 @@ import com.wadpam.guja.exceptions.ConflictRestException;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.exceptions.NotFoundRestException;
 import com.wadpam.guja.exceptions.UnauthorizedRestException;
-import com.wadpam.guja.i18n.RequestScopedPropertyFileLocalization;
+import com.wadpam.guja.i18n.Localization;
+import com.wadpam.guja.i18n.PropertyFileLocalization;
+import com.wadpam.guja.i18n.PropertyFileLocalizationBuilder;
 import com.wadpam.guja.oauth2.api.OAuth2UserResource;
 import com.wadpam.guja.oauth2.dao.DUserDaoBean;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
@@ -73,8 +75,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   private final PasswordEncoder passwordEncoder;
   private final ServerEnvironment severEnvironment;
   private final EmailService emailService;
-  private final Provider<RequestScopedVelocityTemplateStringWriterBuilder> templateProvider;
-  private final Provider<RequestScopedPropertyFileLocalization> localizationProvider;
+  private final Provider<RequestScopedVelocityTemplateStringWriterBuilder> templateBuilderProvider;
+  private final Provider<PropertyFileLocalizationBuilder> localizationBuilderProvider;
   private final TemporaryTokenCache tokenCache;
   private final Provider<UriInfo> uriInfoProvider;
 
@@ -82,8 +84,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   public UserServiceImpl(DUserDaoBean userDao,
                          PasswordEncoder passwordEncoder,
                          EmailService emailService,
-                         Provider<RequestScopedVelocityTemplateStringWriterBuilder> templateProvider,
-                         Provider<RequestScopedPropertyFileLocalization> localizationProvider,
+                         Provider<RequestScopedVelocityTemplateStringWriterBuilder> templateBuilderProvider,
+                         Provider<PropertyFileLocalizationBuilder> localizationBuilderProvider,
                          ServerEnvironment severEnvironment,
                          TemporaryTokenCache tokenCache,
                          Provider<UriInfo> uriInfoProvider) {
@@ -91,8 +93,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     this.userDao = userDao;
     this.passwordEncoder = passwordEncoder;
     this.emailService = emailService;
-    this.templateProvider = templateProvider;
-    this.localizationProvider = localizationProvider;
+    this.templateBuilderProvider = templateBuilderProvider;
+    this.localizationBuilderProvider = localizationBuilderProvider;
     this.severEnvironment = severEnvironment;
     this.tokenCache = tokenCache;
     this.uriInfoProvider = uriInfoProvider;
@@ -147,14 +149,11 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   private boolean sendConfirmEmail(DUser user) {
 
-    // TODO GAE does not support ResourceBundle
-    //String subject = localizationProvider.get().getMessage("verifyEmailAddress", "Verify email address"); // TODO provide translation
-    //String verifyUrl = createVerifyEmailUrl(user.getId(), localizationProvider.get().getLocale());
-    String subject = "Verify email address TODO Translation";
+    Localization localization = localizationBuilderProvider.get().build();
+    String subject = localization.getMessage("verifyEmailAddress", "Verify email address");
+    String verifyUrl = createVerifyEmailUrl(user.getId(), localization.getLocale());
 
-    String verifyUrl = createVerifyEmailUrl(user.getId(), Locale.getDefault());
-
-    String body = templateProvider.get()
+    String body = templateBuilderProvider.get()
         .templateName(emailVerificationTemplate)
         .put("verifyEmailLink", verifyUrl)
         .build()
@@ -312,13 +311,11 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
     DUser user = getByEmail(email); // Throw 404 if not found
 
-    // TODO GAE does not support ResourceBundle
-    //String subject = localizationProvider.get().getMessage("restPassword", "Reset password"); // TODO Provide translations
-    //String resetUrl = createResetPasswordUrl(user.getId(), localizationProvider.get().getLocale());
-    String subject = "Reset password (TODO localization)";
-    String resetUrl = createResetPasswordUrl(user.getId(), Locale.getDefault());
+    Localization localization = localizationBuilderProvider.get().build();
+    String subject = localization.getMessage("restPassword", "Reset password");
+    String resetUrl = createResetPasswordUrl(user.getId(), localization.getLocale());
 
-    String body = templateProvider.get()
+    String body = templateBuilderProvider.get()
         .templateName(resetPasswordTemplate)
         .put("resetPasswordLink", resetUrl)
         .build()
