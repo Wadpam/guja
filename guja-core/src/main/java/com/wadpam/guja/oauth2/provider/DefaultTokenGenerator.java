@@ -51,7 +51,7 @@ public class DefaultTokenGenerator implements TokenGenerator {
         .putLong(System.nanoTime())
         .hash();
 
-    return BaseEncoding.base64Url().encode(hashCode.asBytes());
+    return BaseEncoding.base64Url().omitPadding().encode(hashCode.asBytes());
   }
 
 

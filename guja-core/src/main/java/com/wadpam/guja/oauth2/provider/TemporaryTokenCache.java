@@ -6,6 +6,8 @@ import com.google.common.cache.Cache;
 import com.google.inject.Inject;
 import com.wadpam.guja.cache.CacheBuilderProvider;
 import com.wadpam.guja.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -16,6 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author mattiaslevin
  */
 public class TemporaryTokenCache {
+  private static final Logger LOGGER = LoggerFactory.getLogger(TemporaryTokenCache.class);
 
   private static final int DEFAULT_TOKEN_DURATION_SECONDS = 60 * 60; // 60 minutes
   private final TokenGenerator tokenGenerator;

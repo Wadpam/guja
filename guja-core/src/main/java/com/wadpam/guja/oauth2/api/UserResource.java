@@ -315,7 +315,7 @@ public class UserResource {
    * Change my password. Both the old and new password must be provided.
    *
    * @param passwordRequest old and new password
-   * @return 200 (no content) if successful
+   * @return 204 (no content) if successful
    */
   @POST
   @Path("me/password")
@@ -338,7 +338,7 @@ public class UserResource {
    *
    * @param userId unique user id
    * @param passwordRequest newPassword and token
-   * @return 200 if success, otherwise 403
+   * @return 204 if success, otherwise 403
    */
   @POST
   @Path("{id}/password")
@@ -350,7 +350,7 @@ public class UserResource {
 
     boolean isSuccess = userService.changePasswordUsingToken(userId, passwordRequest.getNewPassword(), passwordRequest.getToken());
 
-    return isSuccess ? Response.ok().build() : Response.status(Response.Status.BAD_REQUEST).build();
+    return isSuccess ? Response.noContent().build() : Response.status(Response.Status.BAD_REQUEST).build();
 
   }
 
@@ -359,7 +359,7 @@ public class UserResource {
    * Reset user password by sending out a reset email.
    *
    * @param passwordRequest users unique email
-   * @return http 200
+   * @return http 204
    */
   @POST
   @Path("password/reset")
@@ -369,7 +369,7 @@ public class UserResource {
 
     userService.resetPassword(passwordRequest.getEmail());
 
-    return Response.ok().build();
+    return Response.noContent().build();
 
   }
 
@@ -377,7 +377,8 @@ public class UserResource {
    * Confirm a users email address using a temporary token.
    * @param userId unique user id
    * @param passwordRequest token
-   * @return 200 if success
+   * @return 204 if success
+   * @return 400 if id / token combination is invalid
    */
   @POST
   @Path("{id}/email/confirm")
@@ -387,14 +388,14 @@ public class UserResource {
     checkNotNull(passwordRequest.getToken());
 
     boolean isSuccess = userService.confirmEmail(userId, passwordRequest.getToken());
-    return isSuccess ? Response.ok().build() : Response.status(Response.Status.BAD_REQUEST).build();
+    return isSuccess ? Response.noContent().build() : Response.status(Response.Status.BAD_REQUEST).build();
 
   }
 
   /**
    * Resend confirm email.
    * @param userId unique user id
-   * @return 200 if success
+   * @return 204 if success
    */
   @POST
   @Path("{id}/email/resendconfirm")
@@ -403,7 +404,7 @@ public class UserResource {
     checkNotNull(userId);
 
     boolean isSuccess = userService.resendConfirmEmail(userId);
-    return isSuccess ? Response.ok().build() : Response.status(Response.Status.BAD_REQUEST).build();
+    return isSuccess ? Response.noContent().build() : Response.status(Response.Status.BAD_REQUEST).build();
 
   }
 

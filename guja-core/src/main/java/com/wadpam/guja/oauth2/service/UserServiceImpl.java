@@ -163,6 +163,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     Localization localization = localizationBuilderProvider.get().build();
     String subject = localization.getMessage("verifyEmailAddress", "Verify email address");
     String verifyUrl = createVerifyEmailUrl(user.getId(), localization.getLocale());
+    LOGGER.debug("verify url {}", verifyUrl);
 
     String body = templateBuilderProvider.get()
         .templateName(emailVerificationTemplate)

@@ -1,23 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
-    <meta charset="UTF-8">
+
     <title>Verify email</title>
+
+    <meta charset="UTF-8">
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script>
+        $.extend({
+          getUrlVars: function(){
+            var vars = [], hash;
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for(var i = 0; i < hashes.length; i++)
+            {
+              hash = hashes[i].split('=');
+              vars.push(hash[0]);
+              vars[hash[0]] = hash[1];
+            }
+            return vars;
+          },
+          getUrlVar: function(name){
+            return $.getUrlVars()[name];
+          }
+        });
+
+        function resendEmail() {
+
+          console.log( "Resend email" );
+
+          var id = $.getUrlVar("id");
+          console.log( "id = " + id );
+
+          jQuery.ajax({
+            url : "/api/user/" + id + "/email/resendconfirm",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType : "json"
+          })
+          .done(function( data, textStatus, jqXHR ) {
+            $( "#failed" ).hide();
+            $( "#resentEmail" ).show();
+          })
+          .fail(function( jqXHR, textStatus, errorThrown ) {
+            $( "#failed" ).hide();
+            $( "#resentEmail" ).html( "<p> Failed resending verification email </p>" );
+            $( "#resentEmail" ).show();
+          });
+
+        };
+
+        $( document ).ready(function() {
+
+          $( "#resentEmail" ).hide();
+
+          var id = $.getUrlVar("id");
+          var token = $.getUrlVar("token");
+          console.log( "id = " + id );
+          console.log( "token = " + token );
+
+          jQuery.ajax({
+            url : "/api/user/" + id + "/email/confirm",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify( { "token" : token } ),
+            dataType: "json"
+          })
+          .done(function( data, textStatus, jqXHR ) {
+            console.log( "success" );
+            $( "#failed" ).hide();
+          })
+          .fail(function( jqXHR, textStatus, errorThrown ) {
+            console.log( "textStatus " +  textStatus);
+            console.log( "errorThrown " +  errorThrown);
+            console.log( "failed" );
+            $( "#success" ).hide();
+            $( "#resendId" ).click(resendEmail);
+          });
+
+        });
+
+    </script>
+
 </head>
 
-<p>Click on the button below to verify your email address!</p>
-
-<p onclick="verifyEmail()">Verify</p>
-
-<p id="result"></p>
-
-<script>
-function verifyEmail() {
-    document.getElementById("result").innerHTML = "YOU CLICKED ME!";
-}
-</script>
 
 <body>
+
+<div id="success">
+    <p>Welcome! Your email address has been verified and your account is now ready for use.</p>
+
+</div>
+
+<div id="failed">
+    <p>Ops, we failed to active your account. Please click on the link below to get a new activation email.</p>
+    <a id="resendId" href="#">Resend activation email</a>
+</div>
+
+<div id="resentEmail">
+    <p>A new activation email is on the way. Check your inbox.</p>
+</div>
 
 </body>
 </html>
