@@ -46,17 +46,24 @@ import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
 import com.wadpam.guja.provider.NonNullObjectMapperProvider;
 import com.wadpam.guja.service.EmailService;
 import com.wadpam.guja.service.JavaMailService;
-import com.wadpam.guja.service.MockEmailService;
 import com.wadpam.guja.template.RequestScopedVelocityTemplateStringWriterBuilder;
 import net.sf.mardao.dao.Supplier;
 
 /**
- * Binds {@link com.google.inject.persist.UnitOfWork}, {@link com.google.inject.persist.PersistService} and {@link com.wadpam.mardao.guice.MardaoTransactionManager}.
+ * Binds {@link com.google.inject.persist.UnitOfWork}, {@link com.google.inject.persist.PersistService} and {@link MardaoTransactionManager}.
  *
  * @author osandstrom
  *         Date: 1/19/14 Time: 8:59 PM
  */
 public class GujaCoreModule extends AbstractModule {
+
+  private final boolean bindAuthorization;
+  private final boolean bindFederated;
+
+  public GujaCoreModule(boolean bindAuthorization, boolean bindFederated) {
+    this.bindAuthorization = bindAuthorization;
+    this.bindFederated = bindFederated;
+  }
 
   @Override
   protected void configure() {
@@ -78,12 +85,16 @@ public class GujaCoreModule extends AbstractModule {
     bind(TokenGenerator.class).to(DefaultTokenGenerator.class);
     bind(TemporaryTokenCache.class);
 
-    bind(OAuth2Resource.class);
+    if (bindAuthorization) {
+      bind(OAuth2AuthorizationResource.class);
+    }
+    if (bindFederated) {
+      bind(OAuth2FederatedResource.class);
+    }
 
     bind(UserAuthenticationProvider.class).to(UserServiceImpl.class);
     bind(Oauth2UserProvider.class).to(UserServiceImpl.class);
 
-    bind(ConnectionResource.class);
     bind(DConnectionDaoBean.class);
 
     bind(FactoryResource.class);
