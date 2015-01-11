@@ -70,7 +70,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author mattiaslevin
  * @author sosandstrom
  */
-@Path("oauth")
+@Path("oauth/federated")
 @Singleton
 @PermitAll
 @Consumes(MediaType.APPLICATION_JSON)
@@ -155,7 +155,6 @@ public class OAuth2FederatedResource {
    * @return the userId associated with the Connection, null if new Connection
    */
   @GET
-  @Path("federated")
   public Response registerFederatedGet(
       @QueryParam("providerId") String providerId,
       @QueryParam("providerUserId") String providerUserId,
@@ -181,7 +180,7 @@ public class OAuth2FederatedResource {
    * @return the userId associated with the Connection, null if new Connection
    */
   @GET
-  @Path("federated/{providerId}")
+  @Path("{providerId}")
   public Response registerFederatedGetPath(
       @PathParam("providerId") String providerId,
       @QueryParam("providerUserId") String providerUserId,
