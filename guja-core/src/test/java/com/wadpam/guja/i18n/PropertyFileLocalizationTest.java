@@ -22,9 +22,6 @@ package com.wadpam.guja.i18n;
  * #L%
  */
 
-import com.google.inject.Provider;
-import com.wadpam.guja.i18n.Localization;
-import com.wadpam.guja.i18n.PropertyFileLocalization;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +30,7 @@ import java.util.Locale;
 
 import static org.junit.Assert.assertTrue;
 
-public class PropertyFileLocalizationProviderTest {
+public class PropertyFileLocalizationTest {
 
   private Localization localization;
 
@@ -89,4 +86,18 @@ public class PropertyFileLocalizationProviderTest {
     assertTrue("default message".equals(localization.getMessage("missingKey", "default message")));
 
   }
+
+  @Test
+  public void testSvLocalization() throws Exception {
+
+    localization = new PropertyFileLocalization(
+        "i18n.TestBundle",
+        new Locale.Builder()
+            .setLanguage("sv")
+            .build());
+
+    assertTrue("SV value1".equals(localization.getMessage("key1", "default message")));
+
+  }
+
 }

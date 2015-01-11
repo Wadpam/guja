@@ -25,9 +25,18 @@ package com.wadpam.guja.i18n;
 import java.util.Locale;
 
 /**
+ * Localization interface.
+ *
  * @author mattiaslevin
  */
 public interface Localization {
+
+  /**
+   * Get a localizable instance of a user defined localizable interface.
+   * @param clazz
+   * @return
+   */
+  <T extends Localizable> T getLocalizable(Class<T> clazz);
 
   /**
    * Get a localized message for a given key.

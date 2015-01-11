@@ -79,7 +79,9 @@ public class OAuth2AuthorizationResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2AuthorizationResource.class);
 
   private static final String PASSWORD_GRANT_TYPE = "password";
+  private static final String REFRESH_TOKEN_GRANT_TYPE = "refresh_token";
   private static final int DEFAULT_EXPIRES_IN = 60 * 60 * 24 * 7;  // 1 week
+  private static final String TOKEN_TYPE_BEARER = "Bearer";
 
   private final DConnectionDaoBean connectionDao;
   private final DFactoryDaoBean factoryDao;
@@ -146,6 +148,7 @@ public class OAuth2AuthorizationResource {
           .put("access_token", connection.getAccessToken())
           .put("refresh_token", connection.getRefreshToken())
           .put("expires_in", DEFAULT_EXPIRES_IN)
+          .put("token_type", TOKEN_TYPE_BEARER)
           .build())
           .cookie(createCookie(connection.getAccessToken(), DEFAULT_EXPIRES_IN))
           .build();
@@ -222,7 +225,7 @@ public class OAuth2AuthorizationResource {
       throw new BadRequestRestException(ImmutableMap.of("error", "invalid_request"));
     }
 
-    if (!PASSWORD_GRANT_TYPE.equals(refreshToken.getGrant_type())) {
+    if (!REFRESH_TOKEN_GRANT_TYPE.equals(refreshToken.getGrant_type())) {
       // Unsupported grant type
       throw new BadRequestRestException(ImmutableMap.of("error", "unsupported_grant_type"));
     }

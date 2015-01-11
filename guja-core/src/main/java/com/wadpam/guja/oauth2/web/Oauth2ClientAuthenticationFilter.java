@@ -69,7 +69,7 @@ public class Oauth2ClientAuthenticationFilter implements Filter, AdminTask {
     this.factoryDao = factoryDaoBean;
 
     if (serverEnvironment.isDevEnvironment()) {
-        createDefaultFactory();
+      createDefaultFactory();
     }
 
   }

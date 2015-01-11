@@ -32,32 +32,25 @@ import java.util.ResourceBundle;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Request build localization provider.
+ * Property file based localization builder.
  *
  * @author mattiaslevin
  */
-public class PropertyFileLocalization implements Localization {
+public class PropertyFileLocalization extends AbstractLocalization {
   private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFileLocalization.class);
 
-
   private ResourceBundle resourceBundle;
-  private final Locale locale;
-
 
   public PropertyFileLocalization(String bundleName, Locale locale) {
-    this.locale = locale;
 
     try {
-      resourceBundle = ResourceBundle.getBundle(checkNotNull(bundleName),
-          checkNotNull(locale),
-          ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES));
+      resourceBundle = ResourceBundle.getBundle(checkNotNull(bundleName), locale);
     } catch (MissingResourceException e) {
       LOGGER.warn("Resource bundle {} not found", bundleName);
       resourceBundle = null;
     }
 
   }
-
 
   @Override
   public String getMessage(String key, String defaultMessage, Object... parameters) {
@@ -82,7 +75,7 @@ public class PropertyFileLocalization implements Localization {
 
   @Override
   public Locale getLocale() {
-    return locale;
+    return null != resourceBundle ? resourceBundle.getLocale() : Locale.getDefault();
   }
 
 }

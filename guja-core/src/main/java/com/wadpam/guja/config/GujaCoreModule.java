@@ -75,8 +75,8 @@ public class GujaCoreModule extends AbstractModule {
 
     bind(RequestScopedLocale.class);
 
-    bind(Localization.class).annotatedWith(Dynamic.class).to(RequestScopedDynamicLocalization.class);
-    bind(Localization.class).annotatedWith(PropertyFile.class).to(RequestScopedPropertyFileLocalization.class);
+    bind(PropertyFileLocalizationBuilder.class);
+    bind(DaoLocalizationBuilder.class);
 
     bind(NonNullObjectMapperProvider.class);
     bind(ObjectMapper.class).toProvider(NonNullObjectMapperProvider.class);

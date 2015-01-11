@@ -33,14 +33,14 @@ import java.util.Locale;
  *
  * @author mattiaslevin
  */
-public class DynamicLocalization implements Localization{
+public class DaoLocalization extends AbstractLocalization {
 
   private final Locale locale;
   private final String bundleName;
   private final Di18nDaoBean i18nDao;
 
 
-  public DynamicLocalization(String bundleName, Locale locale, Di18nDaoBean i18nDao) {
+  public DaoLocalization(String bundleName, Locale locale, Di18nDaoBean i18nDao) {
     this.locale = locale;
     this.bundleName = bundleName;
     this.i18nDao = i18nDao;

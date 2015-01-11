@@ -24,12 +24,11 @@ package com.wadpam.guja.api;
 
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.name.Named;
 import com.google.inject.servlet.RequestScoped;
-import com.wadpam.guja.i18n.Localization;
-import com.wadpam.guja.i18n.PropertyFile;
+import com.wadpam.guja.i18n.PropertyFileLocalizationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,17 +54,17 @@ public class VersionCheckResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(VersionCheckResource.class);
 
   private final VersionCheckPredicate predicate;
-  private final Localization localization;
+  private final Provider<PropertyFileLocalizationBuilder> localizationBuilderProvider;
   private final Map<String, String> upgradeUrls;
 
 
   @Inject
   public VersionCheckResource(@Named("app.versions.upgradeUrls") String upgradeUrls,
                               VersionCheckPredicate predicate,
-                              @PropertyFile Localization localization) {
+                              Provider<PropertyFileLocalizationBuilder> localizationBuilderProvider) {
 
     this.predicate = predicate;
-    this.localization = localization;
+    this.localizationBuilderProvider = localizationBuilderProvider;
     this.upgradeUrls = parsePropertyMap(upgradeUrls);
 
   }
@@ -89,7 +88,9 @@ public class VersionCheckResource {
       LOGGER.debug("Version not supported {} {}", version, platform);
 
       VersionCheckResponse response = new VersionCheckResponse();
-      response.setLocalizedMessage(localization.getMessage("updateRequired", "You must upgrade your application"));
+      response.setLocalizedMessage(localizationBuilderProvider.get()
+          .build()
+          .getMessage("updateRequired", "You must upgrade your application"));
       if (null != upgradeUrls && null != upgradeUrls.get(platform)) {
         response.setUrl(upgradeUrls.get(platform));
       }
