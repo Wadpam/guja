@@ -32,7 +32,6 @@ import com.google.inject.servlet.GuiceServletContextListener;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.wadpam.guja.cache.CacheBuilder;
-import com.wadpam.guja.cache.CacheBuilderProvider;
 import com.wadpam.guja.cache.CacheMethodInterceptor;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
@@ -60,7 +59,8 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
     protected Injector getInjector() {
 
         return Guice.createInjector(
-                new GujaCoreModule(),
+                // bind both authorization server and federated:
+                new GujaCoreModule(true, true),
                 new GujaBaseModule(),
                 new GujaGAEModule(),
                 new JerseyServletModule() {
