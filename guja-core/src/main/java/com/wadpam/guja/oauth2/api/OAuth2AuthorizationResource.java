@@ -278,7 +278,7 @@ public class OAuth2AuthorizationResource {
         if (isAccessTokenType) {
           // Remove the access_token
           // Still allow the user to refresh using the refresh token
-          connection.setAccessToken("0");
+          connection.setAccessToken(null);
           put(connection);
         } else {
           // Delete the connection completely
