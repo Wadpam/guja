@@ -23,16 +23,12 @@ package com.wadpam.guja.oauth2.api;
  */
 
 import com.google.appengine.repackaged.org.joda.time.DateTime;
-import com.google.appengine.repackaged.org.joda.time.Seconds;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.sun.jersey.spi.resource.Singleton;
 import com.wadpam.guja.environment.ServerEnvironment;
-import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.exceptions.UnauthorizedRestException;
-import com.wadpam.guja.oauth2.api.requests.RefreshTokenRequest;
-import com.wadpam.guja.oauth2.api.requests.UserCredentials;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
 import com.wadpam.guja.oauth2.dao.DFactoryDaoBean;
 import com.wadpam.guja.oauth2.dao.DFactoryMapper;
@@ -41,7 +37,6 @@ import com.wadpam.guja.oauth2.domain.DFactory;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import com.wadpam.guja.oauth2.provider.Oauth2UserProvider;
 import com.wadpam.guja.oauth2.provider.TokenGenerator;
-import com.wadpam.guja.oauth2.provider.UserAuthenticationProvider;
 import com.wadpam.guja.oauth2.social.SocialProfile;
 import com.wadpam.guja.oauth2.social.SocialTemplate;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
@@ -54,8 +49,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -82,9 +75,10 @@ public class OAuth2FederatedResource {
 
   private final DConnectionDaoBean connectionDao;
   private final DFactoryDaoBean factoryDao;
-
   private final Oauth2UserProvider userProvider;
   private final TokenGenerator accessTokenGenerator;
+
+  private int tokenExpiresIn = DEFAULT_EXPIRES_IN;
 
   @Inject
   public OAuth2FederatedResource(TokenGenerator accessTokenGenerator,
@@ -122,8 +116,8 @@ public class OAuth2FederatedResource {
     connection.setProviderId(FactoryResource.PROVIDER_ID_SELF);
     connection.setProviderUserId(oauth2User.getId().toString());
     connection.setUserId(oauth2User.getId());
-    connection.setExpireTime(calculateExpirationDate(DEFAULT_EXPIRES_IN));
-    connection.setUserRoles(convertRoles(oauth2User.getRoles()));
+    connection.setExpireTime(calculateExpirationDate(tokenExpiresIn));
+    connection.setUserRoles(OAuth2AuthorizationResource.convertRoles(oauth2User.getRoles()));
     connection.setDisplayName(oauth2User.getDisplayName());
     connection.setImageUrl(imageUrl);
     connection.setProfileUrl(profileUrl);
@@ -206,7 +200,7 @@ public class OAuth2FederatedResource {
     checkNotNull(providerId);
 
     if (null == expiresInSeconds) {
-      expiresInSeconds = DEFAULT_EXPIRES_IN;
+      expiresInSeconds = tokenExpiresIn;
     }
 
     // use the connectionFactory
@@ -284,7 +278,7 @@ public class OAuth2FederatedResource {
     connection.setAppArg0(appArg0);
     connection.setImageUrl(profile.getProfileUrl());
     connection.setProfileUrl(profile.getProfileUrl());
-    connection.setUserRoles(convertRoles(user.getRoles()));
+    connection.setUserRoles(OAuth2AuthorizationResource.convertRoles(user.getRoles()));
     connectionDao.put(connection);
 
     // Remove expired connections for the user
@@ -295,11 +289,10 @@ public class OAuth2FederatedResource {
     connectionDao.put(connection);
 
     return Response.status(isNewUser ? Response.Status.CREATED : Response.Status.OK)
-        .cookie(createCookie(connection.getAccessToken(), null != expiresInSeconds ? expiresInSeconds : DEFAULT_EXPIRES_IN))
+        .cookie(createCookie(connection.getAccessToken(), null != expiresInSeconds ? expiresInSeconds : tokenExpiresIn))
         .entity(connection)
         .build();
   }
-
 
   private void removeExpiredConnections(String providerId, Iterable<DConnection> connections) {
 
@@ -324,20 +317,9 @@ public class OAuth2FederatedResource {
 
   }
 
-
-  public static String convertRoles(Iterable<String> from) {
-    if (null == from) {
-      return null;
-    }
-    final StringBuffer to = new StringBuffer();
-    boolean first = true;
-    for (String s : from) {
-      if (!first) {
-        to.append(DConnection.ROLE_SEPARATOR);
-      }
-      to.append(s.trim());
-      first = false;
-    }
-    return to.toString();
+  @Inject(optional = true)
+  public void setTokenExpiresIn(@Named("app.oauth.tokenExpiresIn") int tokenExpiresIn) {
+    this.tokenExpiresIn = tokenExpiresIn;
   }
+
 }

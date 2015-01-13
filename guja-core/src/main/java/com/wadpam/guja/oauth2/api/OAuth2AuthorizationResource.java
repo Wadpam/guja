@@ -26,24 +26,17 @@ import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.google.appengine.repackaged.org.joda.time.Seconds;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.sun.jersey.spi.resource.Singleton;
 import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
-import com.wadpam.guja.exceptions.UnauthorizedRestException;
 import com.wadpam.guja.oauth2.api.requests.RefreshTokenRequest;
 import com.wadpam.guja.oauth2.api.requests.UserCredentials;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
-import com.wadpam.guja.oauth2.dao.DFactoryDaoBean;
-import com.wadpam.guja.oauth2.dao.DFactoryMapper;
 import com.wadpam.guja.oauth2.domain.DConnection;
-import com.wadpam.guja.oauth2.domain.DFactory;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import com.wadpam.guja.oauth2.provider.TokenGenerator;
-import com.wadpam.guja.oauth2.provider.Oauth2UserProvider;
-import com.wadpam.guja.environment.ServerEnvironment;
 import com.wadpam.guja.oauth2.provider.UserAuthenticationProvider;
-import com.wadpam.guja.oauth2.social.SocialProfile;
-import com.wadpam.guja.oauth2.social.SocialTemplate;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +51,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -78,32 +70,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class OAuth2AuthorizationResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2AuthorizationResource.class);
 
+  private static final boolean ALWAYS_REVOKE_REFRESH_TOKEN = true;
+  private static final int DEFAULT_EXPIRES_IN = 60 * 60 * 24 * 7;  // 1 week
+
   private static final String PASSWORD_GRANT_TYPE = "password";
   private static final String REFRESH_TOKEN_GRANT_TYPE = "refresh_token";
-  private static final int DEFAULT_EXPIRES_IN = 60 * 60 * 24 * 7;  // 1 week
   private static final String TOKEN_TYPE_BEARER = "Bearer";
 
   private final DConnectionDaoBean connectionDao;
-  private final DFactoryDaoBean factoryDao;
-
-  private final Oauth2UserProvider userProvider;
   private final TokenGenerator accessTokenGenerator;
   private final UserAuthenticationProvider authenticationProvider;
+
+  private int tokenExpiresIn = DEFAULT_EXPIRES_IN;
 
 
   @Inject
   public OAuth2AuthorizationResource(UserAuthenticationProvider authenticationProvider,
                                      TokenGenerator accessTokenGenerator,
-                                     Oauth2UserProvider userProvider,
-                                     ServerEnvironment serverEnvironment,
-                                     DConnectionDaoBean connectionDao,
-                                     DFactoryDaoBean factoryDao) {
+                                     DConnectionDaoBean connectionDao) {
 
     this.connectionDao = connectionDao;
-    this.factoryDao = factoryDao;
     this.authenticationProvider = authenticationProvider;
     this.accessTokenGenerator = accessTokenGenerator;
-    this.userProvider = userProvider;
   }
 
   /**
@@ -147,10 +135,10 @@ public class OAuth2AuthorizationResource {
       return Response.ok(ImmutableMap.builder()
           .put("access_token", connection.getAccessToken())
           .put("refresh_token", connection.getRefreshToken())
-          .put("expires_in", DEFAULT_EXPIRES_IN)
+          .put("expires_in", tokenExpiresIn)
           .put("token_type", TOKEN_TYPE_BEARER)
           .build())
-          .cookie(createCookie(connection.getAccessToken(), DEFAULT_EXPIRES_IN))
+          .cookie(createCookie(connection.getAccessToken(), tokenExpiresIn))
           .build();
 
     } else {
@@ -167,7 +155,7 @@ public class OAuth2AuthorizationResource {
     connection.setProviderId(FactoryResource.PROVIDER_ID_SELF);
     connection.setProviderUserId(oauth2User.getId().toString());
     connection.setUserId(oauth2User.getId());
-    connection.setExpireTime(calculateExpirationDate(DEFAULT_EXPIRES_IN));
+    connection.setExpireTime(calculateExpirationDate(tokenExpiresIn));
     connection.setUserRoles(convertRoles(oauth2User.getRoles()));
     connection.setDisplayName(oauth2User.getDisplayName());
     connection.setImageUrl(imageUrl);
@@ -236,16 +224,16 @@ public class OAuth2AuthorizationResource {
     }
 
     connection.setAccessToken(accessTokenGenerator.generate());
-    connection.setExpireTime(calculateExpirationDate(DEFAULT_EXPIRES_IN));
+    connection.setExpireTime(calculateExpirationDate(tokenExpiresIn));
 
     put(connection);
 
     return Response.ok(ImmutableMap.builder()
         .put("access_token", connection.getAccessToken())
         .put("refresh_token", connection.getRefreshToken())
-        .put("expires_in", DEFAULT_EXPIRES_IN)
+        .put("expires_in", tokenExpiresIn)
         .build())
-        .cookie(createCookie(connection.getAccessToken(), DEFAULT_EXPIRES_IN))
+        .cookie(createCookie(connection.getAccessToken(), tokenExpiresIn))
         .build();
 
   }
@@ -266,8 +254,8 @@ public class OAuth2AuthorizationResource {
     if (null != token) {
 
       // Look both in access_token and refresh_token
-      DConnection connection = connectionDao.findByAccessToken(token);
       boolean isAccessTokenType = true;
+      DConnection connection = connectionDao.findByAccessToken(token);
       if (null == connection) {
         isAccessTokenType = false;
         connection = connectionDao.findByRefreshToken(token);
@@ -275,7 +263,7 @@ public class OAuth2AuthorizationResource {
 
       // Ignore expiration time
       if (null != connection) {
-        if (isAccessTokenType) {
+        if (!ALWAYS_REVOKE_REFRESH_TOKEN && isAccessTokenType) {
           // Remove the access_token
           // Still allow the user to refresh using the refresh token
           connection.setAccessToken(null);
@@ -363,7 +351,6 @@ public class OAuth2AuthorizationResource {
 
   }
 
-
   public static String convertRoles(Iterable<String> from) {
     if (null == from) {
       return null;
@@ -379,4 +366,10 @@ public class OAuth2AuthorizationResource {
     }
     return to.toString();
   }
+
+  @Inject(optional = true)
+  public void setTokenExpiresIn(@Named("app.oauth.tokenExpiresIn") int tokenExpiresIn) {
+    this.tokenExpiresIn = tokenExpiresIn;
+  }
+
 }

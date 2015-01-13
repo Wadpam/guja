@@ -62,8 +62,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   private final static String DEFAULT_ADMIN_USERNAME = "admin";
 
-  private static final String VELOCITY_TEMPLATE_VERIFY_EMAIL = "email_verification.vm"; // TODO Make a property
-  private static final String VELOCITY_TEMPLATE_RESET_PASSWORD = "reset_password.vm"; // TODO Make a property
+  private static final String VELOCITY_TEMPLATE_VERIFY_EMAIL = "email_verification.vm";
+  private static final String VELOCITY_TEMPLATE_RESET_PASSWORD = "reset_password.vm";
 
   private DUserDaoBean userDao;
 
