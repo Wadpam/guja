@@ -6,15 +6,15 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertTrue;
 
-public class CacheRemoveEntityMethodInterceptorTest extends AbstractCacheMethodInterceptorTest {
+public class CacheRemoveAllMethodInterceptorTest extends CachePutMethodInterceptorTest {
 
   @Test
   public void testInvoke() throws Exception {
+
     final String parentKey = null;
 
     expect(mockDao.put(parentKey, 1L, "1")).andReturn(1L).once();
-    mockDao.delete(parentKey, 1L);
-    expect(mockDao.get(parentKey, 1L)).andReturn(null).times(1);
+    expect(mockDao.get(parentKey, 1L)).andReturn(null).once();
     expect(mockDao.put(parentKey, 1L, "1")).andReturn(1L).once();
 
     replay(mockDao);
@@ -25,7 +25,7 @@ public class CacheRemoveEntityMethodInterceptorTest extends AbstractCacheMethodI
     String value = dao.get(parentKey, 1L);
     assertTrue("1".equals(value));
 
-    dao.delete(parentKey, 1L);
+    dao.removeAll();
 
     value = dao.get(parentKey, 1L);
     assertTrue(null == value);

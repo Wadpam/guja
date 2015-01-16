@@ -37,7 +37,7 @@ public class CacheRemoveAllMethodInterceptor extends AbstractCacheMethodIntercep
     LOGGER.trace("Cache REMOVE_ALL {}", context.getMethod().getName());
 
     // get cache
-    final Cache<GeneratedCacheKey, Optional<?>> cache = getCache(context);
+    final Cache<GeneratedCacheKey, Optional<?>> cache = getCache(context, methodInvocation);
 
     if (!annotation.afterInvocation()) {
       cache.invalidateAll();

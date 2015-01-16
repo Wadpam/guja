@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
  */
 public interface CacheResolver {
 
-  Cache<GeneratedCacheKey, Optional<?>> resolveCache(CacheInvocationContext<? extends Annotation> cacheInvocationContext);
+  Cache<GeneratedCacheKey, Optional<?>> resolveCache(CacheInvocationContext<? extends Annotation> cacheInvocationContext,
+                                                     Optional<CacheConfig> cacheConfig);
 
 }

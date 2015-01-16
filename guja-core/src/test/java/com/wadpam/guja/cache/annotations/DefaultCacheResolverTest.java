@@ -1,5 +1,6 @@
 package com.wadpam.guja.cache.annotations;
 
+import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.inject.Provider;
 import com.wadpam.guja.cache.CacheBuilder;
@@ -39,8 +40,8 @@ public class DefaultCacheResolverTest {
 
     replay(mockContext);
 
-    Cache cache1 = cacheResolver.resolveCache(mockContext);
-    Cache cache2 = cacheResolver.resolveCache(mockContext);
+    Cache cache1 = cacheResolver.resolveCache(mockContext, Optional.<CacheConfig>absent());
+    Cache cache2 = cacheResolver.resolveCache(mockContext, Optional.<CacheConfig>absent());
 
     assertTrue(cache1.equals(cache2));
 

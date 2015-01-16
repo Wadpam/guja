@@ -35,22 +35,30 @@ public class DefaultCacheResolver implements CacheResolver {
   }
 
   @Override
-  public Cache<GeneratedCacheKey, Optional<?>> resolveCache(CacheInvocationContext<? extends Annotation> cacheInvocationContext) {
+  public Cache<GeneratedCacheKey, Optional<?>> resolveCache(CacheInvocationContext<? extends Annotation> cacheInvocationContext,
+                                                            Optional<CacheConfig> cacheConfig) {
 
     final String cacheName = cacheInvocationContext.getCacheName();
     Cache<GeneratedCacheKey, Optional<?>> cache = namespaces.get(cacheName);
     if (null == cache) {
       LOGGER.debug("Build new dao cache for name {}", cacheName);
 
-      // TODO Do we need to set size and expirationTime to default values?
-      cache = cacheBuilderProvider.get()
-          .name(cacheName)
-          .build();
+      CacheBuilder<GeneratedCacheKey, Optional<?>> cacheBuilder = cacheBuilderProvider.get().name(cacheName);
+      if (cacheConfig.isPresent()) {
+        if (cacheConfig.get().size() > 0) {
+          cacheBuilder.maximumSize(cacheConfig.get().size());
+        }
+        if (cacheConfig.get().expiresAfterSeconds() > 0) {
+          cacheBuilder.expireAfterWrite(cacheConfig.get().expiresAfterSeconds());
+        }
+      }
+      cache = cacheBuilder.build();
 
       Cache<GeneratedCacheKey, Optional<?>> existingCache = namespaces.putIfAbsent(cacheName, cache);
       if (null != existingCache) {
         cache = existingCache;
       }
+
     }
 
     return cache;

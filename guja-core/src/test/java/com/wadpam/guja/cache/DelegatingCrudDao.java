@@ -1,6 +1,7 @@
 package com.wadpam.guja.cache;
 
 import com.google.inject.Inject;
+import com.wadpam.guja.cache.annotations.CacheConfig;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.CrudDao;
 
@@ -62,5 +63,15 @@ public class DelegatingCrudDao implements CrudDao<String, Long> {
     return queryPage(null, i, s);
   }
 
+  @CacheRemoveAll
+  public void removeAll() {
+    // Do nothing
+  }
+
+  @CacheConfig(expiresAfterSeconds = 60 * 10)
+  @CacheResult(cacheName = "DelegatingCrudDao.findByName")
+  public String findByName(String name) {
+    return "Levin";
+  }
 
 }

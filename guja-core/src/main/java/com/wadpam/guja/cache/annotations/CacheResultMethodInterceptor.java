@@ -39,7 +39,7 @@ public class CacheResultMethodInterceptor extends AbstractCacheMethodInterceptor
     LOGGER.debug("Cache RESULT {}", context.getMethod().getName());
 
     // get cache
-    final Cache<GeneratedCacheKey, Optional<?>> cache = getCache(context);
+    final Cache<GeneratedCacheKey, Optional<?>> cache = getCache(context, methodInvocation);
 
     // get key
     final CacheKeyGenerator keyGenerator = getCacheKeyGenerator(methodInvocation, annotation.cacheKeyGenerator());

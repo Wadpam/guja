@@ -1,23 +1,27 @@
 package com.wadpam.guja.cache.annotations;
 
+import com.google.common.base.Optional;
+import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Module;
-import com.google.inject.TypeLiteral;
+import com.google.inject.*;
 import com.wadpam.guja.cache.CacheBuilder;
+import com.wadpam.guja.cache.DelegatingCrudDao;
 import com.wadpam.guja.cache.GuavaCacheBuilderProvider;
 import com.wadpam.guja.cache.PagedCachedMockCrudDao;
+import com.wadpam.guja.oauth2.api.OAuth2UserResource;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.CrudDao;
 import org.junit.Test;
+
+import javax.cache.annotation.GeneratedCacheKey;
+
+import java.util.concurrent.Callable;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CacheResultMethodInterceptorTest extends AbstractCacheMethodInterceptorTest {
-
 
   @Test
   public void testInvoke() throws Exception {
@@ -58,6 +62,45 @@ public class CacheResultMethodInterceptorTest extends AbstractCacheMethodInterce
   }
 
   @Test
+  public void testCacheConfig() throws Exception {
+
+    mockDao = createMock(CrudDao.class);
+    final CacheBuilder mockCacheBuilder = createMock(CacheBuilder.class);
+    Cache mockCache = createMock(Cache.class);
+
+    injector = Guice.createInjector(new Module() {
+      @Override
+      public void configure(Binder binder) {
+
+        binder.bind(DelegatingCrudDao.class);
+        binder.bind(new TypeLiteral<CrudDao<String, Long>>() {}).toInstance(mockDao);
+        binder.bind(CacheBuilder.class).toProvider(new Provider<CacheBuilder>() {
+          @Override
+          public CacheBuilder get() {
+            return mockCacheBuilder;
+          }
+        });
+
+      }
+    }, new CacheAnnotationsModule());
+
+    dao = injector.getInstance(DelegatingCrudDao.class);
+
+    expect(mockCacheBuilder.name("DelegatingCrudDao.findByName")).andReturn(mockCacheBuilder).once();
+    expect(mockCacheBuilder.expireAfterWrite(60 * 10)).andReturn(mockCacheBuilder).once();
+    expect(mockCacheBuilder.build()).andReturn(mockCache).once();
+    expect(mockCache.get(anyObject(GeneratedCacheKey.class), anyObject(Callable.class))).andReturn(Optional.of("Levin")).once();
+
+    replay(mockDao, mockCacheBuilder, mockCache);
+
+    String lastName = dao.findByName("Mattias");
+    assertTrue(lastName.equals("Levin"));
+
+    verify(mockDao, mockCacheBuilder, mockCache);
+
+  }
+
+  @Test
   public void testPage() throws Exception {
     final String parentKey = null;
 
@@ -77,9 +120,6 @@ public class CacheResultMethodInterceptorTest extends AbstractCacheMethodInterce
     // non-overlap between page keys and entity keys relies on different types Long / Integer:
     assertFalse(Long.valueOf(1L).equals(Integer.valueOf(1)));
   }
-
-
-
 
   @Test
   public void testQueryPageNoCache() throws Exception {

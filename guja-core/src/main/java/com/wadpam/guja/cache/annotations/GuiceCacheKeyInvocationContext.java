@@ -149,7 +149,7 @@ public class GuiceCacheKeyInvocationContext<A extends Annotation> implements Cac
   private static Triplet<Collection<CacheInvocationParameter>, Collection<CacheInvocationParameter>, CacheInvocationParameter> getParameterDetails(final MethodInvocation methodInvocation) {
 
     final Method method = methodInvocation.getMethod();
-    final boolean isCacheValueAllowed = method.isAnnotationPresent(CachePut.class);
+    final boolean shouldHaveCacheValueAnnotation = method.isAnnotationPresent(CachePut.class);
 
     // Get parameter type and annotation details
     final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -175,7 +175,7 @@ public class GuiceCacheKeyInvocationContext<A extends Annotation> implements Cac
         if (CacheKey.class.isAssignableFrom(parameterAnnotation.annotationType())) {
           isKey = true;
         } else if (CacheValue.class.isAssignableFrom(parameterAnnotation.annotationType())) {
-          if (!isCacheValueAllowed) {
+          if (!shouldHaveCacheValueAnnotation) {
             throw new AnnotationFormatError("CacheValue parameter annotation is not allowed on " + method);
           } else if (cacheValueParameter != null || isValue) {
             throw new AnnotationFormatError("Multiple CacheValue parameter annotations are not allowed: " + method);
@@ -184,8 +184,6 @@ public class GuiceCacheKeyInvocationContext<A extends Annotation> implements Cac
           }
         }
       }
-
-      // TODO @CacheValue must be present when @CachePut?
 
       // Create parameter details object
       final CacheInvocationParameter invocationParameter = new CacheInvocationParameter() {
@@ -215,6 +213,11 @@ public class GuiceCacheKeyInvocationContext<A extends Annotation> implements Cac
       if (isValue) {
         cacheValueParameter = invocationParameter;
       }
+    }
+
+    // @CacheValue must be present when @CachePut?
+    if (shouldHaveCacheValueAnnotation && null == cacheValueParameter) {
+      throw new AnnotationFormatError("CacheValue annotation must be present on methods annotated with CachePut " + method);
     }
 
     // If no parameters were marked as key parameters then all parameters will be used as keys

@@ -28,12 +28,26 @@ public abstract class AbstractCacheMethodInterceptor implements MethodIntercepto
     this.defaultCacheKeyGeneratorProvider = defaultCacheKeyGeneratorProvider;
   }
 
-  protected <A extends Annotation> Cache<GeneratedCacheKey, Optional<?>> getCache(CacheKeyInvocationContext<A> context) {
-    return cacheResolverProvider.get().resolveCache(context);
+  protected <A extends Annotation> Cache<GeneratedCacheKey, Optional<?>> getCache(CacheKeyInvocationContext<A> context,
+                                                                                  MethodInvocation methodInvocation) {
+    return cacheResolverProvider.get().resolveCache(context, getCacheConfig(methodInvocation));
   }
 
+  protected static Optional<CacheConfig> getCacheConfig(MethodInvocation methodInvocation) {
 
-  protected CacheKeyGenerator getCacheKeyGenerator(MethodInvocation methodInvocation, Class<? extends CacheKeyGenerator> methodCacheKeyGeneratorClass) {
+    // Check method
+    CacheConfig cacheConfig = methodInvocation.getMethod().getAnnotation(CacheConfig.class);
+
+    // Check class
+    if (null == cacheConfig) {
+      cacheConfig = (CacheConfig) GuiceCacheKeyInvocationContext.getThisClass(methodInvocation).getAnnotation(CacheConfig.class);
+    }
+
+    return null != cacheConfig ? Optional.of(cacheConfig) :Optional.<CacheConfig>absent();
+  }
+
+  protected CacheKeyGenerator getCacheKeyGenerator(MethodInvocation methodInvocation,
+                                                   Class<? extends CacheKeyGenerator> methodCacheKeyGeneratorClass) {
 
     try {
 
