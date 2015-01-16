@@ -20,7 +20,7 @@ import com.wadpam.guja.oauth2.domain.DUser;
 /**
  * The DUser domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-01-02T18:17:30.242+0100.
+ * Generated on 2015-01-16T13:38:15.147+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDUserDaoImpl
@@ -31,6 +31,51 @@ public class GeneratedDUserDaoImpl
   }
 
 // ----------------------- field finders -------------------------------
+  /**
+   * query-by method for field address1
+   * @param address1 the specified attribute
+   * @return an Iterable of DUsers for the specified address1
+   */
+  public Iterable<DUser> queryByAddress1(java.lang.String address1) {
+    return queryByField(null, DUserMapper.Field.ADDRESS1.getFieldName(), address1);
+  }
+
+  /**
+   * query-by method for field address2
+   * @param address2 the specified attribute
+   * @return an Iterable of DUsers for the specified address2
+   */
+  public Iterable<DUser> queryByAddress2(java.lang.String address2) {
+    return queryByField(null, DUserMapper.Field.ADDRESS2.getFieldName(), address2);
+  }
+
+  /**
+   * query-by method for field birthInfo
+   * @param birthInfo the specified attribute
+   * @return an Iterable of DUsers for the specified birthInfo
+   */
+  public Iterable<DUser> queryByBirthInfo(java.lang.String birthInfo) {
+    return queryByField(null, DUserMapper.Field.BIRTHINFO.getFieldName(), birthInfo);
+  }
+
+  /**
+   * query-by method for field city
+   * @param city the specified attribute
+   * @return an Iterable of DUsers for the specified city
+   */
+  public Iterable<DUser> queryByCity(java.lang.String city) {
+    return queryByField(null, DUserMapper.Field.CITY.getFieldName(), city);
+  }
+
+  /**
+   * query-by method for field country
+   * @param country the specified attribute
+   * @return an Iterable of DUsers for the specified country
+   */
+  public Iterable<DUser> queryByCountry(java.lang.String country) {
+    return queryByField(null, DUserMapper.Field.COUNTRY.getFieldName(), country);
+  }
+
   /**
    * query-by method for field createdBy
    * @param createdBy the specified attribute
@@ -68,6 +113,15 @@ public class GeneratedDUserDaoImpl
   }
 
   /**
+   * query-by method for field firstName
+   * @param firstName the specified attribute
+   * @return an Iterable of DUsers for the specified firstName
+   */
+  public Iterable<DUser> queryByFirstName(java.lang.String firstName) {
+    return queryByField(null, DUserMapper.Field.FIRSTNAME.getFieldName(), firstName);
+  }
+
+  /**
    * query-by method for field friends
    * @param friends the specified attribute
    * @return an Iterable of DUsers for the specified friends
@@ -77,12 +131,39 @@ public class GeneratedDUserDaoImpl
   }
 
   /**
+   * query-by method for field lastName
+   * @param lastName the specified attribute
+   * @return an Iterable of DUsers for the specified lastName
+   */
+  public Iterable<DUser> queryByLastName(java.lang.String lastName) {
+    return queryByField(null, DUserMapper.Field.LASTNAME.getFieldName(), lastName);
+  }
+
+  /**
    * query-by method for field password
    * @param password the specified attribute
    * @return an Iterable of DUsers for the specified password
    */
   public Iterable<DUser> queryByPassword(java.lang.String password) {
     return queryByField(null, DUserMapper.Field.PASSWORD.getFieldName(), password);
+  }
+
+  /**
+   * query-by method for field phoneNumber1
+   * @param phoneNumber1 the specified attribute
+   * @return an Iterable of DUsers for the specified phoneNumber1
+   */
+  public Iterable<DUser> queryByPhoneNumber1(java.lang.String phoneNumber1) {
+    return queryByField(null, DUserMapper.Field.PHONENUMBER1.getFieldName(), phoneNumber1);
+  }
+
+  /**
+   * query-by method for field phoneNumber2
+   * @param phoneNumber2 the specified attribute
+   * @return an Iterable of DUsers for the specified phoneNumber2
+   */
+  public Iterable<DUser> queryByPhoneNumber2(java.lang.String phoneNumber2) {
+    return queryByField(null, DUserMapper.Field.PHONENUMBER2.getFieldName(), phoneNumber2);
   }
 
   /**
@@ -146,6 +227,15 @@ public class GeneratedDUserDaoImpl
    */
   public DUser findByUsername(java.lang.String username) {
     return queryUniqueByField(null, DUserMapper.Field.USERNAME.getFieldName(), username);
+  }
+
+  /**
+   * query-by method for field zipCode
+   * @param zipCode the specified attribute
+   * @return an Iterable of DUsers for the specified zipCode
+   */
+  public Iterable<DUser> queryByZipCode(java.lang.String zipCode) {
+    return queryByField(null, DUserMapper.Field.ZIPCODE.getFieldName(), zipCode);
   }
 
 
