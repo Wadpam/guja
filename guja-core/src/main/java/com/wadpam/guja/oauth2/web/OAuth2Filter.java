@@ -58,6 +58,7 @@ public class OAuth2Filter implements Filter {
   public static final String HEADER_AUTHORIZATION = "Authorization";
   public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final String PREFIX_BEARER = "Bearer ";
+  public static final String ERROR_INVALID_TOKEN = "error=\"invalid_token\"";
 
   static final Logger LOGGER = LoggerFactory.getLogger(OAuth2Filter.class);
 
@@ -104,7 +105,7 @@ public class OAuth2Filter implements Filter {
         LOGGER.debug("Unauthorised");
         // TODO Should be return 401 or allow the user to continue as anonymous?
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER);
+        response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER + ERROR_INVALID_TOKEN);
         return;
       }
 

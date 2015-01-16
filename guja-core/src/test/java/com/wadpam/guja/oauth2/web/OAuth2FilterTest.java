@@ -54,7 +54,7 @@ public class OAuth2FilterTest {
         filter.doFilter(request, response, chainMock);
 
         assertEquals(401, response.getStatus());
-        assertEquals("Bearer ", response.getHeader("WWW-Authenticate"));
+        assertEquals("Bearer error=\"invalid_token\"", response.getHeader("WWW-Authenticate"));
     }
 
     private void replayAll() {
