@@ -31,7 +31,7 @@ public class TemporaryTokenCache {
     // TODO How to handle generics
     this.tokenCache =  cacheBuilderProvider.get()
         .expireAfterWrite(DEFAULT_TOKEN_DURATION_SECONDS)
-        .from(this.getClass().getName())
+        .name(this.getClass().getName())
         .build();
 
   }

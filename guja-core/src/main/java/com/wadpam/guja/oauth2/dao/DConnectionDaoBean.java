@@ -25,13 +25,13 @@ package com.wadpam.guja.oauth2.dao;
 
 import com.google.inject.Inject;
 import com.wadpam.guja.oauth2.domain.DConnection;
-import net.sf.mardao.dao.Cached;
-import net.sf.mardao.dao.Crud;
 import net.sf.mardao.dao.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
+import javax.cache.annotation.CacheDefaults;
+import javax.cache.annotation.CacheRemove;
+import javax.cache.annotation.CacheResult;
 
 /**
  * Implementation of Business Methods related to entity DConnection.
@@ -42,7 +42,7 @@ import java.util.Collection;
  *
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
-@Cached
+@CacheDefaults(cacheName = "DConnectionDaoBean")
 public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
   private static final Logger LOGGER = LoggerFactory.getLogger(DConnectionDaoBean.class);
 
@@ -52,10 +52,24 @@ public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
     super(supplier);
   }
 
-  @Cached
-  @Crud
+  /**
+   * Enable caching based on access token.
+   * @param accessToken access token
+   */
+  @CacheResult
   @Override
   public DConnection findByAccessToken(String accessToken) {
     return super.findByAccessToken(accessToken);
   }
+
+  /**
+   * Invalidate cache for an access token.
+   * This method never deletes anything from the database and can safely be used to invalidate the cache after an update of delete operation.
+   * @param accessToken access token to invalidate
+   */
+  @CacheRemove
+  public void invalidateCacheByAccessToken(String accessToken) {
+    // Do nothing
+  }
+
 }

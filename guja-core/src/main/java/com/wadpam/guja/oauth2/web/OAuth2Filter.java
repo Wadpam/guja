@@ -32,7 +32,6 @@ import com.google.inject.Singleton;
 import com.wadpam.guja.oauth2.api.FactoryResource;
 import com.wadpam.guja.oauth2.api.OAuth2UserResource;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
-import com.wadpam.guja.oauth2.dao.DOAuth2UserDaoBean;
 import com.wadpam.guja.oauth2.domain.DConnection;
 import net.sf.mardao.dao.AbstractDao;
 import org.slf4j.Logger;
@@ -61,13 +60,10 @@ public class OAuth2Filter implements Filter {
   static final Logger LOGGER = LoggerFactory.getLogger(OAuth2Filter.class);
 
   private final Provider<DConnectionDaoBean> connectionDaoProvider;
-  private final Provider<DOAuth2UserDaoBean> userDaoProvider;
 
   @Inject
-  public OAuth2Filter(Provider<DConnectionDaoBean> connectionDaoProvider,
-                      Provider<DOAuth2UserDaoBean> userDaoProvider) {
+  public OAuth2Filter(Provider<DConnectionDaoBean> connectionDaoProvider) {
     this.connectionDaoProvider = connectionDaoProvider;
-    this.userDaoProvider = userDaoProvider;
   }
 
   @Override

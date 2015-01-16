@@ -45,6 +45,8 @@ public class DUserDaoBean extends GeneratedDUserDaoImpl {
     super(supplier);
   }
 
+  // TODO Consider caching on username
+
   public CursorPage<DUser> queryFriends(Long id, int pageSize, String cursorKey) {
     return queryPage(false, pageSize, null,
         DUserMapper.Field.ID.getFieldName(), false,

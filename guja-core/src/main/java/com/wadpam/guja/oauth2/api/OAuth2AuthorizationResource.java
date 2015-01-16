@@ -33,6 +33,7 @@ import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.oauth2.api.requests.RefreshTokenRequest;
 import com.wadpam.guja.oauth2.api.requests.UserCredentials;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
+import com.wadpam.guja.oauth2.dao.DConnectionMapper;
 import com.wadpam.guja.oauth2.domain.DConnection;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import com.wadpam.guja.oauth2.provider.TokenGenerator;
@@ -149,19 +150,18 @@ public class OAuth2AuthorizationResource {
   }
 
   private DConnection generateConnection(DOAuth2User oauth2User, String profileUrl, String imageUrl) {
-    DConnection connection = new DConnection();
-    connection.setAccessToken(accessTokenGenerator.generate());
-    connection.setRefreshToken(accessTokenGenerator.generate());
-    connection.setProviderId(FactoryResource.PROVIDER_ID_SELF);
-    connection.setProviderUserId(oauth2User.getId().toString());
-    connection.setUserId(oauth2User.getId());
-    connection.setExpireTime(calculateExpirationDate(tokenExpiresIn));
-    connection.setUserRoles(convertRoles(oauth2User.getRoles()));
-    connection.setDisplayName(oauth2User.getDisplayName());
-    connection.setImageUrl(imageUrl);
-    connection.setProfileUrl(profileUrl);
-
-    return connection;
+   return DConnectionMapper.newBuilder()
+       .accessToken(accessTokenGenerator.generate())
+       .refreshToken(accessTokenGenerator.generate())
+       .providerId(FactoryResource.PROVIDER_ID_SELF)
+       .providerUserId(oauth2User.getId().toString())
+       .userId(oauth2User.getId())
+       .expireTime(calculateExpirationDate(tokenExpiresIn))
+       .userRoles(convertRoles(oauth2User.getRoles()))
+       .displayName(oauth2User.getDisplayName())
+       .imageUrl(imageUrl)
+       .profileUrl(profileUrl)
+       .build();
   }
 
   private Date calculateExpirationDate(int expiresInSeconds) {
@@ -223,6 +223,9 @@ public class OAuth2AuthorizationResource {
       throw new BadRequestRestException(ImmutableMap.of("error", "invalid_grant"));
     }
 
+    // invalidate the cache for the old access token
+    connectionDao.invalidateCacheByAccessToken(connection.getAccessToken());
+
     connection.setAccessToken(accessTokenGenerator.generate());
     connection.setExpireTime(calculateExpirationDate(tokenExpiresIn));
 
@@ -263,6 +266,10 @@ public class OAuth2AuthorizationResource {
 
       // Ignore expiration time
       if (null != connection) {
+
+        // Always invalidate the cache based on access token
+        connectionDao.invalidateCacheByAccessToken(connection.getAccessToken());
+
         if (!ALWAYS_REVOKE_REFRESH_TOKEN && isAccessTokenType) {
           // Remove the access_token
           // Still allow the user to refresh using the refresh token
@@ -344,6 +351,7 @@ public class OAuth2AuthorizationResource {
 
     try {
       connectionDao.delete(expiredTokens);
+      // Do not invalidate the cache, they are harmless since expired and they will get evicted over time
     } catch (IOException e) {
       LOGGER.error("Failed to delete expired tokens {}", e);
       throw new InternalServerErrorRestException("Failed to delete expired tokens");

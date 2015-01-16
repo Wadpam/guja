@@ -1,7 +1,7 @@
 package com.wadpam.guja.cache;
 
 /**
- * Created by sosandstrom on 2014-12-18.
+ * @author sosandstrom
  */
 public class GuavaCacheBuilderProvider implements CacheBuilderProvider {
   @Override

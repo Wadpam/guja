@@ -43,7 +43,6 @@ import java.io.IOException;
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DOAuth2UserDaoBean extends GeneratedDOAuth2UserDaoImpl implements Oauth2UserProvider {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(GeneratedDOAuth2UserDaoImpl.class);
 
   @Inject

@@ -21,8 +21,8 @@ public class MemCacheBuilder<K, V> implements CacheBuilder<K, V> {
   }
 
   @Override
-  public CacheBuilder from(String spec) {
-    this.namespace = spec;
+  public CacheBuilder name(String name) {
+    this.namespace = name;
     return this;
   }
 
