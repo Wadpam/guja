@@ -31,7 +31,9 @@ import com.sun.jersey.spi.resource.Singleton;
 import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.oauth2.api.requests.RefreshTokenRequest;
+import com.wadpam.guja.oauth2.api.requests.RevocationRequest;
 import com.wadpam.guja.oauth2.api.requests.UserCredentials;
+import com.wadpam.guja.oauth2.api.requests.ValidationRequest;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
 import com.wadpam.guja.oauth2.domain.DConnection;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
@@ -243,58 +245,76 @@ public class OAuth2AuthorizationResource {
    * Revoke a users access_token and refresh_token.
    * https://tools.ietf.org/html/rfc7009
    *
-   * @param token either the access_token or refresh token
+   * @param revocationRequest contains either the access_token or refresh token
    * @return will always return http 200
    */
   @GET
   @Path("revoke")
-  public Response revoke(@QueryParam("token") String token) {
+  public Response revoke(RevocationRequest revocationRequest) {
     // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
+    String token = revocationRequest.getToken();
+    String tokenHint = revocationRequest.getToken_type_hint();
+
     if (null != token) {
-
-      // Look both in access_token and refresh_token
-      boolean isAccessTokenType = true;
-      DConnection connection = connectionDao.findByAccessToken(token);
-      if (null == connection) {
-        isAccessTokenType = false;
-        connection = connectionDao.findByRefreshToken(token);
-      }
-
-      // Ignore expiration time
-      if (null != connection) {
-        if (!ALWAYS_REVOKE_REFRESH_TOKEN && isAccessTokenType) {
-          // Remove the access_token
-          // Still allow the user to refresh using the refresh token
-          connection.setAccessToken(null);
-          put(connection);
-        } else {
-          // Delete the connection completely
-          delete(connection);
+      // Start with the token type hint but always widen the scope if not found
+      if (null == tokenHint || "access_token".equals(tokenHint)) {
+        if (!revokeAccessToken(token)) {
+          revokeRefreshToken(token);
+        }
+      } else {
+        if (!revokeRefreshToken(token)) {
+          revokeAccessToken(token);
         }
       }
-
     }
 
     // Always send http 200 according to the specification
     return Response.ok().build();
-
   }
 
+  private boolean revokeAccessToken(String token) {
+    DConnection connection = connectionDao.findByAccessToken(token);
+    if (null != connection) {
+      if (ALWAYS_REVOKE_REFRESH_TOKEN) {
+        // Delete the connection completely
+        delete(connection);
+      } else {
+        // Remove the access_token
+        // Still allow the user to refresh using the refresh token
+        connection.setAccessToken(null);
+        put(connection);
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean revokeRefreshToken(String token) {
+    DConnection connection = connectionDao.findByRefreshToken(token);
+    if (null != connection) {
+      // Delete the connection completely
+      delete(connection);
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   /**
    * Validate an access_token.
    * The Oauth2 specification does not specify how this should be done. Do similar to what Google does
    *
-   * @param access_token access token to validate. Be careful about using url safe tokens or use url encoding.
+   * @param validationRequest containing an access token to validate.
    * @return http 200 if success and some basic info about the access_token
    */
   @GET
   @Path("tokeninfo")
-  public Response validate(@QueryParam("access_token") String access_token) {
-    checkNotNull(access_token);
+  public Response validate(ValidationRequest validationRequest) {
+    String accessToken = checkNotNull(validationRequest.getAccess_token());
 
-    DConnection connection = connectionDao.findByAccessToken(access_token);
+    DConnection connection = connectionDao.findByAccessToken(accessToken);
     LOGGER.debug("Connection {}", connection);
     if (null == connection || hasAccessTokenExpired(connection)) {
       throw new BadRequestRestException("Invalid access_token");
