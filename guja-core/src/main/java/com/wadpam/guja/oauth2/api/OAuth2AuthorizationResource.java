@@ -33,7 +33,6 @@ import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.oauth2.api.requests.RefreshTokenRequest;
 import com.wadpam.guja.oauth2.api.requests.RevocationRequest;
 import com.wadpam.guja.oauth2.api.requests.UserCredentials;
-import com.wadpam.guja.oauth2.api.requests.ValidationRequest;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
 import com.wadpam.guja.oauth2.domain.DConnection;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
@@ -306,15 +305,15 @@ public class OAuth2AuthorizationResource {
    * Validate an access_token.
    * The Oauth2 specification does not specify how this should be done. Do similar to what Google does
    *
-   * @param validationRequest containing an access token to validate.
+   * @param access_token access token to validate. Be careful about using url safe tokens or use url encoding.
    * @return http 200 if success and some basic info about the access_token
    */
   @GET
   @Path("tokeninfo")
-  public Response validate(ValidationRequest validationRequest) {
-    String accessToken = checkNotNull(validationRequest.getAccess_token());
+  public Response validate(@QueryParam("access_token") String access_token) {
+    checkNotNull(access_token);
 
-    DConnection connection = connectionDao.findByAccessToken(accessToken);
+    DConnection connection = connectionDao.findByAccessToken(access_token);
     LOGGER.debug("Connection {}", connection);
     if (null == connection || hasAccessTokenExpired(connection)) {
       throw new BadRequestRestException("Invalid access_token");

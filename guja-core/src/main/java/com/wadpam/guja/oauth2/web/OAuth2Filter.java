@@ -63,13 +63,10 @@ public class OAuth2Filter implements Filter {
   static final Logger LOGGER = LoggerFactory.getLogger(OAuth2Filter.class);
 
   private final Provider<DConnectionDaoBean> connectionDaoProvider;
-  private final Provider<DOAuth2UserDaoBean> userDaoProvider;
 
   @Inject
-  public OAuth2Filter(Provider<DConnectionDaoBean> connectionDaoProvider,
-                      Provider<DOAuth2UserDaoBean> userDaoProvider) {
+  public OAuth2Filter(Provider<DConnectionDaoBean> connectionDaoProvider) {
     this.connectionDaoProvider = connectionDaoProvider;
-    this.userDaoProvider = userDaoProvider;
   }
 
   @Override
@@ -89,7 +86,7 @@ public class OAuth2Filter implements Filter {
 
       // access_token used here for app authentication must be issued by self:
       if (null != conn && FactoryResource.PROVIDER_ID_SELF.equals(conn.getProviderId())) {
-        LOGGER.debug("Authenticated. userId={}, roles {}, displayName={}", new Object[] {
+        LOGGER.debug("Authenticated. userId={}, roles={}, displayName={}", new Object[] {
                 conn.getUserId(), conn.getRoles(), conn.getDisplayName()});
 
         AbstractDao.setPrincipalName(null != conn.getUserId() ? conn.getUserId().toString() : null);
@@ -103,7 +100,6 @@ public class OAuth2Filter implements Filter {
 
       } else {
         LOGGER.debug("Unauthorised");
-        // TODO Should be return 401 or allow the user to continue as anonymous?
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER + ERROR_INVALID_TOKEN);
         return;
@@ -113,10 +109,13 @@ public class OAuth2Filter implements Filter {
       LOGGER.debug("Anonymous");
       request.setAttribute(NAME_ROLES, OAuth2UserResource.ROLE_ANONYMOUS);
       request = new SecurityContextRequestWrapper(request);
-
     }
 
     chain.doFilter(request, response);
+
+    // TODO Possibly check the response for 403 and set the WWW-Authenticate header
+    // TODO Set the error code if setting the WWW-Authentication header. Do not set the error code if anonymous according to standard
+
   }
 
   @Override
@@ -124,6 +123,10 @@ public class OAuth2Filter implements Filter {
   }
 
   private static String getAccessToken(HttpServletRequest request) {
+
+    // TODO token is only allowed in one place
+
+    // Get request parameters
     String accessToken = request.getParameter(NAME_ACCESS_TOKEN);
 
     // check for header

@@ -39,7 +39,7 @@ public class OAuth2FilterTest {
         connectionDaoProvider.set(connectionDaoMock);
         userDaoMock = createMock(DOAuth2UserDaoBean.class);
         userDaoProvider.set(userDaoMock);
-        filter = new OAuth2Filter(connectionDaoProvider, userDaoProvider);
+        filter = new OAuth2Filter(connectionDaoProvider);
         chainMock = createMock(FilterChain.class);
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
