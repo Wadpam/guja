@@ -245,10 +245,10 @@ public class OAuth2AuthorizationResource {
    * Revoke a users access_token and refresh_token.
    * https://tools.ietf.org/html/rfc7009
    *
-   * @param revocationRequest contains either the access_token or refresh token
+   * @param revocationRequest contains either the access token or refresh token and a token type hint
    * @return will always return http 200
    */
-  @GET
+  @POST
   @Path("revoke")
   public Response revoke(RevocationRequest revocationRequest) {
     // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
