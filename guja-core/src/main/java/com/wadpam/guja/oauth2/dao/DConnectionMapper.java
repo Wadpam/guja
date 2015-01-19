@@ -12,7 +12,7 @@ import com.wadpam.guja.oauth2.domain.DConnection;
 /**
  * The DConnection domain-object specific mapping methods go here.
  *
- * Generated on 2015-01-16T13:38:15.147+0100.
+ * Generated on 2015-01-19T20:31:51.597+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DConnectionMapper
