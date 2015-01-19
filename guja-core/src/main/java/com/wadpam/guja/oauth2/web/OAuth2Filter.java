@@ -59,6 +59,7 @@ public class OAuth2Filter implements Filter {
   public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final String PREFIX_BEARER = "Bearer ";
   public static final String ERROR_INVALID_TOKEN = "error=\"invalid_token\"";
+  public static final String ERROR_INSUFFICIENT_SCOPE = "error=\"insufficient_scope\"";
 
   static final Logger LOGGER = LoggerFactory.getLogger(OAuth2Filter.class);
 
@@ -111,10 +112,14 @@ public class OAuth2Filter implements Filter {
       request = new SecurityContextRequestWrapper(request);
     }
 
-    chain.doFilter(request, response);
+    HttpStatusResponseWrapper wrappedResponse = new HttpStatusResponseWrapper(response);
+    chain.doFilter(request, wrappedResponse);
 
-    // TODO Possibly check the response for 403 and set the WWW-Authenticate header
-    // TODO Set the error code if setting the WWW-Authentication header. Do not set the error code if anonymous according to standard
+    if (wrappedResponse.getStatus() == HttpServletResponse.SC_FORBIDDEN) {
+      response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER + ERROR_INSUFFICIENT_SCOPE);
+    } else if (wrappedResponse.getStatus() == HttpServletResponse.SC_UNAUTHORIZED) {
+      response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER + ERROR_INVALID_TOKEN);
+    }
 
   }
 
@@ -124,7 +129,7 @@ public class OAuth2Filter implements Filter {
 
   private static String getAccessToken(HttpServletRequest request) {
 
-    // TODO token is only allowed in one place
+    // Token is only allowed in one place but will not implement due to performance considerations
 
     // Get request parameters
     String accessToken = request.getParameter(NAME_ACCESS_TOKEN);

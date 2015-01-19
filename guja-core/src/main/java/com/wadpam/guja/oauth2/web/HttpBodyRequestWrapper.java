@@ -32,11 +32,11 @@ import java.io.*;
  *
  * @author mattiaslevin
  */
-public class BodyRequestWrapper extends HttpServletRequestWrapper {
+public class HttpBodyRequestWrapper extends HttpServletRequestWrapper {
 
   private final String body;
 
-  public BodyRequestWrapper(HttpServletRequest request) throws IOException {
+  public HttpBodyRequestWrapper(HttpServletRequest request) throws IOException {
     super(request);
     StringBuilder stringBuilder = new StringBuilder();
     BufferedReader bufferedReader = null;

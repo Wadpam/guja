@@ -39,6 +39,7 @@ import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import com.wadpam.guja.oauth2.provider.TokenGenerator;
 import com.wadpam.guja.oauth2.provider.UserAuthenticationProvider;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
+import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,12 +113,12 @@ public class OAuth2AuthorizationResource {
 
     if (!PASSWORD_GRANT_TYPE.equals(credentials.getGrant_type())) {
       // Unsupported grant type
-      throw new BadRequestRestException(ImmutableMap.of("error", "unsupported_grant_type"));
+      throw new BadRequestRestException(ImmutableMap.of("error", Oauth2ClientAuthenticationFilter.ERROR_UNSUPPORTED_GRANT_TYPE));
     }
 
     if (null == credentials.getUsername() ||
         null == credentials.getPassword()) {
-      throw new BadRequestRestException(ImmutableMap.of("error", "invalid_request"));
+      throw new BadRequestRestException(ImmutableMap.of("error", Oauth2ClientAuthenticationFilter.ERROR_INVALID_REQUEST));
     }
 
     DOAuth2User oauth2User = authenticationProvider.authenticate(credentials.getUsername(), credentials.getPassword());
@@ -144,7 +145,7 @@ public class OAuth2AuthorizationResource {
 
     } else {
       // authentication failed
-      throw new BadRequestRestException(ImmutableMap.of("error", "invalid_grant"));
+      throw new BadRequestRestException(ImmutableMap.of("error", Oauth2ClientAuthenticationFilter.ERROR_INVALID_GRANT));
     }
 
   }
