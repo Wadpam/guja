@@ -55,7 +55,10 @@ public class OAuth2Filter implements Filter {
   public static final String NAME_CONNECTION = "oauth2connection";
   public static final String NAME_ROLES = "oauth2user.roles";
   public static final String HEADER_AUTHORIZATION = "Authorization";
+  public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final String PREFIX_BEARER = "Bearer ";
+  public static final String ERROR_INVALID_TOKEN = "error=\"invalid_token\"";
+  public static final String ERROR_INSUFFICIENT_SCOPE = "error=\"insufficient_scope\"";
 
   static final Logger LOGGER = LoggerFactory.getLogger(OAuth2Filter.class);
 
@@ -83,7 +86,7 @@ public class OAuth2Filter implements Filter {
 
       // access_token used here for app authentication must be issued by self:
       if (null != conn && FactoryResource.PROVIDER_ID_SELF.equals(conn.getProviderId())) {
-        LOGGER.debug("Authenticated. userId={}, roles {}, displayName={}", new Object[] {
+        LOGGER.debug("Authenticated. userId={}, roles={}, displayName={}", new Object[] {
                 conn.getUserId(), conn.getRoles(), conn.getDisplayName()});
 
         AbstractDao.setPrincipalName(null != conn.getUserId() ? conn.getUserId().toString() : null);
@@ -97,8 +100,8 @@ public class OAuth2Filter implements Filter {
 
       } else {
         LOGGER.debug("Unauthorised");
-        // TODO Should be return 401 or allow the user to continue as anonymous?
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER + ERROR_INVALID_TOKEN);
         return;
       }
 
@@ -106,10 +109,17 @@ public class OAuth2Filter implements Filter {
       LOGGER.debug("Anonymous");
       request.setAttribute(NAME_ROLES, OAuth2UserResource.ROLE_ANONYMOUS);
       request = new SecurityContextRequestWrapper(request);
-
     }
 
-    chain.doFilter(request, response);
+    HttpStatusResponseWrapper wrappedResponse = new HttpStatusResponseWrapper(response);
+    chain.doFilter(request, wrappedResponse);
+
+    if (wrappedResponse.getStatus() == HttpServletResponse.SC_FORBIDDEN) {
+      response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER + ERROR_INSUFFICIENT_SCOPE);
+    } else if (wrappedResponse.getStatus() == HttpServletResponse.SC_UNAUTHORIZED) {
+      response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER + ERROR_INVALID_TOKEN);
+    }
+
   }
 
   @Override
@@ -117,6 +127,10 @@ public class OAuth2Filter implements Filter {
   }
 
   private static String getAccessToken(HttpServletRequest request) {
+
+    // Token is only allowed in one place but will not implement due to performance considerations
+
+    // Get request parameters
     String accessToken = request.getParameter(NAME_ACCESS_TOKEN);
 
     // check for header

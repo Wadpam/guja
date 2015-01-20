@@ -29,7 +29,7 @@ import javax.cache.annotation.CacheValue;
 /**
  * The DFactory domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-01-20T21:35:58.613+0100.
+ * Generated on 2015-01-20T22:12:36.907+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDFactoryDaoImpl

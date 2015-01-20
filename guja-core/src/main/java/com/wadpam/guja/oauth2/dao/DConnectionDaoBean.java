@@ -75,7 +75,7 @@ public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
    * @param id connection id
    */
   @CacheRemove
-  public void delete(@CacheKey String accessToken, Long id) {
+  public void deleteWithCacheKey(@CacheKey String accessToken, Long id) {
     try {
       delete(id);
     } catch (IOException e) {
@@ -90,7 +90,7 @@ public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
    * @param accessToken cache key to invalidate
    */
   @CacheRemove
-  public void invalidateCache(@CacheKey String accessToken) {
+  public void invalidateCacheKey(@CacheKey String accessToken) {
     // Do nothing
   }
 
@@ -102,7 +102,7 @@ public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
    * @return connection id
    */
   @CachePut
-  public Long put(@CacheKey String accessToken, @CacheValue DConnection connection) {
+  public Long putWithCacheKey(@CacheKey String accessToken, @CacheValue DConnection connection) {
     //checkNotNull(accessToken); // Fail quick
     try {
       return put(connection);

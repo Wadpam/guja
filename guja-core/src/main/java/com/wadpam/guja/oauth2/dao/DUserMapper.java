@@ -12,7 +12,7 @@ import com.wadpam.guja.oauth2.domain.DUser;
 /**
  * The DUser domain-object specific mapping methods go here.
  *
- * Generated on 2015-01-20T21:35:58.613+0100.
+ * Generated on 2015-01-20T22:12:36.907+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DUserMapper
@@ -22,19 +22,29 @@ public class DUserMapper
 
   public enum Field {
     ID("id"),
+    ADDRESS1("address1"),
+    ADDRESS2("address2"),
+    BIRTHINFO("birthInfo"),
+    CITY("city"),
+    COUNTRY("country"),
     CREATEDBY("createdBy"),
     CREATEDDATE("createdDate"),
     DISPLAYNAME("displayName"),
     EMAIL("email"),
+    FIRSTNAME("firstName"),
     FRIENDS("friends"),
+    LASTNAME("lastName"),
     PASSWORD("password"),
+    PHONENUMBER1("phoneNumber1"),
+    PHONENUMBER2("phoneNumber2"),
     PROFILELINK("profileLink"),
     ROLES("roles"),
     STATE("state"),
     THUMBNAILURL("thumbnailUrl"),
     UPDATEDBY("updatedBy"),
     UPDATEDDATE("updatedDate"),
-    USERNAME("username");
+    USERNAME("username"),
+    ZIPCODE("zipCode");
 
     private final String fieldName;
 
@@ -65,12 +75,21 @@ public class DUserMapper
     entity.setId(supplier.toLongKey(key));
 
     // set all fields:
+    entity.setAddress1(supplier.getString(value, Field.ADDRESS1.getFieldName()));
+    entity.setAddress2(supplier.getString(value, Field.ADDRESS2.getFieldName()));
+    entity.setBirthInfo(supplier.getString(value, Field.BIRTHINFO.getFieldName()));
+    entity.setCity(supplier.getString(value, Field.CITY.getFieldName()));
+    entity.setCountry(supplier.getString(value, Field.COUNTRY.getFieldName()));
     entity.setCreatedBy(supplier.getString(value, Field.CREATEDBY.getFieldName()));
     entity.setCreatedDate(supplier.getDate(value, Field.CREATEDDATE.getFieldName()));
     entity.setDisplayName(supplier.getString(value, Field.DISPLAYNAME.getFieldName()));
     entity.setEmail(supplier.getString(value, Field.EMAIL.getFieldName()));
+    entity.setFirstName(supplier.getString(value, Field.FIRSTNAME.getFieldName()));
     entity.setFriends(supplier.getCollection(value, Field.FRIENDS.getFieldName()));
+    entity.setLastName(supplier.getString(value, Field.LASTNAME.getFieldName()));
     entity.setPassword(supplier.getString(value, Field.PASSWORD.getFieldName()));
+    entity.setPhoneNumber1(supplier.getString(value, Field.PHONENUMBER1.getFieldName()));
+    entity.setPhoneNumber2(supplier.getString(value, Field.PHONENUMBER2.getFieldName()));
     entity.setProfileLink(supplier.getString(value, Field.PROFILELINK.getFieldName()));
     entity.setRoles(supplier.getCollection(value, Field.ROLES.getFieldName()));
     entity.setState(supplier.getInteger(value, Field.STATE.getFieldName()));
@@ -78,6 +97,7 @@ public class DUserMapper
     entity.setUpdatedBy(supplier.getString(value, Field.UPDATEDBY.getFieldName()));
     entity.setUpdatedDate(supplier.getDate(value, Field.UPDATEDDATE.getFieldName()));
     entity.setUsername(supplier.getString(value, Field.USERNAME.getFieldName()));
+    entity.setZipCode(supplier.getString(value, Field.ZIPCODE.getFieldName()));
     return entity;
   }
 
@@ -142,12 +162,21 @@ public class DUserMapper
     final Object value = supplier.createWriteValue(parentKey, getKind(), id);
 
     // set all fields:
+    supplier.setString(value, Field.ADDRESS1.getFieldName(), entity.getAddress1());
+    supplier.setString(value, Field.ADDRESS2.getFieldName(), entity.getAddress2());
+    supplier.setString(value, Field.BIRTHINFO.getFieldName(), entity.getBirthInfo());
+    supplier.setString(value, Field.CITY.getFieldName(), entity.getCity());
+    supplier.setString(value, Field.COUNTRY.getFieldName(), entity.getCountry());
     supplier.setString(value, Field.CREATEDBY.getFieldName(), entity.getCreatedBy());
     supplier.setDate(value, Field.CREATEDDATE.getFieldName(), entity.getCreatedDate());
     supplier.setString(value, Field.DISPLAYNAME.getFieldName(), entity.getDisplayName());
     supplier.setString(value, Field.EMAIL.getFieldName(), entity.getEmail());
+    supplier.setString(value, Field.FIRSTNAME.getFieldName(), entity.getFirstName());
     supplier.setCollection(value, Field.FRIENDS.getFieldName(), entity.getFriends());
+    supplier.setString(value, Field.LASTNAME.getFieldName(), entity.getLastName());
     supplier.setString(value, Field.PASSWORD.getFieldName(), entity.getPassword());
+    supplier.setString(value, Field.PHONENUMBER1.getFieldName(), entity.getPhoneNumber1());
+    supplier.setString(value, Field.PHONENUMBER2.getFieldName(), entity.getPhoneNumber2());
     supplier.setString(value, Field.PROFILELINK.getFieldName(), entity.getProfileLink());
     supplier.setCollection(value, Field.ROLES.getFieldName(), entity.getRoles());
     supplier.setInteger(value, Field.STATE.getFieldName(), entity.getState());
@@ -155,6 +184,7 @@ public class DUserMapper
     supplier.setString(value, Field.UPDATEDBY.getFieldName(), entity.getUpdatedBy());
     supplier.setDate(value, Field.UPDATEDDATE.getFieldName(), entity.getUpdatedDate());
     supplier.setString(value, Field.USERNAME.getFieldName(), entity.getUsername());
+    supplier.setString(value, Field.ZIPCODE.getFieldName(), entity.getZipCode());
     return value;
   }
 
@@ -170,6 +200,31 @@ public class DUserMapper
 
     public Builder id(Long id) {
       entity.setId(id);
+      return this;
+    }
+
+    public Builder address1(String address1) {
+      entity.setAddress1(address1);
+      return this;
+    }
+
+    public Builder address2(String address2) {
+      entity.setAddress2(address2);
+      return this;
+    }
+
+    public Builder birthInfo(String birthInfo) {
+      entity.setBirthInfo(birthInfo);
+      return this;
+    }
+
+    public Builder city(String city) {
+      entity.setCity(city);
+      return this;
+    }
+
+    public Builder country(String country) {
+      entity.setCountry(country);
       return this;
     }
 
@@ -193,13 +248,33 @@ public class DUserMapper
       return this;
     }
 
+    public Builder firstName(String firstName) {
+      entity.setFirstName(firstName);
+      return this;
+    }
+
     public Builder friends(Collection friends) {
       entity.setFriends(friends);
       return this;
     }
 
+    public Builder lastName(String lastName) {
+      entity.setLastName(lastName);
+      return this;
+    }
+
     public Builder password(String password) {
       entity.setPassword(password);
+      return this;
+    }
+
+    public Builder phoneNumber1(String phoneNumber1) {
+      entity.setPhoneNumber1(phoneNumber1);
+      return this;
+    }
+
+    public Builder phoneNumber2(String phoneNumber2) {
+      entity.setPhoneNumber2(phoneNumber2);
       return this;
     }
 
@@ -235,6 +310,11 @@ public class DUserMapper
 
     public Builder username(String username) {
       entity.setUsername(username);
+      return this;
+    }
+
+    public Builder zipCode(String zipCode) {
+      entity.setZipCode(zipCode);
       return this;
     }
 

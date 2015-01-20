@@ -62,8 +62,69 @@ public class DUser extends DOAuth2User {
   @Basic
   private Collection<Long> friends;
 
-  // TODO Missing a lot of properties - name, address etc
+  /**
+   * First name.
+   */
+  @Basic
+  private String firstName;
 
+  /**
+   * Last name.
+   */
+  @Basic
+  private String lastName;
+
+  /**
+   * Address line 1.
+   */
+  @Basic
+  private String address1;
+
+  /**
+   * Address line 2.
+   * Project and country specific use.
+   */
+  @Basic
+  private String address2;
+
+  /**
+   * ZIP code.
+   */
+  @Basic
+  private String zipCode;
+
+  /**
+   * City
+   */
+  @Basic
+  private String city;
+
+  /**
+   * Country.
+   */
+  @Basic
+  private String country;
+
+  /**
+   * Phone number 1.
+   * Project and country specific use.
+   */
+  @Basic
+  private String phoneNumber1;
+
+  /**
+   * Phone number 2.
+   * Project and country specific use.
+   */
+  @Basic
+  private String phoneNumber2;
+
+  /**
+   * Birth related information.
+   * Project specific user, e.g. birth year.
+   */
+  @Basic
+  private String birthInfo;
 
   public String getUsername() {
     return username;
@@ -89,5 +150,85 @@ public class DUser extends DOAuth2User {
 
   public void setFriends(Collection<Long> friends) {
     this.friends = friends;
+  }
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  public String getLastName() {
+    return lastName;
+  }
+
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
+
+  public String getAddress1() {
+    return address1;
+  }
+
+  public void setAddress1(String address1) {
+    this.address1 = address1;
+  }
+
+  public String getAddress2() {
+    return address2;
+  }
+
+  public void setAddress2(String address2) {
+    this.address2 = address2;
+  }
+
+  public String getZipCode() {
+    return zipCode;
+  }
+
+  public void setZipCode(String zipCode) {
+    this.zipCode = zipCode;
+  }
+
+  public String getCity() {
+    return city;
+  }
+
+  public void setCity(String city) {
+    this.city = city;
+  }
+
+  public String getCountry() {
+    return country;
+  }
+
+  public void setCountry(String country) {
+    this.country = country;
+  }
+
+  public String getPhoneNumber1() {
+    return phoneNumber1;
+  }
+
+  public void setPhoneNumber1(String phoneNumber1) {
+    this.phoneNumber1 = phoneNumber1;
+  }
+
+  public String getPhoneNumber2() {
+    return phoneNumber2;
+  }
+
+  public void setPhoneNumber2(String phoneNumber2) {
+    this.phoneNumber2 = phoneNumber2;
+  }
+
+  public String getBirthInfo() {
+    return birthInfo;
+  }
+
+  public void setBirthInfo(String birthInfo) {
+    this.birthInfo = birthInfo;
   }
 }
