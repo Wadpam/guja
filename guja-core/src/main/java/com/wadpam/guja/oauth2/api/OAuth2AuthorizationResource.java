@@ -31,6 +31,7 @@ import com.sun.jersey.spi.resource.Singleton;
 import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.oauth2.api.requests.RefreshTokenRequest;
+import com.wadpam.guja.oauth2.api.requests.RevocationRequest;
 import com.wadpam.guja.oauth2.api.requests.UserCredentials;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
 import com.wadpam.guja.oauth2.domain.DConnection;
@@ -38,6 +39,7 @@ import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import com.wadpam.guja.oauth2.provider.TokenGenerator;
 import com.wadpam.guja.oauth2.provider.UserAuthenticationProvider;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
+import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,12 +113,12 @@ public class OAuth2AuthorizationResource {
 
     if (!PASSWORD_GRANT_TYPE.equals(credentials.getGrant_type())) {
       // Unsupported grant type
-      throw new BadRequestRestException(ImmutableMap.of("error", "unsupported_grant_type"));
+      throw new BadRequestRestException(ImmutableMap.of("error", Oauth2ClientAuthenticationFilter.ERROR_UNSUPPORTED_GRANT_TYPE));
     }
 
     if (null == credentials.getUsername() ||
         null == credentials.getPassword()) {
-      throw new BadRequestRestException(ImmutableMap.of("error", "invalid_request"));
+      throw new BadRequestRestException(ImmutableMap.of("error", Oauth2ClientAuthenticationFilter.ERROR_INVALID_REQUEST));
     }
 
     DOAuth2User oauth2User = authenticationProvider.authenticate(credentials.getUsername(), credentials.getPassword());
@@ -143,7 +145,7 @@ public class OAuth2AuthorizationResource {
 
     } else {
       // authentication failed
-      throw new BadRequestRestException(ImmutableMap.of("error", "invalid_grant"));
+      throw new BadRequestRestException(ImmutableMap.of("error", Oauth2ClientAuthenticationFilter.ERROR_INVALID_GRANT));
     }
 
   }
@@ -243,44 +245,62 @@ public class OAuth2AuthorizationResource {
    * Revoke a users access_token and refresh_token.
    * https://tools.ietf.org/html/rfc7009
    *
-   * @param token either the access_token or refresh token
+   * @param revocationRequest contains either the access token or refresh token and a token type hint
    * @return will always return http 200
    */
-  @GET
+  @POST
   @Path("revoke")
-  public Response revoke(@QueryParam("token") String token) {
+  public Response revoke(RevocationRequest revocationRequest) {
     // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
+    String token = revocationRequest.getToken();
+    String tokenHint = revocationRequest.getToken_type_hint();
+
     if (null != token) {
-
-      // Look both in access_token and refresh_token
-      boolean isAccessTokenType = true;
-      DConnection connection = connectionDao.findByAccessToken(token);
-      if (null == connection) {
-        isAccessTokenType = false;
-        connection = connectionDao.findByRefreshToken(token);
-      }
-
-      // Ignore expiration time
-      if (null != connection) {
-        if (!ALWAYS_REVOKE_REFRESH_TOKEN && isAccessTokenType) {
-          // Remove the access_token
-          // Still allow the user to refresh using the refresh token
-          connection.setAccessToken(null);
-          put(connection);
-        } else {
-          // Delete the connection completely
-          delete(connection);
+      // Start with the token type hint but always widen the scope if not found
+      if (null == tokenHint || "access_token".equals(tokenHint)) {
+        if (!revokeAccessToken(token)) {
+          revokeRefreshToken(token);
+        }
+      } else {
+        if (!revokeRefreshToken(token)) {
+          revokeAccessToken(token);
         }
       }
-
     }
 
     // Always send http 200 according to the specification
     return Response.ok().build();
-
   }
 
+  private boolean revokeAccessToken(String token) {
+    DConnection connection = connectionDao.findByAccessToken(token);
+    if (null != connection) {
+      if (ALWAYS_REVOKE_REFRESH_TOKEN) {
+        // Delete the connection completely
+        delete(connection);
+      } else {
+        // Remove the access_token
+        // Still allow the user to refresh using the refresh token
+        connection.setAccessToken(null);
+        put(connection);
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean revokeRefreshToken(String token) {
+    DConnection connection = connectionDao.findByRefreshToken(token);
+    if (null != connection) {
+      // Delete the connection completely
+      delete(connection);
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   /**
    * Validate an access_token.

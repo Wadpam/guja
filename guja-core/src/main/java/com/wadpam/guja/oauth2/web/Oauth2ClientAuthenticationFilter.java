@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Map;
 
@@ -47,13 +48,27 @@ import java.util.Map;
  * A Oauth2 client authentication filter.
  * Authenticate the client using basic authentication.
  *
+ * Note! This filter only deal with client authentication. User authentication is handled by the OAuth2AuthorizationResource
+ *
  * @author mattiaslevin
  */
 @Singleton
 public class Oauth2ClientAuthenticationFilter implements Filter, AdminTask {
   public static final Logger LOGGER = LoggerFactory.getLogger(Oauth2ClientAuthenticationFilter.class);
 
+  final static String APPLICATION_JSON_WITH_UTF8_CHARSET = MediaType.APPLICATION_JSON + ";charset=UTF-8";
+
   public static final String PREFIX_BASIC_AUTHENTICATION = "Basic ";
+
+  public static final String ERROR_INVALID_REQUEST = "invalid_request";
+  public static final String ERROR_INVALID_CLIENT = "invalid_client";
+  public static final String ERROR_INVALID_GRANT = "invalid_grant";
+  public static final String ERROR_UNAUTHORIZED_CLIENT = "unauthorized_client";
+  public static final String ERROR_UNSUPPORTED_GRANT_TYPE = "unsupported_grant_type";
+  public static final String ERROR_INVALID_SCOPE = "invalid_scope"; // Not used
+
+  public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
+  public static final String PREFIX_BEARER = "Bearer ";
 
   private final ObjectMapper objectMapper;
   private final DFactoryDaoBean factoryDao;
@@ -102,47 +117,88 @@ public class Oauth2ClientAuthenticationFilter implements Filter, AdminTask {
     HttpServletResponse response = (HttpServletResponse) res;
 
     // Either the Authorize header or json body is used to provide the client credentials
+    String authHeader = request.getHeader(OAuth2Filter.HEADER_AUTHORIZATION);
+    ClientCredentials credentials = null;
+    if (request.getContentLength() > 0) {
+      HttpBodyRequestWrapper wrappedRequest = new HttpBodyRequestWrapper(request);
+      credentials = objectMapper.readValue(wrappedRequest.getBody(), ClientCredentials.class);
+      // Must wrap the request
+      request = wrappedRequest;
+    }
+
+    // Check for duplicate authentication methods - invalid request
+    if (null != authHeader &&
+        null != credentials && null != credentials.getClient_id() && null != credentials.getClient_secret()) {
+      LOGGER.info("Bad request - duplicate client authentication credentials");
+      // Multiple authentication credentials (400, "invalid_request")
+      errorMessage(response, HttpServletResponse.SC_BAD_REQUEST, ERROR_INVALID_REQUEST);
+      return;
+    }
 
     // check for header
-    if (null != request.getHeader(OAuth2Filter.HEADER_AUTHORIZATION)) {
+    if (null != authHeader) {
 
-      String auth = request.getHeader(OAuth2Filter.HEADER_AUTHORIZATION);
-      LOGGER.debug("{}: {}", OAuth2Filter.HEADER_AUTHORIZATION, auth);
-      int beginIndex = auth.indexOf(PREFIX_BASIC_AUTHENTICATION);
+      LOGGER.debug("{}: {}", OAuth2Filter.HEADER_AUTHORIZATION, authHeader);
+      int beginIndex = authHeader.indexOf(PREFIX_BASIC_AUTHENTICATION);
       if (-1 < beginIndex) {
-        String baString = auth.substring(beginIndex + PREFIX_BASIC_AUTHENTICATION.length());
+        String baString = authHeader.substring(beginIndex + PREFIX_BASIC_AUTHENTICATION.length());
         String storedBaString = getBasicAuthenticationString();
         LOGGER.debug("{} equals? {}", baString, storedBaString);
         if (!baString.equals(storedBaString)) {
-          LOGGER.info("Unauthorized");
-          response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+          LOGGER.info("Unauthorized - invalid client credentials");
+          // Unauthorized (401, "invalid_client")
+          response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER); // TODO What should be returned
+          errorMessage(response, HttpServletResponse.SC_UNAUTHORIZED, ERROR_INVALID_CLIENT);
           return;
         }
-      }
-
-    } else if (request.getContentLength() > 0) {
-      // Check JSON
-      BodyRequestWrapper wrappedRequest = new BodyRequestWrapper(request);
-      ClientCredentials credentials = objectMapper.readValue(wrappedRequest.getBody(), ClientCredentials.class);
-      LOGGER.debug(String.format("%s: %s, %s", PREFIX_BASIC_AUTHENTICATION, credentials.getClient_id(), credentials.getClient_secret()));
-      if (null == credentials ||
-          null == credentials.getClient_id() ||
-          null == credentials.getClient_secret() ||
-          !isCredentialsValid(credentials.getClient_id(), credentials.getClient_secret())) {
-        LOGGER.info("Unauthorized");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      } else {
+        // Unsupported client authentication method (401, "invalid_client")
+        LOGGER.info("Unauthorized - client authentication method not supported");
+        response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER); // TODO What should be returned
+        errorMessage(response, HttpServletResponse.SC_UNAUTHORIZED, ERROR_INVALID_CLIENT);
         return;
       }
 
-      request = wrappedRequest;
+    } else if (null != credentials) {
+      // Check JSON
+      LOGGER.debug(String.format("%s: %s, %s", PREFIX_BASIC_AUTHENTICATION, credentials.getClient_id(), credentials.getClient_secret()));
+
+      if (null == credentials.getClient_id() && null == credentials.getClient_secret()) {
+        // No client authentication included (401, "invalid_client")
+        LOGGER.info("Unauthorized - no client credentials found");
+        errorMessage(response, HttpServletResponse.SC_UNAUTHORIZED, ERROR_INVALID_CLIENT);
+        return;
+      } else if (null == credentials.getClient_id() ^ null == credentials.getClient_secret()) {
+        LOGGER.info("Bad request - missing required parameter");
+        // Missing client authentication parameter (400, "invalid_request")
+        errorMessage(response, HttpServletResponse.SC_BAD_REQUEST, ERROR_INVALID_REQUEST);
+        return;
+      } else if (!isCredentialsValid(credentials.getClient_id(), credentials.getClient_secret())) {
+        LOGGER.info("Unauthorized - invalid client credentials");
+        // Unauthorized (401, "invalid_client")
+        errorMessage(response, HttpServletResponse.SC_UNAUTHORIZED, ERROR_INVALID_CLIENT);
+        return;
+      }
 
     } else {
-      LOGGER.info("Unauthorized (no body)");
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      // No client authentication included (401, "invalid_client")
+      LOGGER.info("Unauthorized - no client credentials found)");
+      errorMessage(response, HttpServletResponse.SC_UNAUTHORIZED, ERROR_INVALID_CLIENT);
+      return;
     }
 
     chain.doFilter(request, response);
 
+  }
+
+  private static void errorMessage(HttpServletResponse response, int responseCode, String errorMessage) {
+    response.setStatus(responseCode);
+    try {
+      response.getWriter().write(String.format("{\"error\":\"%s\"}", errorMessage));
+      response.setContentType(APPLICATION_JSON_WITH_UTF8_CHARSET);
+    } catch (IOException e) {
+      LOGGER.error("Failed to write json body {}", e);
+    }
   }
 
   private boolean isCredentialsValid(String clientId, String clientSecret) {
