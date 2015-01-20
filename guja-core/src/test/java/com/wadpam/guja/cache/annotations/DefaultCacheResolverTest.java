@@ -5,6 +5,7 @@ import com.google.common.cache.Cache;
 import com.google.inject.Provider;
 import com.wadpam.guja.cache.CacheBuilder;
 import com.wadpam.guja.cache.GuavaCacheBuilderProvider;
+import net.sf.mardao.core.CacheConfig;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

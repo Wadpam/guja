@@ -26,6 +26,7 @@ package com.wadpam.guja.oauth2.domain;
  * #L%
  */
 
+import net.sf.mardao.core.Cached;
 import net.sf.mardao.domain.AbstractLongEntity;
 
 import javax.persistence.Basic;
@@ -40,6 +41,7 @@ import java.util.Collection;
  * @author sosandstrom
  * @author mattiaslevin
  */
+@Cached
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
 public class DOAuth2User extends AbstractLongEntity {

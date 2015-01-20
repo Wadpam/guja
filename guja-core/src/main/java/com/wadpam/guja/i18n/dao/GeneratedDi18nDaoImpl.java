@@ -17,10 +17,11 @@ import net.sf.mardao.dao.AbstractDao;
 import net.sf.mardao.dao.Supplier;
 import com.wadpam.guja.i18n.domain.Di18n;
 
+
 /**
  * The Di18n domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-01-02T18:17:29.812+0100.
+ * Generated on 2015-01-20T21:35:58.138+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDi18nDaoImpl
@@ -29,6 +30,9 @@ public class GeneratedDi18nDaoImpl
   public GeneratedDi18nDaoImpl(Supplier supplier) {
     super(new Di18nMapper(supplier), supplier);
   }
+
+// ----------------------- Caching -------------------------------------
+
 
 // ----------------------- field finders -------------------------------
   /**

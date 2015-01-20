@@ -1,7 +1,7 @@
 package com.wadpam.guja.cache;
 
 import com.google.inject.Inject;
-import com.wadpam.guja.cache.annotations.CacheConfig;
+import net.sf.mardao.core.CacheConfig;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.CrudDao;
 

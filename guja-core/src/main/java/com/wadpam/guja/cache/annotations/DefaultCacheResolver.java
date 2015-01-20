@@ -5,6 +5,7 @@ import com.google.common.cache.Cache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.wadpam.guja.cache.CacheBuilder;
+import net.sf.mardao.core.CacheConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

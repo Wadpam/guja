@@ -24,6 +24,7 @@ package com.wadpam.guja.oauth2.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import net.sf.mardao.core.Cached;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -37,6 +38,7 @@ import java.util.Collection;
  *
  * @author mattiaslevin
  */
+@Cached
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"username"}))
 public class DUser extends DOAuth2User {

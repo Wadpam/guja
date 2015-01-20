@@ -3,6 +3,7 @@ package com.wadpam.guja.cache.annotations;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 import com.google.appengine.repackaged.com.google.common.collect.Sets;
 import com.wadpam.guja.util.Triplet;
+import net.sf.mardao.core.CacheConfig;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public class GuiceCacheKeyInvocationContext<A extends Annotation> implements Cac
 
     this.methodInvocation = methodInvocation;
     this.methodAnnotation = methodCacheAnnotation;
-    this.methodCacheName = methodCacheName;
+    this.methodCacheName = "".equals(methodCacheName) ? null : methodCacheName; // Guard against "" which is the default annotation value
 
     Triplet<Collection<CacheInvocationParameter>, Collection<CacheInvocationParameter>, CacheInvocationParameter> invocationParams =
         getParameterDetails(methodInvocation);
@@ -131,7 +132,7 @@ public class GuiceCacheKeyInvocationContext<A extends Annotation> implements Cac
       }
     }
 
-    // Use the calls name as default cache name
+    // Use the class name as default cache name
     return clazz.getName();
   }
 

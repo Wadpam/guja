@@ -12,7 +12,7 @@ import com.wadpam.guja.oauth2.domain.DFactory;
 /**
  * The DFactory domain-object specific mapping methods go here.
  *
- * Generated on 2015-01-02T18:17:30.242+0100.
+ * Generated on 2015-01-20T21:35:58.613+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DFactoryMapper

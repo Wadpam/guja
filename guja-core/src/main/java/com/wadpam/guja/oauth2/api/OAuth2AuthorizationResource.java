@@ -128,7 +128,7 @@ public class OAuth2AuthorizationResource {
 
       DConnection connection = generateConnection(oauth2User, null, null);
 
-      put(connection);
+      connectionDao.put(connection.getAccessToken(), connection);
 
       // Remove expired connections for the user
       removeExpiredConnections(FactoryResource.PROVIDER_ID_SELF, existingConnections);
@@ -168,28 +168,6 @@ public class OAuth2AuthorizationResource {
     return DateTime.now().plusSeconds(expiresInSeconds).toDate();
   }
 
-
-  public DConnection put(DConnection connection) {
-    try {
-      connectionDao.put(connection);
-      return connection;
-    } catch (IOException e) {
-      LOGGER.error("Failed to save connection {}", e);
-      throw new InternalServerErrorRestException("Failed to save connection");
-    }
-  }
-
-
-  private void delete(DConnection connection) {
-    try {
-      connectionDao.delete(connection.getId());
-    } catch (IOException e) {
-      LOGGER.error("Failed to delete connection {}", e);
-      throw new InternalServerErrorRestException("Failed to delete connection");
-    }
-  }
-
-
   private NewCookie createCookie(String accessToken, int expiresInSeconds) {
     return new NewCookie(OAuth2Filter.NAME_ACCESS_TOKEN, accessToken, "/api", null, null, expiresInSeconds, false);
   }
@@ -223,13 +201,13 @@ public class OAuth2AuthorizationResource {
       throw new BadRequestRestException(ImmutableMap.of("error", "invalid_grant"));
     }
 
-    // invalidate the cache for the old access token
-    connectionDao.invalidateCacheByAccessToken(connection.getAccessToken());
+    // Invalidate the old cache key
+    connectionDao.invalidateCache(connection.getAccessToken());
 
     connection.setAccessToken(accessTokenGenerator.generate());
     connection.setExpireTime(calculateExpirationDate(tokenExpiresIn));
 
-    put(connection);
+    connectionDao.put(connection.getAccessToken(), connection);
 
     return Response.ok(ImmutableMap.builder()
         .put("access_token", connection.getAccessToken())
@@ -252,7 +230,7 @@ public class OAuth2AuthorizationResource {
   @GET
   @Path("revoke")
   public Response revoke(@QueryParam("token") String token) {
-    // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
+    // Perform all validations here to control the exact error message returned to comply with the Oauth2 standard
 
     if (null != token) {
 
@@ -267,17 +245,21 @@ public class OAuth2AuthorizationResource {
       // Ignore expiration time
       if (null != connection) {
 
-        // Always invalidate the cache based on access token
-        connectionDao.invalidateCacheByAccessToken(connection.getAccessToken());
-
         if (!ALWAYS_REVOKE_REFRESH_TOKEN && isAccessTokenType) {
           // Remove the access_token
           // Still allow the user to refresh using the refresh token
+          connectionDao.invalidateCache(connection.getAccessToken());
           connection.setAccessToken(null);
-          put(connection);
+          try {
+            // Do not cache, access token is null
+            connectionDao.put(connection);
+          } catch (IOException e) {
+            LOGGER.error("Failed to update connection {}", e);
+            throw new InternalServerErrorRestException("Failed to update connection");
+          }
         } else {
           // Delete the connection completely
-          delete(connection);
+          connectionDao.delete(connection.getAccessToken(), connection.getId());
         }
       }
 
@@ -350,8 +332,8 @@ public class OAuth2AuthorizationResource {
     }
 
     try {
-      connectionDao.delete(expiredTokens);
       // Do not invalidate the cache, they are harmless since expired and they will get evicted over time
+      connectionDao.delete(expiredTokens);
     } catch (IOException e) {
       LOGGER.error("Failed to delete expired tokens {}", e);
       throw new InternalServerErrorRestException("Failed to delete expired tokens");

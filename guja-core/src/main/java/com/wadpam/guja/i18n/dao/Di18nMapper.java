@@ -12,7 +12,7 @@ import com.wadpam.guja.i18n.domain.Di18n;
 /**
  * The Di18n domain-object specific mapping methods go here.
  *
- * Generated on 2015-01-02T18:17:29.812+0100.
+ * Generated on 2015-01-20T21:35:58.138+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class Di18nMapper

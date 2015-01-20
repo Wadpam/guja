@@ -26,6 +26,7 @@ package com.wadpam.guja.oauth2.domain;
  * #L%
  */
 
+import net.sf.mardao.core.Cached;
 import net.sf.mardao.domain.AbstractStringEntity;
 
 import javax.persistence.Basic;
@@ -37,6 +38,7 @@ import javax.persistence.Entity;
  *
  * @author sosandstrom
  */
+@Cached
 @Entity
 public class DFactory extends AbstractStringEntity {
 

@@ -3,6 +3,7 @@ package com.wadpam.guja.cache.annotations;
 import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.inject.Provider;
+import net.sf.mardao.core.CacheConfig;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 

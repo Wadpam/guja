@@ -16,11 +16,20 @@ import net.sf.mardao.core.geo.DLocation;
 import net.sf.mardao.dao.AbstractDao;
 import net.sf.mardao.dao.Supplier;
 import com.wadpam.guja.oauth2.domain.DFactory;
+import net.sf.mardao.core.Cached;
+import net.sf.mardao.core.CacheConfig;
+import java.io.IOException;
+import javax.cache.annotation.CacheResult;
+import javax.cache.annotation.CachePut;
+import javax.cache.annotation.CacheRemove;
+import javax.cache.annotation.CacheKey;
+import javax.cache.annotation.CacheValue;
+
 
 /**
  * The DFactory domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-01-02T18:17:30.242+0100.
+ * Generated on 2015-01-20T21:35:58.613+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDFactoryDaoImpl
@@ -29,6 +38,28 @@ public class GeneratedDFactoryDaoImpl
   public GeneratedDFactoryDaoImpl(Supplier supplier) {
     super(new DFactoryMapper(supplier), supplier);
   }
+
+// ----------------------- Caching -------------------------------------
+
+  // Cache crud methods
+  @CacheResult
+  @Override
+  public DFactory get(@CacheKey Object parentKey, @CacheKey java.lang.String id) throws IOException {
+    return super.get(parentKey, id);
+  }
+
+  @CachePut
+  @Override
+  public java.lang.String put(@CacheKey Object parentKey, @CacheKey java.lang.String id, @CacheValue DFactory entity) throws IOException {
+    return super.put(parentKey, id, entity);
+  }
+
+  @CacheRemove
+  @Override
+  public void delete(@CacheKey Object parentKey, @CacheKey java.lang.String id) throws IOException {
+    super.delete(parentKey, id);
+  }
+
 
 // ----------------------- field finders -------------------------------
   /**
