@@ -414,12 +414,12 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   }
 
   @Inject(optional = true)
-  public void setEmailVerificationTemplate(@Named("app.email.verify.template") String emailVerificationTemplate) {
+  public void setEmailVerificationTemplate(@Named("app.template.verifyemail") String emailVerificationTemplate) {
     this.emailVerificationTemplate = emailVerificationTemplate;
   }
 
   @Inject(optional = true)
-  public void setResetPasswordTemplate(@Named("app.password.template") String resetPasswordTemplate) {
+  public void setResetPasswordTemplate(@Named("app.template.resetpassword") String resetPasswordTemplate) {
     this.resetPasswordTemplate = resetPasswordTemplate;
   }
 }

@@ -107,8 +107,6 @@ public class JavaMailService implements EmailService {
                 msg.setContent(mp);
             }
 
-            msg.setText(body);
-
             Transport.send(msg);
             return true;
 
