@@ -32,7 +32,6 @@ import com.google.inject.Singleton;
 import com.wadpam.guja.oauth2.api.FactoryResource;
 import com.wadpam.guja.oauth2.api.OAuth2UserResource;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
-import com.wadpam.guja.oauth2.dao.DOAuth2UserDaoBean;
 import com.wadpam.guja.oauth2.domain.DConnection;
 import net.sf.mardao.dao.AbstractDao;
 import org.slf4j.Logger;

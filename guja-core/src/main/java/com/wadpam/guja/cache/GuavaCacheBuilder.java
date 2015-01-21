@@ -7,7 +7,9 @@ import com.google.common.cache.LoadingCache;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by sosandstrom on 2014-12-18.
+ * Guava cache builder.
+ *
+ * @author sosandstrom
  */
 public class GuavaCacheBuilder<K, V> implements CacheBuilder<K, V> {
 
@@ -21,8 +23,8 @@ public class GuavaCacheBuilder<K, V> implements CacheBuilder<K, V> {
   }
 
   @Override
-  public CacheBuilder from(String ignored) {
-    this.cacheBuilder = com.google.common.cache.CacheBuilder.from("");
+  public CacheBuilder name(String ignored) {
+    // Do nothing
     return this;
   }
 

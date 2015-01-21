@@ -5,13 +5,15 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 /**
- * Created by sosandstrom on 2014-12-18.
+ * Cache builder.
+ *
+ * @author sosandstrom
  */
 public interface CacheBuilder<K, V> {
 
   CacheBuilder expireAfterWrite(int seconds);
 
-  CacheBuilder from(String spec);
+  CacheBuilder name(String spec);
 
   CacheBuilder maximumSize(long size);
 

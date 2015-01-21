@@ -34,6 +34,7 @@ import com.wadpam.guja.oauth2.api.requests.RefreshTokenRequest;
 import com.wadpam.guja.oauth2.api.requests.RevocationRequest;
 import com.wadpam.guja.oauth2.api.requests.UserCredentials;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
+import com.wadpam.guja.oauth2.dao.DConnectionMapper;
 import com.wadpam.guja.oauth2.domain.DConnection;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import com.wadpam.guja.oauth2.provider.TokenGenerator;
@@ -129,7 +130,7 @@ public class OAuth2AuthorizationResource {
 
       DConnection connection = generateConnection(oauth2User, null, null);
 
-      put(connection);
+      connectionDao.putWithCacheKey(connection.getAccessToken(), connection);
 
       // Remove expired connections for the user
       removeExpiredConnections(FactoryResource.PROVIDER_ID_SELF, existingConnections);
@@ -151,46 +152,23 @@ public class OAuth2AuthorizationResource {
   }
 
   private DConnection generateConnection(DOAuth2User oauth2User, String profileUrl, String imageUrl) {
-    DConnection connection = new DConnection();
-    connection.setAccessToken(accessTokenGenerator.generate());
-    connection.setRefreshToken(accessTokenGenerator.generate());
-    connection.setProviderId(FactoryResource.PROVIDER_ID_SELF);
-    connection.setProviderUserId(oauth2User.getId().toString());
-    connection.setUserId(oauth2User.getId());
-    connection.setExpireTime(calculateExpirationDate(tokenExpiresIn));
-    connection.setUserRoles(convertRoles(oauth2User.getRoles()));
-    connection.setDisplayName(oauth2User.getDisplayName());
-    connection.setImageUrl(imageUrl);
-    connection.setProfileUrl(profileUrl);
-
-    return connection;
+   return DConnectionMapper.newBuilder()
+       .accessToken(accessTokenGenerator.generate())
+       .refreshToken(accessTokenGenerator.generate())
+       .providerId(FactoryResource.PROVIDER_ID_SELF)
+       .providerUserId(oauth2User.getId().toString())
+       .userId(oauth2User.getId())
+       .expireTime(calculateExpirationDate(tokenExpiresIn))
+       .userRoles(convertRoles(oauth2User.getRoles()))
+       .displayName(oauth2User.getDisplayName())
+       .imageUrl(imageUrl)
+       .profileUrl(profileUrl)
+       .build();
   }
 
   private Date calculateExpirationDate(int expiresInSeconds) {
     return DateTime.now().plusSeconds(expiresInSeconds).toDate();
   }
-
-
-  public DConnection put(DConnection connection) {
-    try {
-      connectionDao.put(connection);
-      return connection;
-    } catch (IOException e) {
-      LOGGER.error("Failed to save connection {}", e);
-      throw new InternalServerErrorRestException("Failed to save connection");
-    }
-  }
-
-
-  private void delete(DConnection connection) {
-    try {
-      connectionDao.delete(connection.getId());
-    } catch (IOException e) {
-      LOGGER.error("Failed to delete connection {}", e);
-      throw new InternalServerErrorRestException("Failed to delete connection");
-    }
-  }
-
 
   private NewCookie createCookie(String accessToken, int expiresInSeconds) {
     return new NewCookie(OAuth2Filter.NAME_ACCESS_TOKEN, accessToken, "/api", null, null, expiresInSeconds, false);
@@ -225,10 +203,13 @@ public class OAuth2AuthorizationResource {
       throw new BadRequestRestException(ImmutableMap.of("error", "invalid_grant"));
     }
 
+    // Invalidate the old cache key
+    connectionDao.invalidateCacheKey(connection.getAccessToken());
+
     connection.setAccessToken(accessTokenGenerator.generate());
     connection.setExpireTime(calculateExpirationDate(tokenExpiresIn));
 
-    put(connection);
+    connectionDao.putWithCacheKey(connection.getAccessToken(), connection);
 
     return Response.ok(ImmutableMap.builder()
         .put("access_token", connection.getAccessToken())
@@ -278,12 +259,20 @@ public class OAuth2AuthorizationResource {
     if (null != connection) {
       if (ALWAYS_REVOKE_REFRESH_TOKEN) {
         // Delete the connection completely
-        delete(connection);
+        connectionDao.deleteWithCacheKey(connection.getAccessToken(), connection.getId());
       } else {
+        // Invalidate old cache key
+        connectionDao.invalidateCacheKey(connection.getAccessToken());
         // Remove the access_token
         // Still allow the user to refresh using the refresh token
         connection.setAccessToken(null);
-        put(connection);
+        try {
+          // Do not cache, access token is null
+          connectionDao.put(connection);
+        } catch (IOException e) {
+          LOGGER.error("Failed to update connection {}", e);
+          throw new InternalServerErrorRestException("failed to update connection");
+        }
       }
       return true;
     } else {
@@ -295,7 +284,7 @@ public class OAuth2AuthorizationResource {
     DConnection connection = connectionDao.findByRefreshToken(token);
     if (null != connection) {
       // Delete the connection completely
-      delete(connection);
+      connectionDao.deleteWithCacheKey(connection.getAccessToken(), connection.getId());
       return true;
     } else {
       return false;
@@ -363,6 +352,7 @@ public class OAuth2AuthorizationResource {
     }
 
     try {
+      // Do not invalidate the cache, they are harmless since expired and they will get evicted over time
       connectionDao.delete(expiredTokens);
     } catch (IOException e) {
       LOGGER.error("Failed to delete expired tokens {}", e);

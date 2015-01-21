@@ -1,25 +1,26 @@
-package com.wadpam.guja.crud;
+package com.wadpam.guja.cache;
 
 import com.google.inject.Inject;
+import net.sf.mardao.core.CacheConfig;
 import net.sf.mardao.core.CursorPage;
-import net.sf.mardao.dao.Cached;
-import net.sf.mardao.dao.Crud;
 import net.sf.mardao.dao.CrudDao;
 
+import javax.cache.annotation.*;
 import java.io.IOException;
 
 /**
- * CrudDao for unit testing.
+ * Delegating CrudDao.
+ *
  * @author mattiaslevin
  */
-@Cached
+@CacheDefaults(cacheName = "DelegatingCrudDao")
 public class DelegatingCrudDao implements CrudDao<String, Long> {
 
   final private CrudDao<String, Long> delegateDao;
 
   @Inject
-  public DelegatingCrudDao(CrudDao<String, Long> mock) {
-    this.delegateDao = mock;
+  public DelegatingCrudDao(CrudDao<String, Long> delegate) {
+    this.delegateDao = delegate;
   }
 
   @Override
@@ -27,15 +28,13 @@ public class DelegatingCrudDao implements CrudDao<String, Long> {
     return delegateDao.count(o);
   }
 
-  @Cached
-  @Crud
+  @CachePut
   @Override
-  public Long put(Object parentKey, Long aLong, String s) throws IOException {
+  public Long put(@CacheKey Object parentKey, @CacheKey Long aLong, @CacheValue String s) throws IOException {
     return delegateDao.put(parentKey, aLong, s);
   }
 
-  @Cached
-  @Crud
+  @CacheResult
   @Override
   public String get(Object parentKey, Long aLong) throws IOException {
     return delegateDao.get(parentKey, aLong);
@@ -45,8 +44,7 @@ public class DelegatingCrudDao implements CrudDao<String, Long> {
     return get(null, aLong);
   }
 
-  @Cached
-  @Crud
+  @CacheRemove
   @Override
   public void delete(Object parentKey, Long aLong) throws IOException {
     delegateDao.delete(parentKey, aLong);
@@ -56,8 +54,6 @@ public class DelegatingCrudDao implements CrudDao<String, Long> {
     delete(null, aLong);
   }
 
-  @Cached
-  @Crud
   @Override
   public CursorPage<String> queryPage(Object ancestorKey, int i, String s) {
     return delegateDao.queryPage(ancestorKey, i, s);
@@ -65,6 +61,17 @@ public class DelegatingCrudDao implements CrudDao<String, Long> {
 
   public CursorPage<String> queryPage(int i, String s) {
     return queryPage(null, i, s);
+  }
+
+  @CacheRemoveAll
+  public void removeAll() {
+    // Do nothing
+  }
+
+  @CacheConfig(expiresAfterSeconds = 60 * 10)
+  @CacheResult(cacheName = "DelegatingCrudDao.findByName")
+  public String findByName(String name) {
+    return "Levin";
   }
 
 }

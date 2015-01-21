@@ -23,6 +23,7 @@ package com.wadpam.guja.api;
  */
 
 
+import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -68,7 +69,8 @@ public class MonitorResource {
     return Response.ok(ImmutableMap.builder()
         .put("name", appName)
         .put("version", appVersion)
-        .put("date", new Date().toString())
+        .put("date", DateTime.now().toString())
+        .put("timestamp", DateTime.now().getMillis() / 1000)
         .build())
         .build();
   }
