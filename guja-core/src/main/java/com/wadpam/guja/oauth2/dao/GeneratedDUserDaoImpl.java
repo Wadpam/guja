@@ -16,11 +16,20 @@ import net.sf.mardao.core.geo.DLocation;
 import net.sf.mardao.dao.AbstractDao;
 import net.sf.mardao.dao.Supplier;
 import com.wadpam.guja.oauth2.domain.DUser;
+import net.sf.mardao.core.Cached;
+import net.sf.mardao.core.CacheConfig;
+import java.io.IOException;
+import javax.cache.annotation.CacheResult;
+import javax.cache.annotation.CachePut;
+import javax.cache.annotation.CacheRemove;
+import javax.cache.annotation.CacheKey;
+import javax.cache.annotation.CacheValue;
+
 
 /**
  * The DUser domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-01-19T20:31:51.597+0100.
+ * Generated on 2015-01-20T22:12:36.907+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDUserDaoImpl
@@ -29,6 +38,28 @@ public class GeneratedDUserDaoImpl
   public GeneratedDUserDaoImpl(Supplier supplier) {
     super(new DUserMapper(supplier), supplier);
   }
+
+// ----------------------- Caching -------------------------------------
+
+  // Cache crud methods
+  @CacheResult
+  @Override
+  public DUser get(@CacheKey Object parentKey, @CacheKey java.lang.Long id) throws IOException {
+    return super.get(parentKey, id);
+  }
+
+  @CachePut
+  @Override
+  public java.lang.Long put(@CacheKey Object parentKey, @CacheKey java.lang.Long id, @CacheValue DUser entity) throws IOException {
+    return super.put(parentKey, id, entity);
+  }
+
+  @CacheRemove
+  @Override
+  public void delete(@CacheKey Object parentKey, @CacheKey java.lang.Long id) throws IOException {
+    super.delete(parentKey, id);
+  }
+
 
 // ----------------------- field finders -------------------------------
   /**

@@ -31,6 +31,7 @@ import net.sf.mardao.dao.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.cache.annotation.CacheDefaults;
 import java.io.IOException;
 
 /**
@@ -42,8 +43,8 @@ import java.io.IOException;
  *
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
+@CacheDefaults(cacheName = "DOAuth2User")
 public class DOAuth2UserDaoBean extends GeneratedDOAuth2UserDaoImpl implements Oauth2UserProvider {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(GeneratedDOAuth2UserDaoImpl.class);
 
   @Inject

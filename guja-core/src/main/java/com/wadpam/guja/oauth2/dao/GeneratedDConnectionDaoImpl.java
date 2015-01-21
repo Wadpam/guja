@@ -17,10 +17,11 @@ import net.sf.mardao.dao.AbstractDao;
 import net.sf.mardao.dao.Supplier;
 import com.wadpam.guja.oauth2.domain.DConnection;
 
+
 /**
  * The DConnection domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-01-19T20:31:51.597+0100.
+ * Generated on 2015-01-20T22:12:36.907+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDConnectionDaoImpl
@@ -29,6 +30,9 @@ public class GeneratedDConnectionDaoImpl
   public GeneratedDConnectionDaoImpl(Supplier supplier) {
     super(new DConnectionMapper(supplier), supplier);
   }
+
+// ----------------------- Caching -------------------------------------
+
 
 // ----------------------- field finders -------------------------------
   /**

@@ -1,20 +1,28 @@
 package com.wadpam.guja.cache;
 
 import com.google.inject.Inject;
-import com.wadpam.guja.crud.DelegatingCrudDao;
-import net.sf.mardao.dao.Cached;
+import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.CrudDao;
+
+import javax.cache.annotation.CacheDefaults;
+import javax.cache.annotation.CacheResult;
 
 /**
  * A page caching mock dao.
  * @author mattiaslevin
  */
-@Cached(cachePages = true)
+@CacheDefaults(cacheName = "PagedCachedMockCrudDao")
 public class PagedCachedMockCrudDao extends DelegatingCrudDao {
 
   @Inject
   public PagedCachedMockCrudDao(CrudDao<String, Long> mock) {
     super(mock);
+  }
+
+  @CacheResult
+  @Override
+  public CursorPage<String> queryPage(Object ancestorKey, int i, String s) {
+    return super.queryPage(ancestorKey, i, s);
   }
 
 }

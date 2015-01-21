@@ -35,7 +35,7 @@ public class MockCacheBuilderProvider implements CacheBuilderProvider {
       }
 
       @Override
-      public CacheBuilder from(String spec) {
+      public CacheBuilder name(String spec) {
         return this;
       }
 
