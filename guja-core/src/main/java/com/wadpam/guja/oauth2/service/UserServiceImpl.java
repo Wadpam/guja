@@ -180,7 +180,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 30 * 60); // token is valid 30 minutes
     return uriInfoProvider.get().getBaseUriBuilder()
         .path("html")
-        .path("verify_email.html")
+        .path("EmailVerification")
+        .path("emailVerification.html")
         .queryParam("id", userId)
         .queryParam("token", temporaryToken)
         .queryParam("language", locale.getLanguage())
@@ -342,7 +343,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 60 * 10); // token is valid 10 minutes
     return uriInfoProvider.get().getBaseUriBuilder()
         .path("html")
-        .path("reset_password.html")
+        .path("ResetPassword")
+        .path("resetPassword.html")
         .queryParam("id", userId)
         .queryParam("token", temporaryToken)
         .queryParam("language", locale.getLanguage())
