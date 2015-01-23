@@ -23,8 +23,8 @@ package com.wadpam.guja.environment;
  */
 
 import com.google.appengine.api.utils.SystemProperty;
-import com.sun.corba.se.spi.activation.Server;
-import com.sun.jersey.spi.resource.Singleton;
+import com.google.inject.Singleton;
+
 
 /**
  * Provide basic information about the current GAE server environment.

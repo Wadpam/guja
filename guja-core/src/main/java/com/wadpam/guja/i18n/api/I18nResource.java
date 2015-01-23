@@ -22,12 +22,12 @@ package com.wadpam.guja.i18n.api;
  * #L%
  */
 
-import com.google.inject.Singleton;
 import com.wadpam.guja.crud.CrudResource;
 import com.wadpam.guja.i18n.dao.Di18nDaoBean;
 import com.wadpam.guja.i18n.domain.Di18n;
 
 import javax.annotation.security.RolesAllowed;
+import javax.inject.Singleton;
 import javax.ws.rs.Path;
 
 

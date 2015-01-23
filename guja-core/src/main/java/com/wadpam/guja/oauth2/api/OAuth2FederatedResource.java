@@ -25,7 +25,6 @@ package com.wadpam.guja.oauth2.api;
 import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.sun.jersey.spi.resource.Singleton;
 import com.wadpam.guja.environment.ServerEnvironment;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import com.wadpam.guja.exceptions.UnauthorizedRestException;
@@ -44,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
+import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;

@@ -22,7 +22,8 @@ package com.wadpam.guja.environment;
  * #L%
  */
 
-import com.sun.jersey.spi.resource.Singleton;
+
+import com.google.inject.Singleton;
 
 /**
  * Provide basic information about the current server environment.

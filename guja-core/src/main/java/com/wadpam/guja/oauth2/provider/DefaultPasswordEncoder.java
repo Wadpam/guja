@@ -22,7 +22,8 @@ package com.wadpam.guja.oauth2.provider;
  * #L%
  */
 
-import com.sun.jersey.spi.resource.Singleton;
+
+import com.google.inject.Singleton;
 import com.wadpam.guja.exceptions.InternalServerErrorRestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

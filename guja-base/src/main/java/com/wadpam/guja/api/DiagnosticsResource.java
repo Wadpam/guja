@@ -23,14 +23,13 @@ package com.wadpam.guja.api;
  */
 
 import com.google.appengine.repackaged.org.joda.time.DateTime;
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.wadpam.guja.readerwriter.DiagnosticsProtoMessageBodyReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

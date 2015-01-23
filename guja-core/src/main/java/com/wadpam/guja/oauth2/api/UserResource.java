@@ -23,7 +23,6 @@ package com.wadpam.guja.oauth2.api;
  */
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.oauth2.domain.DUser;
 import com.wadpam.guja.oauth2.service.UserService;
@@ -34,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
