@@ -58,7 +58,7 @@ public class UserResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserResource.class);
 
   private static final Pattern USERNAME_PATTERN = Pattern.compile("^[-_@\\.\\w]{5,254}$", Pattern.UNICODE_CHARACTER_CLASS);
-  private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[\\x21-\\x7E\\xA0-\\xBF\\w]{5,}$", Pattern.UNICODE_CHARACTER_CLASS);
+  private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[\\x21-\\x7E\\xA0-\\xBF\\w]{5,256}$", Pattern.UNICODE_CHARACTER_CLASS);
   private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$");
 
   private UserService userService;

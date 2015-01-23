@@ -1,5 +1,20 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Bekräfta konto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+
     <body>
-        <p><a href='${verifyEmailLink}'>Klicka här</a> för att verifiera din email</p>
+
+        <article>
+            <h3>Välkommen till XXX</h3>
+            <p>Klicka på länken nedan för att aktivera ditt konto.</p>
+            <p><a href="${verifyEmailLink}" target="_blank"></a></p>
+            <p>/XXX teamet</p>
+        </article>
+
     </body>
+
 </html>
