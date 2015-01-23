@@ -168,6 +168,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     String body = templateBuilderProvider.get()
         .templateName(emailVerificationTemplate)
         .put("verifyEmailLink", verifyUrl)
+        .put("user", user)
+        .put("baseUrl", uriInfoProvider.get().getBaseUri().toString())
         .build()
         .toString();
 
@@ -331,6 +333,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     String body = templateBuilderProvider.get()
         .templateName(resetPasswordTemplate)
         .put("resetPasswordLink", resetUrl)
+        .put("user", user)
+        .put("baseUrl", uriInfoProvider.get().getBaseUri().toString())
         .build()
         .toString();
 
