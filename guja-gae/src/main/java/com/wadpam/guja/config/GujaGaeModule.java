@@ -42,7 +42,7 @@ import net.sf.mardao.dao.Supplier;
  *
  * @author mattiaslevin
  */
-public class GujaGae2Module extends AbstractModule {
+public class GujaGaeModule extends AbstractModule {
 
 
   @Override

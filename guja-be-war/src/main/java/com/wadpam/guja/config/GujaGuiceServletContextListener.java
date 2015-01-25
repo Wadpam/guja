@@ -57,7 +57,7 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
         // bind both authorization server and federated:
         new GujaCoreModule(true, true),
         new GujaBaseModule(),
-        new GujaGae2Module(),
+        new GujaGaeModule(),
         new CacheAnnotationsModule(),
         new JerseyServletModule() {
           private Properties bindProperties() {
