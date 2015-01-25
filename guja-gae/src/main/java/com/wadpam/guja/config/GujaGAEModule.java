@@ -23,6 +23,8 @@ package com.wadpam.guja.config;
  */
 
 import com.google.inject.AbstractModule;
+import com.google.inject.persist.PersistService;
+import com.google.inject.persist.UnitOfWork;
 import com.wadpam.guja.admintask.GAEAdminTaskQueue;
 import com.wadpam.guja.admintask.AdminTaskQueue;
 import com.wadpam.guja.api.GAEBlobResource;
@@ -31,6 +33,8 @@ import com.wadpam.guja.cache.CacheBuilderProvider;
 import com.wadpam.guja.cache.MemCacheBuilderProvider;
 import com.wadpam.guja.environment.GAEServerEnvironment;
 import com.wadpam.guja.environment.ServerEnvironment;
+import net.sf.mardao.dao.DatastoreSupplier;
+import net.sf.mardao.dao.Supplier;
 
 
 /**
@@ -38,11 +42,16 @@ import com.wadpam.guja.environment.ServerEnvironment;
  *
  * @author mattiaslevin
  */
-public class GujaGAEModule extends AbstractModule {
+public class GujaGaeModule extends AbstractModule {
 
 
   @Override
   protected void configure() {
+
+    bind(UnitOfWork.class).to(MardaoDatastoreUnitOfWork.class);
+    bind(PersistService.class).to(MardaoDatastorePersistService.class);
+
+    bind(Supplier.class).to(DatastoreSupplier.class);
 
     bind(CacheBuilderProvider.class).to(MemCacheBuilderProvider.class);
     bind(CacheBuilder.class).toProvider(MemCacheBuilderProvider.class);

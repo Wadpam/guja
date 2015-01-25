@@ -22,38 +22,31 @@ package com.wadpam.guja.config;
  * #L%
  */
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.inject.persist.PersistService;
+import com.google.inject.persist.UnitOfWork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created with IntelliJ IDEA.
+ * Manage unit of works towards the persistence service, e.g. open and close sessions.
+ * The GAE Datastore does not require any sessions.
  *
  * @author osandstrom
- *         Date: 1/19/14 Time: 8:12 PM
  */
-public class MardaoGuicePersistService implements PersistService {
-  static final Logger LOGGER = LoggerFactory.getLogger(MardaoGuicePersistService.class);
-  private DatastoreService datastore;
+public class MardaoDatastoreUnitOfWork implements UnitOfWork {
+  static final Logger LOGGER = LoggerFactory.getLogger(MardaoDatastoreUnitOfWork.class);
 
-  public MardaoGuicePersistService() {
+  public MardaoDatastoreUnitOfWork() {
     LOGGER.debug("<init>");
   }
 
-  public DatastoreService getDatastore() {
-    return datastore;
+  @Override
+  public void begin() {
+    LOGGER.debug("begin()");
   }
 
   @Override
-  public void start() {
-    LOGGER.debug("start");
-    datastore = DatastoreServiceFactory.getDatastoreService();
+  public void end() {
+    LOGGER.debug("end()");
   }
 
-  @Override
-  public void stop() {
-    LOGGER.debug("stop");
-  }
 }

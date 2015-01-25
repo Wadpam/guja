@@ -59,7 +59,7 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
         // bind both authorization server and federated:
         new GujaCoreModule(true, true),
         new GujaBaseModule(),
-        new GujaGAEModule(),
+        new GujaGaeModule(),
         new CacheAnnotationsModule(),
         new JerseyServletModule() {
           private Properties bindProperties() {
@@ -85,8 +85,6 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
             //filter("/*").through(PersistFilter.class);
             filter("/api/*").through(OAuth2Filter.class);
             filter("/oauth/authorize", "/oauth/refresh", "/oauth/revoke").through(Oauth2ClientAuthenticationFilter.class);
-
-            bind(Supplier.class).to(DatastoreSupplier.class);
 
             // Servlets
             serve("/*").with(GuiceContainer.class, ImmutableMap.of(
