@@ -1,9 +1,9 @@
 package com.wadpam.guja.cache.annotations;
 
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
-import com.google.appengine.repackaged.com.google.common.collect.Sets;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.wadpam.guja.util.Triplet;
-import net.sf.mardao.core.CacheConfig;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

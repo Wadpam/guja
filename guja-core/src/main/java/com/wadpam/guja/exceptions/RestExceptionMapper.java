@@ -22,7 +22,7 @@ package com.wadpam.guja.exceptions;
  * #L%
  */
 
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
