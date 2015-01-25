@@ -33,8 +33,6 @@ import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.wadpam.guja.cache.annotations.CacheAnnotationsModule;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
-import net.sf.mardao.dao.DatastoreSupplier;
-import net.sf.mardao.dao.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +57,7 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
         // bind both authorization server and federated:
         new GujaCoreModule(true, true),
         new GujaBaseModule(),
-        new GujaGaeModule(),
+        new GujaGae2Module(),
         new CacheAnnotationsModule(),
         new JerseyServletModule() {
           private Properties bindProperties() {
