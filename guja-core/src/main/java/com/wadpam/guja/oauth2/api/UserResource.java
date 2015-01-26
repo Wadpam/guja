@@ -104,7 +104,7 @@ public class UserResource {
 
   }
 
-  private void validateUser(DUser user) {
+  private static void validateUser(DUser user) {
     checkUsernameFormat(user.getUsername());
     checkPasswordFormat(user.getPassword());
     checkEmailFormat(user.getEmail());
