@@ -1,4 +1,4 @@
-package com.wadpam.guja.config;
+package com.wadpam.guja.persist;
 
 /*
  * #%L

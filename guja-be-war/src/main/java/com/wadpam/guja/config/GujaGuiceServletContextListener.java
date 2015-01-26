@@ -31,6 +31,7 @@ import com.google.inject.servlet.GuiceServletContextListener;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.wadpam.guja.cache.annotations.CacheAnnotationsModule;
+import com.wadpam.guja.persist.MardaoDatastoreModule;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
 import org.slf4j.Logger;
@@ -58,6 +59,7 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
         new GujaCoreModule(true, true),
         new GujaBaseModule(),
         new GujaGaeModule(),
+        new MardaoDatastoreModule(),
         new CacheAnnotationsModule(),
         new JerseyServletModule() {
           private Properties bindProperties() {
