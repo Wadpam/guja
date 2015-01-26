@@ -1,4 +1,4 @@
-package com.wadpam.guja.config;
+package com.wadpam.guja.persist;
 
 /*
  * #%L
@@ -29,16 +29,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created with IntelliJ IDEA.
+ * Manage the start and stop of the GAE datastore persist service.
  *
  * @author osandstrom
- *         Date: 1/19/14 Time: 8:12 PM
  */
-public class MardaoGuicePersistService implements PersistService {
-  static final Logger LOGGER = LoggerFactory.getLogger(MardaoGuicePersistService.class);
+public class MardaoDatastorePersistService implements PersistService {
+  static final Logger LOGGER = LoggerFactory.getLogger(MardaoInMemoryPersistService.class);
+
   private DatastoreService datastore;
 
-  public MardaoGuicePersistService() {
+  public MardaoDatastorePersistService() {
     LOGGER.debug("<init>");
   }
 
@@ -48,12 +48,14 @@ public class MardaoGuicePersistService implements PersistService {
 
   @Override
   public void start() {
-    LOGGER.debug("start");
+    // No actions are needed to start the datastore
+    LOGGER.debug("Start");
     datastore = DatastoreServiceFactory.getDatastoreService();
   }
 
   @Override
   public void stop() {
-    LOGGER.debug("stop");
+    // No actions are needed to stop the datastore
+    LOGGER.debug("Stop");
   }
 }

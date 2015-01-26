@@ -31,10 +31,9 @@ import com.google.inject.servlet.GuiceServletContextListener;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.wadpam.guja.cache.annotations.CacheAnnotationsModule;
+import com.wadpam.guja.persist.MardaoDatastoreModule;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
-import net.sf.mardao.dao.DatastoreSupplier;
-import net.sf.mardao.dao.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +58,8 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
         // bind both authorization server and federated:
         new GujaCoreModule(true, true),
         new GujaBaseModule(),
-        new GujaGAEModule(),
+        new GujaGaeModule(),
+        new MardaoDatastoreModule(),
         new CacheAnnotationsModule(),
         new JerseyServletModule() {
           private Properties bindProperties() {
@@ -85,8 +85,6 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
             //filter("/*").through(PersistFilter.class);
             filter("/api/*").through(OAuth2Filter.class);
             filter("/oauth/authorize", "/oauth/refresh", "/oauth/revoke").through(Oauth2ClientAuthenticationFilter.class);
-
-            bind(Supplier.class).to(DatastoreSupplier.class);
 
             // Servlets
             serve("/*").with(GuiceContainer.class, ImmutableMap.of(

@@ -23,7 +23,7 @@ package com.wadpam.guja.oauth2.web;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.appengine.repackaged.com.google.common.io.BaseEncoding;
+import com.google.common.io.BaseEncoding;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.wadpam.guja.admintask.AdminTask;

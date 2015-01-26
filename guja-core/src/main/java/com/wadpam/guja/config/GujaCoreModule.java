@@ -68,9 +68,6 @@ public class GujaCoreModule extends AbstractModule {
   @Override
   protected void configure() {
 
-    bind(UnitOfWork.class).to(MardaoGuiceUnitOfWork.class);
-    bind(PersistService.class).to(MardaoGuicePersistService.class);
-
     bind(RestExceptionMapper.class);
 
     bind(RequestScopedLocale.class);

@@ -23,11 +23,11 @@
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.google.appengine</groupId>
-            <artifactId>appengine-api-1.0-sdk</artifactId>
-            <version>${gae.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.google.appengine</groupId>-->
+            <!--<artifactId>appengine-api-1.0-sdk</artifactId>-->
+            <!--<version>${gae.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-servlet</artifactId>
@@ -70,13 +70,23 @@
         </dependency>
         <dependency>
             <groupId>net.sf.mardao</groupId>
-            <artifactId>mardao-gae</artifactId>
+            <artifactId>mardao-core</artifactId>
             <version>${mardao.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
             <version>1.7</version>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
         </dependency>
 
         <!-- From parent -->

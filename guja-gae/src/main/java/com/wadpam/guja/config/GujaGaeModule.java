@@ -23,8 +23,8 @@ package com.wadpam.guja.config;
  */
 
 import com.google.inject.AbstractModule;
-import com.wadpam.guja.admintask.GAEAdminTaskQueue;
 import com.wadpam.guja.admintask.AdminTaskQueue;
+import com.wadpam.guja.admintask.GAEAdminTaskQueue;
 import com.wadpam.guja.api.GAEBlobResource;
 import com.wadpam.guja.cache.CacheBuilder;
 import com.wadpam.guja.cache.CacheBuilderProvider;
@@ -38,7 +38,7 @@ import com.wadpam.guja.environment.ServerEnvironment;
  *
  * @author mattiaslevin
  */
-public class GujaGAEModule extends AbstractModule {
+public class GujaGaeModule extends AbstractModule {
 
 
   @Override

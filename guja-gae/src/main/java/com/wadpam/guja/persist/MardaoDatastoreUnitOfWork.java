@@ -1,4 +1,4 @@
-package com.wadpam.guja.config;
+package com.wadpam.guja.persist;
 
 /*
  * #%L
@@ -27,14 +27,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created with IntelliJ IDEA.
+ * Manage unit of works towards the persistence service, e.g. open and close sessions.
+ * The GAE datastore supplier does not require any sessions.
  *
- * @author osandstrom Date: 1/19/14 Time: 8:16 PM
+ * @author osandstrom
  */
-public class MardaoGuiceUnitOfWork implements UnitOfWork {
-  static final Logger LOGGER = LoggerFactory.getLogger(MardaoGuiceUnitOfWork.class);
+public class MardaoDatastoreUnitOfWork implements UnitOfWork {
+  static final Logger LOGGER = LoggerFactory.getLogger(MardaoInMemoryUnitOfWork.class);
 
-  public MardaoGuiceUnitOfWork() {
+  public MardaoDatastoreUnitOfWork() {
     LOGGER.debug("<init>");
   }
 

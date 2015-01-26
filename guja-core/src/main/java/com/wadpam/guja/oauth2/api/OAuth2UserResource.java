@@ -22,7 +22,7 @@ package com.wadpam.guja.oauth2.api;
  * #L%
  */
 
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.wadpam.guja.crud.CrudResource;
 import com.wadpam.guja.exceptions.BadRequestRestException;

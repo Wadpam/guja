@@ -22,7 +22,7 @@ package com.wadpam.guja.oauth2.web;
  * #L%
  */
 
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 import com.wadpam.guja.oauth2.api.OAuth2UserResource;
 import com.wadpam.guja.oauth2.domain.DConnection;
 

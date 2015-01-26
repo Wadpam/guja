@@ -22,7 +22,6 @@ package com.wadpam.guja.oauth2.api;
  * #L%
  */
 
-import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.wadpam.guja.environment.ServerEnvironment;
@@ -39,6 +38,7 @@ import com.wadpam.guja.oauth2.provider.TokenGenerator;
 import com.wadpam.guja.oauth2.social.SocialProfile;
 import com.wadpam.guja.oauth2.social.SocialTemplate;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

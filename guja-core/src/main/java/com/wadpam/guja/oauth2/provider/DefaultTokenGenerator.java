@@ -22,10 +22,9 @@ package com.wadpam.guja.oauth2.provider;
  * #L%
  */
 
-
-import com.google.appengine.repackaged.com.google.common.io.BaseEncoding;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
+import com.google.common.io.BaseEncoding;
 import com.google.inject.Singleton;
 
 import java.security.SecureRandom;

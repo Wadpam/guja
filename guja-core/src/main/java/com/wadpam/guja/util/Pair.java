@@ -39,7 +39,7 @@ public class Pair<M, N> implements Serializable, Comparable<Pair<M, N>> {
   }
 
   public static <K, V> Pair<K, V> of(K first, V second) {
-    return new Pair(first, second);
+    return new Pair<K, V>(first, second);
   }
 
   public M first() {

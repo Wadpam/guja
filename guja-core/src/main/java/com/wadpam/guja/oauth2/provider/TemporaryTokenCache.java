@@ -1,11 +1,11 @@
 package com.wadpam.guja.oauth2.provider;
 
 
-import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.google.common.cache.Cache;
 import com.google.inject.Inject;
 import com.wadpam.guja.cache.CacheBuilderProvider;
 import com.wadpam.guja.util.Pair;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

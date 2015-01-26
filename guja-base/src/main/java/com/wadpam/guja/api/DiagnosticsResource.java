@@ -22,9 +22,9 @@ package com.wadpam.guja.api;
  * #L%
  */
 
-import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.google.inject.Inject;
 import com.wadpam.guja.readerwriter.DiagnosticsProtoMessageBodyReader;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
