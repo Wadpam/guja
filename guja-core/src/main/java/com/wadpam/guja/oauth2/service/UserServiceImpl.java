@@ -293,8 +293,18 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     DUser existingUser = getById(id); // With raise 404 if not found
 
     // Only allow the user to update some properties
-    existingUser.setEmail(user.getEmail().toLowerCase());
+    existingUser.setAddress1(user.getAddress1());
+    existingUser.setAddress2(user.getAddress2());
+    existingUser.setBirthInfo(user.getBirthInfo());
+    existingUser.setCity(user.getCity());
+    existingUser.setCountry(user.getCountry());
     existingUser.setDisplayName(user.getDisplayName());
+    existingUser.setEmail(user.getEmail().toLowerCase());
+    existingUser.setFirstName(user.getFirstName());
+    existingUser.setLastName(user.getLastName());
+    existingUser.setPhoneNumber1(user.getPhoneNumber1());
+    existingUser.setPhoneNumber2(user.getPhoneNumber2());
+    existingUser.setZipCode(user.getZipCode());
 
     if (isAdmin) {
       existingUser.setState(user.getState());
