@@ -7,8 +7,7 @@ import net.sf.mardao.dao.DatastoreSupplier;
 import net.sf.mardao.dao.Supplier;
 
 /**
- * Configure Guice to use Mardao Datastore provider.
- * Set PersistService and unit of work.
+ * Configure Guice and Mardao to user GAE datastore supplier.
  *
  * @author mattiaslevin
  */

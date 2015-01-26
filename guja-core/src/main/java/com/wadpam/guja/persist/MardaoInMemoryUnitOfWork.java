@@ -22,40 +22,31 @@ package com.wadpam.guja.persist;
  * #L%
  */
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.inject.persist.PersistService;
+import com.google.inject.persist.UnitOfWork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Manage the start and stop of the GAE datastore persist service.
+ * Manage unit of works towards the persistence service, e.g. open and close sessions.
+ * The in-memory supplier does not require any sessions.
  *
  * @author osandstrom
  */
-public class MardaoDatastorePersistService implements PersistService {
-  static final Logger LOGGER = LoggerFactory.getLogger(MardaoInMemoryPersistService.class);
+public class MardaoInMemoryUnitOfWork implements UnitOfWork {
+  static final Logger LOGGER = LoggerFactory.getLogger(MardaoInMemoryUnitOfWork.class);
 
-  private DatastoreService datastore;
-
-  public MardaoDatastorePersistService() {
+  public MardaoInMemoryUnitOfWork() {
     LOGGER.debug("<init>");
   }
 
-  public DatastoreService getDatastore() {
-    return datastore;
+  @Override
+  public void begin() {
+    LOGGER.debug("begin()");
   }
 
   @Override
-  public void start() {
-    // No actions are needed to start the datastore
-    LOGGER.debug("Start");
-    datastore = DatastoreServiceFactory.getDatastoreService();
+  public void end() {
+    LOGGER.debug("end()");
   }
 
-  @Override
-  public void stop() {
-    // No actions are needed to stop the datastore
-    LOGGER.debug("Stop");
-  }
 }

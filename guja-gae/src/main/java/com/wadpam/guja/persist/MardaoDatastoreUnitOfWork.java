@@ -28,12 +28,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Manage unit of works towards the persistence service, e.g. open and close sessions.
- * The GAE Datastore does not require any sessions.
+ * The GAE datastore supplier does not require any sessions.
  *
  * @author osandstrom
  */
 public class MardaoDatastoreUnitOfWork implements UnitOfWork {
-  static final Logger LOGGER = LoggerFactory.getLogger(MardaoDatastoreUnitOfWork.class);
+  static final Logger LOGGER = LoggerFactory.getLogger(MardaoInMemoryUnitOfWork.class);
 
   public MardaoDatastoreUnitOfWork() {
     LOGGER.debug("<init>");
