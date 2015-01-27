@@ -212,7 +212,7 @@ public class UserResource {
    * @return http 204 is successful
    */
   @DELETE
-  @Path("id")
+  @Path("{id}")
   @RolesAllowed({"ROLE_ADMIN"})
   public Response delete(@PathParam("id") Long id) {
     checkNotNull(id);
