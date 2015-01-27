@@ -23,6 +23,9 @@ package com.wadpam.guja.oauth2.web;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Maps;
 import com.google.common.io.BaseEncoding;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -42,6 +45,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 
 /**
@@ -119,9 +124,40 @@ public class Oauth2ClientAuthenticationFilter implements Filter, AdminTask {
     // Either the Authorize header or json body is used to provide the client credentials
     String authHeader = request.getHeader(OAuth2Filter.HEADER_AUTHORIZATION);
     ClientCredentials credentials = null;
-    if (request.getContentLength() > 0) {
+    if (request.getContentLength() > 0 &&
+        (request.getContentType().equals(MediaType.APPLICATION_JSON) || request.getContentType().equals(MediaType.APPLICATION_FORM_URLENCODED))) {
+
       HttpBodyRequestWrapper wrappedRequest = new HttpBodyRequestWrapper(request);
-      credentials = objectMapper.readValue(wrappedRequest.getBody(), ClientCredentials.class);
+
+      if (request.getContentType().equals(MediaType.APPLICATION_JSON)) {
+
+        // Parse JSON body
+        credentials = objectMapper.readValue(wrappedRequest.getBody(), ClientCredentials.class);
+
+      } else if (request.getContentType().equals(MediaType.APPLICATION_FORM_URLENCODED)) {
+
+        // Parse the form encoded request body. Remember to URL decode the parameters
+        Map<String, String> formParams = Splitter.on("&").trimResults().withKeyValueSeparator("=").split(wrappedRequest.getBody());
+        formParams = Maps.transformValues(formParams, new Function<String, String>() {
+          @Override
+          public String apply(String value) {
+            try {
+              return URLDecoder.decode(value, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+              LOGGER.error("Not possible to URL decode {}", e);
+              return value;
+            }
+          }
+        });
+
+        LOGGER.debug("URL decoded form body {}", formParams);
+
+        credentials = new ClientCredentials();
+        credentials.setClient_id(formParams.get("client_id"));
+        credentials.setClient_secret((formParams.get("client_secret")));
+
+      }
+
       // Must wrap the request
       request = wrappedRequest;
     }

@@ -68,7 +68,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Path("oauth")
 @Singleton
 @PermitAll
-@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class OAuth2AuthorizationResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2AuthorizationResource.class);
@@ -107,6 +106,7 @@ public class OAuth2AuthorizationResource {
    */
   @POST
   @Path("authorize")
+  @Consumes(MediaType.APPLICATION_JSON)
   public Response authorize(UserCredentials credentials) {
     // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
@@ -151,6 +151,25 @@ public class OAuth2AuthorizationResource {
 
   }
 
+  @POST
+  @Path("authorize")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  public Response authorize(@FormParam("client_id") String clientId,
+                            @FormParam("client_secret") String clientSecret,
+                            @FormParam("username") String username,
+                            @FormParam("password") String password,
+                            @FormParam("grant_type") String grantType) {
+
+    UserCredentials credentials = new UserCredentials();
+    credentials.setClient_id(clientId);
+    credentials.setClient_secret(clientSecret);
+    credentials.setUsername(username);
+    credentials.setPassword(password);
+    credentials.setGrant_type(grantType);
+
+    return authorize(credentials);
+  }
+
   private DConnection generateConnection(DOAuth2User oauth2User, String profileUrl, String imageUrl) {
    return DConnectionMapper.newBuilder()
        .accessToken(accessTokenGenerator.generate())
@@ -185,6 +204,7 @@ public class OAuth2AuthorizationResource {
    */
   @POST
   @Path("refresh")
+  @Consumes(MediaType.APPLICATION_JSON)
   public Response refreshAccessToken(RefreshTokenRequest refreshToken) {
     // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
@@ -221,6 +241,23 @@ public class OAuth2AuthorizationResource {
 
   }
 
+  @POST
+  @Path("refresh")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  public Response refreshAccessToken(@FormParam("client_id") String clientId,
+                                     @FormParam("client_secret") String clientSecret,
+                                     @FormParam("refresh_token") String refreshToken,
+                                     @FormParam("grant_type") String grantType) {
+
+    RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest();
+    refreshTokenRequest.setClient_id(clientId);
+    refreshTokenRequest.setClient_secret(clientSecret);
+    refreshTokenRequest.setRefresh_token(refreshToken);
+    refreshTokenRequest.setGrant_type(grantType);
+
+    return refreshAccessToken(refreshTokenRequest);
+  }
+
 
   /**
    * Revoke a users access_token and refresh_token.
@@ -231,6 +268,7 @@ public class OAuth2AuthorizationResource {
    */
   @POST
   @Path("revoke")
+  @Consumes(MediaType.APPLICATION_JSON)
   public Response revoke(RevocationRequest revocationRequest) {
     // Perform all validation here to control the exact error message returned to comply with the Oauth2 standard
 
@@ -252,6 +290,23 @@ public class OAuth2AuthorizationResource {
 
     // Always send http 200 according to the specification
     return Response.ok().build();
+  }
+
+  @POST
+  @Path("revoke")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  public Response revoke(@FormParam("client_id") String clientId,
+                         @FormParam("client_secret") String clientSecret,
+                         @FormParam("token") String token,
+                         @FormParam("token_type_hint") String tokenTypeHint) {
+
+    RevocationRequest revocationRequest = new RevocationRequest();
+    revocationRequest.setClient_id(clientId);
+    revocationRequest.setClient_secret(clientSecret);
+    revocationRequest.setToken(token);
+    revocationRequest.setToken_type_hint(tokenTypeHint);
+
+    return revoke(revocationRequest);
   }
 
   private boolean revokeAccessToken(String token) {
