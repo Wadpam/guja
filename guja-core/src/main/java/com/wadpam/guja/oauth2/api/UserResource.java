@@ -90,7 +90,9 @@ public class UserResource {
       throw new BadRequestRestException("Missing mandatory parameters");
     }
 
-    validateUser(user);
+    checkUsernameFormat(user.getUsername());
+    checkPasswordFormat(user.getPassword());
+    checkEmailFormat(user.getEmail());
 
     user = userService.signup(user);
 
@@ -102,12 +104,6 @@ public class UserResource {
         .entity(user.getId())
         .build();
 
-  }
-
-  private static void validateUser(DUser user) {
-    checkUsernameFormat(user.getUsername());
-    checkPasswordFormat(user.getPassword());
-    checkEmailFormat(user.getEmail());
   }
 
   private static void checkUsernameFormat(String username) {
@@ -241,7 +237,7 @@ public class UserResource {
                          @Context SecurityContext securityContext,
                          DUser user) {
     checkNotNull(id);
-    validateUser(user);
+    checkEmailFormat(user.getEmail());
 
     user = userService.update(id, user, securityContext.isUserInRole(OAuth2UserResource.ROLE_ADMIN));
 
