@@ -36,6 +36,7 @@ import com.wadpam.guja.oauth2.domain.DConnection;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import com.wadpam.guja.oauth2.provider.TokenGenerator;
 import com.wadpam.guja.oauth2.provider.UserAuthenticationProvider;
+import com.wadpam.guja.oauth2.web.JsonCharacterEncodingReponseFilter;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
 import org.joda.time.DateTime;
@@ -68,7 +69,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Path("oauth")
 @Singleton
 @PermitAll
-@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+@Produces(JsonCharacterEncodingReponseFilter.APPLICATION_JSON_UTF8)
 public class OAuth2AuthorizationResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2AuthorizationResource.class);
 

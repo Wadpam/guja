@@ -30,6 +30,7 @@ import com.google.appengine.repackaged.com.google.common.io.BaseEncoding;
 import com.google.common.collect.ImmutableMap;
 import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.exceptions.NotFoundRestException;
+import com.wadpam.guja.oauth2.web.JsonCharacterEncodingReponseFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Path("api/blob")
 @PermitAll
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(JsonCharacterEncodingReponseFilter.APPLICATION_JSON_UTF8)
 public class GAEBlobResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(GAEBlobResource.class);
 
@@ -78,7 +81,6 @@ public class GAEBlobResource {
    */
   @GET
   @Path("upload")
-  @Produces(MediaType.APPLICATION_JSON)
   public Response getUploadUrl(@QueryParam("callback") String callback,
                                @QueryParam("keepQueryParams") @DefaultValue("false") Boolean keepQueryParam,
                                @Context HttpServletRequest request) {
@@ -109,7 +111,6 @@ public class GAEBlobResource {
    */
   @POST
   @Path("upload")
-  @Produces(MediaType.APPLICATION_JSON)
   public Response uploadCallback(@QueryParam("imageSize") Integer imageSize,
                                  @Context HttpServletRequest request,
                                  @Context UriInfo uriInfo) {

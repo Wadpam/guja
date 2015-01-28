@@ -26,6 +26,7 @@ import com.google.inject.Inject;
 import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.oauth2.domain.DUser;
 import com.wadpam.guja.oauth2.service.UserService;
+import com.wadpam.guja.oauth2.web.JsonCharacterEncodingReponseFilter;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import net.sf.mardao.core.CursorPage;
 import org.slf4j.Logger;
@@ -53,7 +54,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Path("api/user")
 @Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+@Produces(JsonCharacterEncodingReponseFilter.APPLICATION_JSON_UTF8)
 public class UserResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserResource.class);
 

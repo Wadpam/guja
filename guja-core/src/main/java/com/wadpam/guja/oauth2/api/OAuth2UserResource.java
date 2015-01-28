@@ -28,6 +28,7 @@ import com.wadpam.guja.crud.CrudResource;
 import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.oauth2.dao.DOAuth2UserDaoBean;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
+import com.wadpam.guja.oauth2.web.JsonCharacterEncodingReponseFilter;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 
 import javax.annotation.security.RolesAllowed;
@@ -51,7 +52,7 @@ import java.util.Collection;
  * @author mattiaslevin
  */
 @Path("api/oauth2user")
-@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+@Produces(JsonCharacterEncodingReponseFilter.APPLICATION_JSON_UTF8)
 @RolesAllowed({"ROLE_ADMIN"})
 public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, DOAuth2UserDaoBean> {
 

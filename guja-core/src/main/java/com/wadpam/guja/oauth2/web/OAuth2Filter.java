@@ -41,6 +41,8 @@ import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Date;
 
@@ -75,6 +77,7 @@ public class OAuth2Filter implements Filter {
 
   @Override
   public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+
     HttpServletRequest request = (HttpServletRequest) req;
     HttpServletResponse response = (HttpServletResponse) res;
 
@@ -111,14 +114,25 @@ public class OAuth2Filter implements Filter {
       request = new SecurityContextRequestWrapper(request);
     }
 
-    HttpStatusResponseWrapper wrappedResponse = new HttpStatusResponseWrapper(response);
-    chain.doFilter(request, wrappedResponse);
+    // Not possible to change response header after chain.doFilter(...) has been called
+    // http://stackoverflow.com/questions/23084182/change-contenttype-or-characterencoding-in-java-filter-only-if-contenttype-j
+    response = new HttpStatusResponseWrapper(response) {
 
-    if (wrappedResponse.getStatus() == HttpServletResponse.SC_FORBIDDEN) {
-      response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER + ERROR_INSUFFICIENT_SCOPE);
-    } else if (wrappedResponse.getStatus() == HttpServletResponse.SC_UNAUTHORIZED) {
-      response.setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER + ERROR_INVALID_TOKEN);
-    }
+      @Override
+      public ServletOutputStream getOutputStream() throws java.io.IOException {
+
+        if (getStatus() == HttpServletResponse.SC_FORBIDDEN) {
+          setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER + ERROR_INSUFFICIENT_SCOPE);
+        } else if (getStatus() == HttpServletResponse.SC_UNAUTHORIZED) {
+          setHeader(HEADER_WWW_AUTHENTICATE, PREFIX_BEARER + ERROR_INVALID_TOKEN);
+        }
+        return super.getOutputStream();
+      }
+
+    };
+
+
+    chain.doFilter(request, response);
 
   }
 

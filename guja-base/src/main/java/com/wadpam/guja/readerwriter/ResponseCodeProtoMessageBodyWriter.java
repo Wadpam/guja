@@ -47,7 +47,7 @@ import java.lang.reflect.Type;
  */
 @Provider
 @Singleton
-@Produces("application/x-protobuf")
+@Produces(ProtoWrapperResponseFilter.APPLICATION_X_PROTOBUF)
 public class ResponseCodeProtoMessageBodyWriter implements MessageBodyWriter<ResponseCodeEntityWrapper> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ResponseCodeProtoMessageBodyWriter.class);

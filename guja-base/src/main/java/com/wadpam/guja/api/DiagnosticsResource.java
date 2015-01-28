@@ -23,6 +23,8 @@ package com.wadpam.guja.api;
  */
 
 import com.google.inject.Inject;
+import com.wadpam.guja.filter.ProtoWrapperResponseFilter;
+import com.wadpam.guja.oauth2.web.JsonCharacterEncodingReponseFilter;
 import com.wadpam.guja.readerwriter.DiagnosticsProtoMessageBodyReader;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -76,8 +78,8 @@ public class DiagnosticsResource {
 
 
   @POST
-  @Consumes({MediaType.APPLICATION_JSON, DiagnosticsProtoMessageBodyReader.APPLICATION_X_PROTOBUF})
-  @Produces({MediaType.APPLICATION_JSON, DiagnosticsProtoMessageBodyReader.APPLICATION_X_PROTOBUF})
+  @Consumes({MediaType.APPLICATION_JSON, ProtoWrapperResponseFilter.APPLICATION_X_PROTOBUF})
+  @Produces({JsonCharacterEncodingReponseFilter.APPLICATION_JSON_UTF8, ProtoWrapperResponseFilter.APPLICATION_X_PROTOBUF})
   public Response logDiagnostics(Diagnostics diagnostics) {
     logger.log(diagnostics.getSeverity(), formatLogString(diagnostics));
     return Response.noContent().build();
