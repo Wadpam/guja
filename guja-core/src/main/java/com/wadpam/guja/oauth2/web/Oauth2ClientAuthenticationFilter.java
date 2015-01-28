@@ -125,16 +125,17 @@ public class Oauth2ClientAuthenticationFilter implements Filter, AdminTask {
     String authHeader = request.getHeader(OAuth2Filter.HEADER_AUTHORIZATION);
     ClientCredentials credentials = null;
     if (request.getContentLength() > 0 &&
-        (request.getContentType().equals(MediaType.APPLICATION_JSON) || request.getContentType().equals(MediaType.APPLICATION_FORM_URLENCODED))) {
+        (request.getContentType().startsWith(MediaType.APPLICATION_JSON) ||
+            request.getContentType().startsWith(MediaType.APPLICATION_FORM_URLENCODED)) ) {
 
       HttpBodyRequestWrapper wrappedRequest = new HttpBodyRequestWrapper(request);
 
-      if (request.getContentType().equals(MediaType.APPLICATION_JSON)) {
+      if (request.getContentType().startsWith(MediaType.APPLICATION_JSON)) {
 
         // Parse JSON body
         credentials = objectMapper.readValue(wrappedRequest.getBody(), ClientCredentials.class);
 
-      } else if (request.getContentType().equals(MediaType.APPLICATION_FORM_URLENCODED)) {
+      } else if (request.getContentType().startsWith(MediaType.APPLICATION_FORM_URLENCODED)) {
 
         // Parse the form encoded request body. Remember to URL decode the parameters
         Map<String, String> formParams = Splitter.on("&").trimResults().withKeyValueSeparator("=").split(wrappedRequest.getBody());
