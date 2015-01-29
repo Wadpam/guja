@@ -58,7 +58,8 @@ public class ProtoWrapperResponseFilter implements ContainerResponseFilter {
 
       for (Object contentType : contentTypes) {
         if (contentType.equals(APPLICATION_X_PROTOBUF_TYPE) &&
-            !response.getEntity().getClass().isAnnotationPresent(SkipProtoWrapper.class)) {
+            // Response entity might be null
+            (null == response.getEntity() || !response.getEntity().getClass().isAnnotationPresent(SkipProtoWrapper.class))) {
           LOGGER.debug("Content type is x-protobuf, wrap response entity");
           ResponseCodeEntityWrapper<Object> wrapper = new ResponseCodeEntityWrapper<>(response.getStatus(), response.getEntity());
           response.setEntity(wrapper, response.getEntityType());
