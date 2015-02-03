@@ -23,6 +23,7 @@ package com.wadpam.guja.config;
  */
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -34,6 +35,7 @@ import com.wadpam.guja.cache.annotations.CacheAnnotationsModule;
 import com.wadpam.guja.persist.MardaoDatastoreModule;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
+import com.wadpam.guja.jackson.NonNullObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +82,9 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
 
             // Bindings
             Properties props = bindProperties();
+
+            bind(NonNullObjectMapperProvider.class);
+            bind(ObjectMapper.class).toProvider(NonNullObjectMapperProvider.class);
 
             // Filters
             //filter("/*").through(PersistFilter.class);

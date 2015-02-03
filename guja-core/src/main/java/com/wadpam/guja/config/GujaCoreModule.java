@@ -22,13 +22,10 @@ package com.wadpam.guja.config;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.multibindings.Multibinder;
-import com.google.inject.persist.PersistService;
 import com.google.inject.persist.Transactional;
-import com.google.inject.persist.UnitOfWork;
 import com.wadpam.guja.admintask.AdminTask;
 import com.wadpam.guja.admintask.AdminTaskResource;
 import com.wadpam.guja.exceptions.RestExceptionMapper;
@@ -43,7 +40,6 @@ import com.wadpam.guja.oauth2.service.UserAdminTask;
 import com.wadpam.guja.oauth2.service.UserService;
 import com.wadpam.guja.oauth2.service.UserServiceImpl;
 import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
-import com.wadpam.guja.provider.NonNullObjectMapperProvider;
 import com.wadpam.guja.service.EmailService;
 import com.wadpam.guja.service.JavaMailService;
 import com.wadpam.guja.template.RequestScopedVelocityTemplateStringWriterBuilder;
@@ -75,8 +71,7 @@ public class GujaCoreModule extends AbstractModule {
     bind(PropertyFileLocalizationBuilder.class);
     bind(DaoLocalizationBuilder.class);
 
-    bind(NonNullObjectMapperProvider.class);
-    bind(ObjectMapper.class).toProvider(NonNullObjectMapperProvider.class);
+    // Binding Jackson mapper has been moved to the backend to allow each project setting their own implementation
 
     bind(PasswordEncoder.class).to(DefaultPasswordEncoder.class);
     bind(TokenGenerator.class).to(DefaultTokenGenerator.class);
