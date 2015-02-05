@@ -23,7 +23,7 @@ package com.wadpam.guja.crud;
  */
 
 import com.google.inject.persist.Transactional;
-import com.wadpam.guja.oauth2.web.JsonCharacterEncodingReponseFilter;
+import com.wadpam.guja.web.JsonCharacterEncodingResponseFilter;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.dao.AbstractDao;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @Path("path/{parentId}/path").
  */
 @Consumes(MediaType.APPLICATION_JSON)
-@Produces(JsonCharacterEncodingReponseFilter.APPLICATION_JSON_UTF8)
+@Produces(JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8)
 public class ParentedCrudResource<PT, PID extends Serializable, P extends AbstractDao<PT, PID>, T, ID extends Serializable,
     D extends AbstractDao<T, ID>> {
 

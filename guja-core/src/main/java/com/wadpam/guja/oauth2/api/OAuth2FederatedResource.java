@@ -37,7 +37,7 @@ import com.wadpam.guja.oauth2.provider.Oauth2UserProvider;
 import com.wadpam.guja.oauth2.provider.TokenGenerator;
 import com.wadpam.guja.oauth2.social.SocialProfile;
 import com.wadpam.guja.oauth2.social.SocialTemplate;
-import com.wadpam.guja.oauth2.web.JsonCharacterEncodingReponseFilter;
+import com.wadpam.guja.web.JsonCharacterEncodingResponseFilter;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -68,7 +68,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @PermitAll
 @Consumes(MediaType.APPLICATION_JSON)
-@Produces(JsonCharacterEncodingReponseFilter.APPLICATION_JSON_UTF8)
+@Produces(JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8)
 public class OAuth2FederatedResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(OAuth2FederatedResource.class);
 

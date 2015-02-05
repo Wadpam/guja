@@ -33,7 +33,7 @@ public class DateSerializer extends StdSerializer<Date> {
 
   @Override
   public void serialize(Date date, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonGenerationException {
-    LOGGER.debug("Serialize {}", date);
+    //LOGGER.debug("Serialize {}", date);
     jsonGenerator.writeNumber((date == null) ? 0L : date.getTime() / 1000);
   }
 

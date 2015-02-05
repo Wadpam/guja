@@ -30,7 +30,7 @@ import com.google.appengine.repackaged.com.google.common.io.BaseEncoding;
 import com.google.common.collect.ImmutableMap;
 import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.exceptions.NotFoundRestException;
-import com.wadpam.guja.oauth2.web.JsonCharacterEncodingReponseFilter;
+import com.wadpam.guja.web.JsonCharacterEncodingResponseFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +57,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Path("api/blob")
 @PermitAll
 @Consumes(MediaType.APPLICATION_JSON)
-@Produces(JsonCharacterEncodingReponseFilter.APPLICATION_JSON_UTF8)
+@Produces(JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8)
 public class GAEBlobResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(GAEBlobResource.class);
 

@@ -27,7 +27,7 @@ package com.wadpam.guja.api;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.wadpam.guja.oauth2.web.JsonCharacterEncodingReponseFilter;
+import com.wadpam.guja.web.JsonCharacterEncodingResponseFilter;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 
@@ -63,7 +62,7 @@ public class MonitorResource {
   }
 
   @GET
-  @Produces(JsonCharacterEncodingReponseFilter.APPLICATION_JSON_UTF8)
+  @Produces(JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8)
   public Response ping() {
     LOGGER.debug("Ping");
 

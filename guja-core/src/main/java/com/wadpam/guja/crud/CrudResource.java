@@ -23,9 +23,8 @@ package com.wadpam.guja.crud;
  */
 
 import com.google.inject.persist.Transactional;
-import com.wadpam.guja.oauth2.web.JsonCharacterEncodingReponseFilter;
+import com.wadpam.guja.web.JsonCharacterEncodingResponseFilter;
 import net.sf.mardao.core.CursorPage;
-import net.sf.mardao.dao.AbstractDao;
 import net.sf.mardao.dao.CrudDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *         Date: 1/19/14 Time: 10:54 AM
  */
 @Consumes(MediaType.APPLICATION_JSON)
-@Produces(JsonCharacterEncodingReponseFilter.APPLICATION_JSON_UTF8)
+@Produces(JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8)
 public class CrudResource<T, ID extends Serializable, D extends CrudDao<T, ID>> {
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(CrudResource.class);

@@ -29,13 +29,16 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.GuiceServletContextListener;
+import com.sun.corba.se.spi.activation.Server;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.wadpam.guja.cache.annotations.CacheAnnotationsModule;
+import com.wadpam.guja.environment.ServerEnvironment;
 import com.wadpam.guja.persist.MardaoDatastoreModule;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
 import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
 import com.wadpam.guja.jackson.NonNullObjectMapperProvider;
+import com.wadpam.guja.web.CORSFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,8 +91,14 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
 
             // Filters
             //filter("/*").through(PersistFilter.class);
-            filter("/api/*").through(OAuth2Filter.class);
+
+            // Enable CORS if running on dev server
+            filter("/*").through(CORSFilter.class);
+            //filter("/*").through(CORSFilter.class, ImmutableMap.of("alwaysEnabled", "true"));
+
             filter("/oauth/authorize", "/oauth/refresh", "/oauth/revoke").through(Oauth2ClientAuthenticationFilter.class);
+
+            filter("/api/*").through(OAuth2Filter.class);
 
             // Servlets
             serve("/*").with(GuiceContainer.class, ImmutableMap.of(
