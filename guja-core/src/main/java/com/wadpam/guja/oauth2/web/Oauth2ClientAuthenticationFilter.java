@@ -77,6 +77,7 @@ public class Oauth2ClientAuthenticationFilter implements Filter, AdminTask {
 
   private final ObjectMapper objectMapper;
   private final DFactoryDaoBean factoryDao;
+  private final ServerEnvironment serverEnvironment;
 
   private String basicAuthenticationString;
 
@@ -87,6 +88,7 @@ public class Oauth2ClientAuthenticationFilter implements Filter, AdminTask {
 
     this.objectMapper = objectMapper;
     this.factoryDao = factoryDaoBean;
+    this.serverEnvironment = serverEnvironment;
 
     if (serverEnvironment.isDevEnvironment()) {
       createDefaultFactory();
@@ -121,7 +123,10 @@ public class Oauth2ClientAuthenticationFilter implements Filter, AdminTask {
     HttpServletRequest request = (HttpServletRequest) req;
     HttpServletResponse response = (HttpServletResponse) res;
 
-    // Either the Authorize header or json body is used to provide the client credentials
+    if (serverEnvironment.isDevEnvironment()) {
+      response.addHeader("Access-Control-Allow-Origin", "*");
+    }
+      // Either the Authorize header or json body is used to provide the client credentials
     String authHeader = request.getHeader(OAuth2Filter.HEADER_AUTHORIZATION);
     ClientCredentials credentials = null;
     if (request.getContentLength() > 0 &&
