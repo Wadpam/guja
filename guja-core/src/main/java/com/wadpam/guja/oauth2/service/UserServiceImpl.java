@@ -161,7 +161,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   private boolean sendConfirmEmail(DUser user) {
 
     Localization localization = localizationBuilderProvider.get().build();
-    String subject = localization.getMessage("verifyEmailAddress", "Verify email address");
+    String subject = localization.getMessage("verifyEmailAddress", "Verify email address", user.getUsername());
     String verifyUrl = createVerifyEmailUrl(user.getId(), localization.getLocale());
     LOGGER.debug("verify url {}", verifyUrl);
 
@@ -337,7 +337,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     DUser user = getByEmail(email); // Throw 404 if not found
 
     Localization localization = localizationBuilderProvider.get().build();
-    String subject = localization.getMessage("restPassword", "Reset password");
+    String subject = localization.getMessage("restPassword", "Reset password", user.getUsername());
     String resetUrl = createResetPasswordUrl(user.getId(), localization.getLocale());
 
     String body = templateBuilderProvider.get()

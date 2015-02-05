@@ -2,17 +2,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>Bekräfta konto</title>
+  <title>${user.username}, här är länken för att aktivera ditt konto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 
     <body>
 
         <article>
-            <h3>Välkommen till XXX</h3>
-            <p>Klicka på länken nedan för att aktivera ditt konto.</p>
-            <p><a href="${verifyEmailLink}" target="_blank"></a></p>
-            <p>/XXX teamet</p>
+            <p>Hej ${user.username}</p>
+            <p>Klicka <a href="${verifyEmailLink}" target="_blank">här</a> eller klistra in länken nedan i din webläsare för att aktivera ditt XXX konto.</p>
+            <p><a href="${verifyEmailLink}" target="_blank">${verifyEmailLink}</a></p>
+            <p>Länken är giltig i 24 timmar så använden den omgående.</p>
+            <p>Tack för att du använder XXX!<br>
+            XXX teamet</p>
         </article>
 
     </body>
