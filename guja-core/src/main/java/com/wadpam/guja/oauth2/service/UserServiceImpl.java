@@ -179,7 +179,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   private String createVerifyEmailUrl(Long userId, Locale locale) {
 
-    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 30 * 60); // token is valid 30 minutes
+    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 60 * 60 * 24); // token is valid 24h
     return uriInfoProvider.get().getBaseUriBuilder()
         .path("html")
         .path("EmailVerification")
@@ -354,7 +354,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   private String createResetPasswordUrl(Long userId, Locale locale) {
 
-    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 60 * 10); // token is valid 10 minutes
+    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 60 * 60 * 24); // token is valid 24h
     return uriInfoProvider.get().getBaseUriBuilder()
         .path("html")
         .path("ResetPassword")
