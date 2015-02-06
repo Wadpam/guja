@@ -3,7 +3,7 @@
     <parent>
         <artifactId>guja</artifactId>
         <groupId>com.wadpam.guja</groupId>
-        <version>0.0.7-SNAPSHOT</version>
+        <version>0.8.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
