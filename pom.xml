@@ -4,7 +4,7 @@
 
     <groupId>com.wadpam.guja</groupId>
     <artifactId>guja</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.7-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -38,7 +38,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>guja-be-war</artifactId>
-                <version>0.0.6</version>
+                <version>0.0.7-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
 
