@@ -22,7 +22,6 @@ package com.wadpam.guja.oauth2.service;
  * #L%
  */
 
-import com.wadpam.guja.oauth2.api.UserResource;
 import com.wadpam.guja.oauth2.domain.DUser;
 import net.sf.mardao.core.CursorPage;
 
@@ -44,19 +43,41 @@ public interface UserService {
   DUser signup(DUser user);
 
   /**
-   * Let the user confirm their email address.
+   * Let the user confirm their new account.
+   *
    * @param userId unique user id
    * @param token temporary generated token
    * @return true if the email was confirmed
    */
-  boolean confirmEmail(Long userId, String token);
+  boolean confirmAccountUsingToken(Long userId, String token);
 
   /**
    * Resend email confirmation email.
+   *
    * @param userId unique user id
    * @return true of the email was sent
    */
-  boolean resendConfirmEmail(Long userId);
+  boolean resendVerifyAccountEmail(Long userId);
+
+  /**
+   * Change email address.
+   * The new email address is temporarily stored in the cache until the user verified the email address.
+   * Only after that is the email changed permanently,
+   *
+   * @param userId unique user id
+   * @param newEmailAddress new email
+   * @return true of the email was sent
+   */
+  boolean changeEmailAddress(Long userId, String newEmailAddress);
+
+  /**
+   * User confirms changing email.
+   *
+   * @param userId unique user id
+   * @param token temporary token
+   * @return true if the email was confirmed
+   */
+  boolean confirmEmailAddressChangeUsingToken(Long userId, String token);
 
   /**
    * Get user by user id.
@@ -135,7 +156,7 @@ public interface UserService {
    * @param token temporary password
    * @return true if the password was successfully changed
    */
-  boolean changePasswordUsingToken(Long userId, String newPassword, String token);
+  boolean confirmResetPasswordUsingToken(Long userId, String newPassword, String token);
 
   /**
    * Create a default admin account.

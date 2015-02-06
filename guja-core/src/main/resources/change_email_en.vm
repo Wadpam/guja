@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>${user.username}, here's the link to active your account</title>
+  <title>${user.username}, here's the link to change your email address</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 
@@ -10,8 +10,9 @@
 
         <article>
             <p>Hi ${user.username}</p>
-            <p>To activate your XXX account, click <a href="${verifyEmailLink}" target="_blank">here</a> or paste the following link into your browser:</p>
-            <p><a href="${verifyEmailLink}" target="_blank">${verifyEmailLink}</a></p>
+            <p>You recently requested to change your email address.</p>
+            <p>To change your XXX email address, click <a href="${confirmationUrl}" target="_blank">here</a> or paste the following link into your browser:</p>
+            <p><a href="${confirmationUrl}" target="_blank">${confirmationUrl}</a></p>
             <p>The link will expire in 24 hours, so be sure to use it right away.</p>
             <p>Thanks for using XXX!<br>
             The XXX team</p>

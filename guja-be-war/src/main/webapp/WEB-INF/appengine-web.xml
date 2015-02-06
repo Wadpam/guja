@@ -32,15 +32,19 @@
         <property name="jersey.config.server.tracing.type" value="ALL" />
     </system-properties>
 
-  <static-files>
-    <include path="/robots.txt" />
-    <include path="/favicon.ico" />
-    <include path="/**.png" />
-    <include path="/**.gif" />
-    <include path="/**.html" />
-    <include path="/**.js" />
-    <include path="/**.css" />
-    <include path="/**.ttf" />
-    <include path="/**.woff" />
+    <static-files>
+        <include path="/robots.txt" />
+        <include path="/favicon.ico" />
+        <include path="/**.png" />
+        <include path="/**.gif" />
+        <include path="/**.html" />
+        <include path="/**.js" />
+        <include path="/**.css" />
+        <include path="/**.ttf" />
+        <include path="/**.woff" />
+
+        <!-- html static resources-->
+        <include path="/html/**.*" />
+
   </static-files>
 </appengine-web-app>

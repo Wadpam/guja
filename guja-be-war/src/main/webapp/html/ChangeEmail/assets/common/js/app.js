@@ -21,29 +21,6 @@ function DisplayVerifyEmailAsync_Failed(jqXHR, textStatus, errorThrown, failMess
     $('#pnlUnsuccessfulServerResponse').removeClass('hidden');
 }
 
-function ResendConfirmationAsync() {
-    var successMessage;
-    var failMessage;
-
-    successMessage = "Please check your e-mail";
-    failMessage = "Failed resending verification email!";
-
-    // let's see what we got from query string
-    var idFromQS = $.getQueryString("id");
-
-    var backendServiceURL = "/api/user/" + idFromQS + "/email/resendconfirm";
-    $.ajax({
-        type: "POST",
-        url: backendServiceURL
-    }).done(function (data, textStatus, jqXHR) {
-        DisplayVerifyEmailAsync_Succeed(data, textStatus, jqXHR, successMessage);
-    }).fail(function (jqXHR, textStatus, errorThrown) {
-        DisplayVerifyEmailAsync_Failed(jqXHR, textStatus, errorThrown, failMessage);
-    }).always(function () {
-        //
-    });
-}
-
 function VerifyEmailAsync() {
     // let's see what we got from query string
     var idFromQS = $.getQueryString("id");
@@ -72,11 +49,6 @@ function VerifyEmailAsync() {
         //
     });
 }
-
-$('#btnResendConfirmation').on('click', function () {
-    HideServerResponseTextPanels();
-    ResendConfirmationAsync();
-});
 
 $(function () {
     //Okay, we have loaded DOM
