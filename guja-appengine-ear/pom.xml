@@ -47,4 +47,25 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>gae-debug</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.appengine</groupId>
+                        <artifactId>appengine-maven-plugin</artifactId>
+                        <version>${appengine.target.version}</version>
+                        <configuration>
+                            <jvmFlags>
+                                <jvmFlag>-Xdebug</jvmFlag>
+                                <jvmFlag>-agentlib:jdwp=transport=dt_socket,address=5005,server=y,suspend=n</jvmFlag>
+                            </jvmFlags>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>

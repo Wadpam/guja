@@ -128,7 +128,6 @@ public class UserResource {
     }
   }
 
-
   /**
    * Get details for a single user.
    *
@@ -142,7 +141,6 @@ public class UserResource {
     checkNotNull(id);
     return Response.ok(userService.getById(id)).build();
   }
-
 
   /**
    * Get user info for current user.
@@ -187,7 +185,6 @@ public class UserResource {
 
   }
 
-
   /**
    * Get a page of users.
    *
@@ -207,7 +204,20 @@ public class UserResource {
 
 
   /**
-   * Delete a user
+   * Allow a user to delete their own account.
+   *
+   * @return http 204 is successful
+   */
+  @DELETE
+  @Path("me")
+  @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
+  public Response delete(@Context HttpServletRequest request) {
+    Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
+    return delete(id);
+  }
+
+  /**
+   * Delete a user.
    *
    * @param id unique user id
    * @return http 204 is successful
@@ -220,7 +230,6 @@ public class UserResource {
     userService.deleteById(id);
     return Response.noContent().build();
   }
-
 
   /**
    * Update a user.
@@ -250,16 +259,14 @@ public class UserResource {
         .location(uriBuilder.build())
         .entity(user.getId())
         .build();
-
   }
-
 
   /**
    * Update the current user.
    *
    * @param request injected
    * @param uriInfo injected
-   * @param entity  new user info
+   * @param user  new user info
    * @return http 200
    * The URI of the updated user will be stated in the Location header
    */
@@ -269,18 +276,17 @@ public class UserResource {
   public Response updateMe(@Context HttpServletRequest request,
                            @Context UriInfo uriInfo,
                            @Context SecurityContext securityContext,
-                           DUser entity) {
+                           DUser user) {
 
     Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
-    if (null == entity.getId()) {
-      entity.setId(id);
-    } else if (!entity.getId().equals(id)) {
+    if (null == user.getId()) {
+      user.setId(id);
+    } else if (!user.getId().equals(id)) {
       throw new BadRequestRestException("User ids does not match");
     }
 
-    return update(id, uriInfo, securityContext, entity);
+    return update(id, uriInfo, securityContext, user);
   }
-
 
   /**
    * Get all users added me as friends
@@ -312,7 +318,6 @@ public class UserResource {
     return Response.ok(page).build();
   }
 
-
   /**
    * Change my password. Both the old and new password must be provided.
    *
@@ -322,7 +327,7 @@ public class UserResource {
   @POST
   @Path("me/password")
   @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
-  public Response changePassword(@Context HttpServletRequest request, Request passwordRequest) {
+  public Response changePassword(@Context HttpServletRequest request, PasswordRequest passwordRequest) {
 
     checkPasswordFormat(passwordRequest.getNewPassword());
     checkNotNull(passwordRequest.getOldPassword());
@@ -336,84 +341,172 @@ public class UserResource {
   }
 
   /**
-   * Change password using a temporary token. Used during password reset flow.
+   * Change password using a temporary token.
+   * Used during password reset flow.
    *
    * @param userId unique user id
-   * @param passwordRequest newPassword and token
+   * @param request newPassword and token
    * @return 204 if success, otherwise 403
    */
   @POST
   @Path("{id}/password")
   @PermitAll
-  public Response changePassword(@PathParam("id") Long userId, Request passwordRequest) {
+  public Response changePassword(@PathParam("id") Long userId, PasswordRequest request) {
     checkNotNull(userId);
-    checkNotNull(passwordRequest.getToken());
-    checkPasswordFormat(passwordRequest.newPassword);
+    checkNotNull(request.getToken());
+    checkPasswordFormat(request.getNewPassword());
 
-    boolean isSuccess = userService.changePasswordUsingToken(userId, passwordRequest.getNewPassword(), passwordRequest.getToken());
-
+    boolean isSuccess = userService.confirmResetPasswordUsingToken(userId, request.getNewPassword(), request.getToken());
     return isSuccess ? Response.noContent().build() : Response.status(Response.Status.BAD_REQUEST).build();
-
   }
-
 
   /**
    * Reset user password by sending out a reset email.
    *
-   * @param passwordRequest users unique email
+   * @param request users unique email
    * @return http 204
    */
   @POST
   @Path("password/reset")
   @PermitAll
-  public Response resetPassword(Request passwordRequest) {
-    checkNotNull(passwordRequest.getEmail());
+  public Response resetPassword(PasswordRequest request) {
+    checkNotNull(request.getEmail());
 
-    userService.resetPassword(passwordRequest.getEmail());
-
+    userService.resetPassword(request.getEmail());
     return Response.noContent().build();
-
   }
 
   /**
-   * Confirm a users email address using a temporary token.
+   * Confirm a newly create account using a temporary token.
+   *
    * @param userId unique user id
-   * @param passwordRequest token
+   * @param request token
    * @return 204 if success
    * @return 400 if id / token combination is invalid
    */
   @POST
-  @Path("{id}/email/confirm")
+  @Path("{id}/account/confirm")
   @PermitAll
-  public Response confirmEmail(@PathParam("id") Long userId, Request passwordRequest) {
+  public Response confirmAccount(@PathParam("id") Long userId, AccountRequest request) {
     checkNotNull(userId);
-    checkNotNull(passwordRequest.getToken());
+    checkNotNull(request.getToken());
 
-    boolean isSuccess = userService.confirmEmail(userId, passwordRequest.getToken());
+    boolean isSuccess = userService.confirmAccountUsingToken(userId, request.getToken());
     return isSuccess ? Response.noContent().build() : Response.status(Response.Status.BAD_REQUEST).build();
-
   }
 
   /**
-   * Resend confirm email.
+   * Resend account verification email.
+   *
    * @param userId unique user id
    * @return 204 if success
    */
   @POST
-  @Path("{id}/email/resendconfirm")
+  @Path("{id}/account/resend")
   @PermitAll
-  public Response resendConfirmEmail(@PathParam("id") Long userId) {
+  public Response resendVerifyAccountEmail(@PathParam("id") Long userId) {
     checkNotNull(userId);
 
-    boolean isSuccess = userService.resendConfirmEmail(userId);
+    boolean isSuccess = userService.resendVerifyAccountEmail(userId);
     return isSuccess ? Response.noContent().build() : Response.status(Response.Status.BAD_REQUEST).build();
+  }
 
+  /**
+   * User request changing their email address.
+   * The new email is temporarily stored and an email is sent to the new email address for confirmation.
+   *
+   * @param emailRequest new email address
+   * @return 204 if success
+   */
+  @POST
+  @Path("me/email")
+  @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
+  public Response changeEmail(@Context HttpServletRequest request, EmailRequest emailRequest) {
+    Long userId = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
+    return changeEmail(userId, emailRequest);
+  }
+
+  /**
+   * Admin changing a users email.
+   *
+   * @param userId unique user id
+   * @param request injected
+   * @return 204 if success
+   */
+  @POST
+  @Path("{id}/email")
+  @RolesAllowed({"ROLE_ADMIN"})
+  public Response changeEmail(@PathParam("id") Long userId, EmailRequest request) {
+    checkNotNull(userId);
+    checkEmailFormat(request.getEmail());
+
+    boolean isSuccess = userService.changeEmailAddress(userId, request.getEmail());
+    return isSuccess ? Response.noContent().build() : Response.status(Response.Status.BAD_REQUEST).build();
+  }
+
+  /**
+   * User confirm changing email.
+   * The token is verified and the temporary stored email will not be permanently saved as the users email.
+   *
+   * @param userId unique email
+   * @return 204 if success
+   */
+  @POST
+  @Path("{id}/email/confirm")
+  @PermitAll
+  public Response confirmChangeEmail(@PathParam("id") Long userId, EmailRequest request) {
+    checkNotNull(userId);
+    checkNotNull(request.getToken());
+
+    boolean isSuccess = userService.confirmEmailAddressChangeUsingToken(userId, request.getToken());
+    return isSuccess ? Response.noContent().build() : Response.status(Response.Status.BAD_REQUEST).build();
   }
 
 
-  public static class Request {
+  public static class EmailRequest {
 
-    public Request() {
+    public EmailRequest() {
+    }
+
+    private String email;
+    private String token;
+
+    public String getEmail() {
+      return email;
+    }
+
+    public void setEmail(String email) {
+      this.email = email;
+    }
+
+    public String getToken() {
+      return token;
+    }
+
+    public void setToken(String token) {
+      this.token = token;
+    }
+  }
+
+  public static class AccountRequest {
+
+    public AccountRequest() {
+    }
+
+    private String token;
+
+    public String getToken() {
+      return token;
+    }
+
+    public void setToken(String token) {
+      this.token = token;
+    }
+  }
+
+  public static class PasswordRequest {
+
+    public PasswordRequest() {
     }
 
     private String oldPassword;

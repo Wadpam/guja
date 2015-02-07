@@ -22,6 +22,7 @@ package com.wadpam.guja.oauth2.service;
  * #L%
  */
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -50,6 +51,8 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * User service implementation based on Mardao.
@@ -62,13 +65,16 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   private final static String DEFAULT_ADMIN_USERNAME = "admin";
 
-  private static final String VELOCITY_TEMPLATE_VERIFY_EMAIL = "email_verification.vm";
+  private static final String VELOCITY_TEMPLATE_VERIFY_ACCOUNT = "verify_account.vm";
+  private static final String VELOCITY_TEMPLATE_CHANGE_EMAIL = "change_email.vm";
   private static final String VELOCITY_TEMPLATE_RESET_PASSWORD = "reset_password.vm";
 
   private DUserDaoBean userDao;
 
-  private boolean shouldVerifyEmail = true;
-  private String emailVerificationTemplate = VELOCITY_TEMPLATE_VERIFY_EMAIL;
+  private boolean shouldVerifyAccountCreation = true;
+
+  private String verifyAccountTemplate = VELOCITY_TEMPLATE_VERIFY_ACCOUNT;
+  private String changeEmailTemplate = VELOCITY_TEMPLATE_CHANGE_EMAIL;
   private String resetPasswordTemplate = VELOCITY_TEMPLATE_RESET_PASSWORD;
 
   private final PasswordEncoder passwordEncoder;
@@ -107,8 +113,6 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Override
   public DUser signup(DUser user) {
 
-    // TODO Consider only have a unique constraint on username (will have impact in other places)
-
     // Check if username already exists
     DUser existingUser = userDao.findByUsername(user.getUsername()); // Would be good if we can change to async request
     if (null != existingUser && existingUser.getState() == DUser.UNVERIFIED_STATE) {
@@ -144,59 +148,174 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     user.setRoles(OAuth2UserResource.DEFAULT_ROLES_USER);
 
     // Is email validation enforced?
-    user.setState((!shouldVerifyEmail || severEnvironment.isDevEnvironment())
+    user.setState((!shouldVerifyAccountCreation || severEnvironment.isDevEnvironment())
         ? DUser.ACTIVE_STATE : DUser.UNVERIFIED_STATE);
 
     // Save
     put(user);
 
-    if (shouldVerifyEmail) {
+    if (shouldVerifyAccountCreation) {
       // Send email confirmation email
-      sendConfirmEmail(user);
+      verifyAccount(user);
     }
 
     return user;
   }
 
-  private boolean sendConfirmEmail(DUser user) {
+  private enum TokenType {
+    ACCOUNT, EMAIL, PASSWORD
+  }
+
+  private boolean verifyAccount(DUser user) {
 
     Localization localization = localizationBuilderProvider.get().build();
-    String subject = localization.getMessage("verifyEmailAddress", "Verify email address", user.getUsername());
-    String verifyUrl = createVerifyEmailUrl(user.getId(), localization.getLocale());
-    LOGGER.debug("verify url {}", verifyUrl);
+    String subject = localization.getMessage("verifyAccount", "Verify account", user.getUsername());
+
+    String token = tokenCache.generateTemporaryToken(tokenKey(user.getId(), TokenType.ACCOUNT), 60 * 60 * 24); // token is valid 24h
+
+    String url = buildConfirmationURL(user.getId(), localization.getLocale(), token, "VerifyAccount");
+    LOGGER.debug("verify account url {}", url);
 
     String body = templateBuilderProvider.get()
-        .templateName(emailVerificationTemplate)
-        .put("verifyEmailLink", verifyUrl)
+        .templateName(verifyAccountTemplate)
+        .put("confirmationUrl", url)
         .put("user", user)
         .put("baseUrl", uriInfoProvider.get().getBaseUri().toString())
         .build()
         .toString();
 
     return emailService.sendEmail(user.getEmail(), user.getDisplayName(), subject, body, true);
-
   }
 
-  private String createVerifyEmailUrl(Long userId, Locale locale) {
+  @Override
+  public boolean resendVerifyAccountEmail(Long userId) {
+    DUser user = getById(userId); // Will throw 404 if not found
+    return verifyAccount(user);
+  }
 
-    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 60 * 60 * 24); // token is valid 24h
+  private String buildConfirmationURL(Long userId, Locale locale, String token, String pathComponent) {
     return uriInfoProvider.get().getBaseUriBuilder()
         .path("html")
-        .path("EmailVerification")
-        .path("emailVerification.html")
+        .path(pathComponent)
+        .path("index.html")
         .queryParam("id", userId)
-        .queryParam("token", temporaryToken)
+        .queryParam("token", token)
         .queryParam("language", locale.getLanguage())
         .build()
         .toString();
   }
 
+  private static String tokenKey(Long userId, TokenType tokenType) {
+    return String.format("%s-%s", tokenType.ordinal(), userId);
+  }
+
   @Override
-  public boolean resendConfirmEmail(Long userId) {
+  public boolean confirmAccountUsingToken(Long userId, String token) {
 
     DUser user = getById(userId); // Will throw 404 if not found
-    return sendConfirmEmail(user);
+    if (user.getState() == DUser.ACTIVE_STATE) {
+      // User is already activated.
+      // Probably clicked on an old link, do nothing
+      tokenCache.removeToken(tokenKey(userId, TokenType.ACCOUNT));
+      return true;
+    } else if (tokenCache.validateToken(tokenKey(userId, TokenType.ACCOUNT), token)) {
+      if (user.getState() != DUser.LOCKED_STATE) {
+        // Only change state if user account is not locked
+        user.setState(DUser.ACTIVE_STATE);
+        put(user);
+        return true;
+      }
+    }
 
+    return false;
+  }
+
+  @Override
+  public boolean changeEmailAddress(Long userId, String newEmailAddress) {
+
+    Future<DUser> futureUser = getAsyncById(userId); // Non blocking
+
+    // Check that email is unique
+    DUser user = userDao.findByEmail(newEmailAddress); // Blocking
+    if (null != user) {
+      LOGGER.info("Email already taken {}", user.getEmail());
+      throw new ConflictRestException("Email already taken");
+    }
+
+    try {
+      user = futureUser.get(); // Blocking
+    } catch (Exception e) {
+      LOGGER.error("Failed to read async from datastore {}", e);
+      throw new InternalServerErrorRestException("Failed to read async from datastore");
+    }
+
+    Localization localization = localizationBuilderProvider.get().build();
+    String subject = localization.getMessage("changeEmail", "Change email address", user.getUsername());
+
+    String token = tokenCache.generateTemporaryToken(tokenKey(user.getId(), TokenType.EMAIL), 60 * 60 * 24, newEmailAddress); // token is valid 24h
+
+    String url = buildConfirmationURL(user.getId(), localization.getLocale(), token, "ChangeEmail");
+    LOGGER.debug("verify new email url {}", url);
+
+    String body = templateBuilderProvider.get()
+        .templateName(changeEmailTemplate)
+        .put("confirmationUrl", url)
+        .put("user", user)
+        .put("baseUrl", uriInfoProvider.get().getBaseUri().toString())
+        .build()
+        .toString();
+
+    return emailService.sendEmail(newEmailAddress, user.getDisplayName(), subject, body, true);
+  }
+
+  @Override
+  public boolean confirmEmailAddressChangeUsingToken(Long userId, String token) {
+    Optional<Object> newEmailAddress = tokenCache.getContextForToken(tokenKey(userId, TokenType.EMAIL), token);
+    if (newEmailAddress.isPresent()) {
+      DUser user = getById(userId);
+      user.setEmail((String)newEmailAddress.get());
+      put(user);
+      return true;
+    } else {
+      LOGGER.debug("No new email was found in cache or link expired");
+      return false;
+    }
+  }
+
+  @Override
+  public void resetPassword(String email) {
+
+    DUser user = getByEmail(email); // Throw 404 if not found
+
+    Localization localization = localizationBuilderProvider.get().build();
+    String subject = localization.getMessage("restPassword", "Reset password", user.getUsername());
+
+    String token = tokenCache.generateTemporaryToken(tokenKey(user.getId(), TokenType.PASSWORD), 60 * 60 * 24); // token is valid 24
+
+    String url = buildConfirmationURL(user.getId(), localization.getLocale(), token, "ResetPassword");
+    LOGGER.debug("reset password url {}", url);
+
+    String body = templateBuilderProvider.get()
+        .templateName(resetPasswordTemplate)
+        .put("confirmationUrl", url)
+        .put("user", user)
+        .put("baseUrl", uriInfoProvider.get().getBaseUri().toString())
+        .build()
+        .toString();
+
+    emailService.sendEmail(user.getEmail(), user.getDisplayName(), subject, body, true);
+  }
+
+  @Override
+  public boolean confirmResetPasswordUsingToken(Long userId, String newPassword, String token) {
+    if (tokenCache.validateToken(tokenKey(userId, TokenType.PASSWORD), token)) {
+      DUser user = getById(userId); // Will throw 404 if not found
+      user.setPassword(passwordEncoder.encode(newPassword));
+      put(user);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -204,7 +323,6 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
     DUser admin = userDao.findByUsername(DEFAULT_ADMIN_USERNAME);
     if (null == admin) {
-
       admin = new DUser();
       admin.setDisplayName("Default admin (remove)");
       admin.setUsername(DEFAULT_ADMIN_USERNAME);
@@ -212,13 +330,10 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
       admin.setEmail("fake@email.com");
       admin.setState(DOAuth2User.ACTIVE_STATE);
       admin.setRoles(OAuth2UserResource.DEFAULT_ROLES_ADMIN);
-
       put(admin);
-
     }
 
     return admin;
-
   }
 
   private Long put(DUser dUser) {
@@ -246,7 +361,16 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   }
 
-  public DUser getByEmail(String email) {
+  public Future<DUser> getAsyncById(Long id) {
+    try {
+      return userDao.getAsync(null, id);
+    } catch (IOException e) {
+      LOGGER.error("Failed to read user {}", id);
+      throw new InternalServerErrorRestException(String.format("Failed to read user %s", id));
+    }
+  }
+
+  private DUser getByEmail(String email) {
     DUser user = userDao.findByEmail(email);
     if (null == user) {
       throw new NotFoundRestException();
@@ -256,14 +380,12 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   @Override
   public void deleteById(Long id) {
-
     try {
       userDao.delete(id);
     } catch (IOException e) {
       LOGGER.error("Failed to delete user {}", e);
       throw new InternalServerErrorRestException(String.format("Failed to delete user"));
     }
-
   }
 
   @Override
@@ -332,69 +454,6 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   }
 
   @Override
-  public void resetPassword(String email) {
-
-    DUser user = getByEmail(email); // Throw 404 if not found
-
-    Localization localization = localizationBuilderProvider.get().build();
-    String subject = localization.getMessage("restPassword", "Reset password", user.getUsername());
-    String resetUrl = createResetPasswordUrl(user.getId(), localization.getLocale());
-
-    String body = templateBuilderProvider.get()
-        .templateName(resetPasswordTemplate)
-        .put("resetPasswordLink", resetUrl)
-        .put("user", user)
-        .put("baseUrl", uriInfoProvider.get().getBaseUri().toString())
-        .build()
-        .toString();
-
-    emailService.sendEmail(user.getEmail(), user.getDisplayName(), subject, body, true);
-
-  }
-
-  private String createResetPasswordUrl(Long userId, Locale locale) {
-
-    String temporaryToken = tokenCache.generateTemporaryToken(userId.toString(), 60 * 60 * 24); // token is valid 24h
-    return uriInfoProvider.get().getBaseUriBuilder()
-        .path("html")
-        .path("ResetPassword")
-        .path("resetPassword.html")
-        .queryParam("id", userId)
-        .queryParam("token", temporaryToken)
-        .queryParam("language", locale.getLanguage())
-        .build()
-        .toString();
-  }
-
-  @Override
-  public boolean changePasswordUsingToken(Long userId, String newPassword, String token) {
-
-    if (tokenCache.validateToken(userId.toString(), token)) {
-      DUser user = getById(userId);
-      user.setPassword(passwordEncoder.encode(newPassword));
-      put(user);
-      return true;
-    }
-
-    return false;
-  }
-
-  @Override
-  public boolean confirmEmail(Long userId, String token) {
-    if (tokenCache.validateToken(userId.toString(), token)) {
-      DUser user = getById(userId);
-      if (user.getState() != DUser.LOCKED_STATE) {
-        // Only change state if user account is not locked
-        user.setState(DUser.ACTIVE_STATE);
-        put(user);
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  @Override
   public DOAuth2User authenticate(String username, String password) {
 
     DUser user = userDao.findByUsername(username);
@@ -423,17 +482,22 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   }
 
   @Inject(optional = true)
-  public void setShouldVerifyEmail(@Named("app.email.verification") boolean shouldVerifyEmail) {
-    this.shouldVerifyEmail = shouldVerifyEmail;
+  public void setShouldVerifyAccountCreation(@Named("app.email.verification") boolean shouldVerifyAccountCreation) {
+    this.shouldVerifyAccountCreation = shouldVerifyAccountCreation;
   }
 
   @Inject(optional = true)
-  public void setEmailVerificationTemplate(@Named("app.template.verifyemail") String emailVerificationTemplate) {
-    this.emailVerificationTemplate = emailVerificationTemplate;
+  public void setVerifyAccountTemplate(@Named("app.template.verifyAccount") String verifyAccountTemplate) {
+    this.verifyAccountTemplate = verifyAccountTemplate;
   }
 
   @Inject(optional = true)
-  public void setResetPasswordTemplate(@Named("app.template.resetpassword") String resetPasswordTemplate) {
+  public void setResetPasswordTemplate(@Named("app.template.resetPassword") String resetPasswordTemplate) {
     this.resetPasswordTemplate = resetPasswordTemplate;
+  }
+
+  @Inject(optional = true)
+  public void setVerifyEmaildTemplate(@Named("app.template.changeEmail") String changeEmailTemplate) {
+    this.changeEmailTemplate = changeEmailTemplate;
   }
 }

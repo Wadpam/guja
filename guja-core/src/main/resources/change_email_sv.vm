@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>${user.username}, här är länken för att aktivera ditt konto</title>
+  <title>${user.username}, här är länken för att ändra din email address</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 
@@ -10,8 +10,9 @@
 
         <article>
             <p>Hej ${user.username}</p>
-            <p>Klicka <a href="${verifyEmailLink}" target="_blank">här</a> eller klistra in länken nedan i din webläsare för att aktivera ditt XXX konto.</p>
-            <p><a href="${verifyEmailLink}" target="_blank">${verifyEmailLink}</a></p>
+            <p>Du bad nyligen om att ändra din email address.</p>
+            <p>Klicka <a href="${confirmationUrl}" target="_blank">här</a> eller klistra in länken nedan i din webläsare för att ändra din email address.</p>
+            <p><a href="${confirmationUrl}" target="_blank">${confirmationUrl}</a></p>
             <p>Länken är giltig i 24 timmar så använden den omgående.</p>
             <p>Tack för att du använder XXX!<br>
             XXX teamet</p>

@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <title>Verify email address</title>
+        <meta charset="utf-8">
+        <!-- Latest compiled and minified CSS for Bootstrap-->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    </head>
+
+    <body class="container">
+
+        <!-- Page Header -->
+        <header class="row">
+            <div class="col-xs-12">
+                <h1 class="page-header">
+                    <img id="imgLogotype"
+                         alt="Logotype" src="assets/common/img/AF_Logotype20141_Black64x64.jpg" />
+                    Verify email address
+                </h1>
+            </div>
+        </header>
+
+
+        <article class="row">
+            <div class="col-xs-12">
+
+                <article id="pnlSuccessfulServerResponse" class="panel panel-success hidden">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Success</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p id="successMessage">
+                            <b>Message: </b><span></span>
+                        </p>
+                    </div>
+                </article>
+
+                <article id="pnlUnsuccessfulServerResponse" class="panel panel-danger hidden">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Error</h3>
+                    </div>
+                    <div class="panel-body">
+                        <span id="errorMessage">Something went wrong!</span>
+                        <a data-toggle="collapse" data-parent="#pnlUnsuccessfulServerResponse" href="#codErrorMessage" aria-expanded="true" aria-controls="collapseOne">Details</a>
+                        <br />
+                        <code id="codErrorMessage" class="collapse">
+                            <p id="errorMessageJqXHRStatus">
+                                <b>jqXHR.status: </b><span></span>
+                            </p>
+                            <p id="errorMessageTextStatus">
+                                <b>textStatus: </b><span></span>
+                            </p>
+                            <p id="errorMessageErrorThrown">
+                                <b>errorThrown: </b><span></span>
+                            </p>
+                        </code>
+                        <br />
+                    </div>
+                </article>
+                
+            </div>
+
+        </article>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+        <script src="assets/common/js/getQueryString.js"></script>
+        <script src="assets/common/js/app.js"></script>
+
+    </body>
+</html>
