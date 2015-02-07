@@ -30,27 +30,28 @@ package com.wadpam.guja.oauth2.api;
 
 import com.google.inject.Inject;
 import com.wadpam.guja.crud.CrudResource;
+import com.wadpam.guja.dao.DaoBuilder;
+import com.wadpam.guja.dao.DaoBuilderFactory;
 import com.wadpam.guja.oauth2.dao.DFactoryDaoBean;
 import com.wadpam.guja.oauth2.domain.DFactory;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import java.io.Serializable;
 
 /**
  * @author osandstrom
  */
 @Path("_adm/factory")
 @PermitAll // This resource is protected in web.xml. Must be GAE app developer to access this resource.
-public class FactoryResource extends CrudResource<DFactory, String, DFactoryDaoBean> {
+public class FactoryResource extends CrudResource<DFactory, String, String, DaoBuilder<DFactory, String, String>> {
 
   public static final String PROVIDER_ID_FACEBOOK = "facebook";
   public static final String PROVIDER_ID_SELF = "self";
 
   @Inject
-  public FactoryResource(DFactoryDaoBean dao) {
-    super(dao);
+  public FactoryResource(DFactoryDaoBean dao, DaoBuilderFactory builderFactory) {
+    super(builderFactory.<DFactory, String, String, Void, Serializable>create(dao, null));
   }
 
 

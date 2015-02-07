@@ -150,7 +150,7 @@ public class CacheResultMethodInterceptorTest extends AbstractCacheMethodInterce
 
     mockDao = createMock(CrudDao.class);
 
-    // Create a crud dao with page caching enabled
+    // Create a crud builder with page caching enabled
     injector = Guice.createInjector(new Module() {
       @Override
       public void configure(Binder binder) {

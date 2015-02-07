@@ -46,21 +46,21 @@
         <dependency>
             <groupId>com.wadpam.guja</groupId>
             <artifactId>guja-core</artifactId>
-            <version>0.8.2-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>com.wadpam.guja</groupId>
             <artifactId>guja-base</artifactId>
-            <version>0.8.2-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>com.wadpam.guja</groupId>
             <artifactId>guja-gae</artifactId>
-            <version>0.8.2-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>net.sf.mardao</groupId>
+            <artifactId>mardao-core</artifactId>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>

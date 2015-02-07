@@ -19,7 +19,10 @@
         <dependency>
             <groupId>com.wadpam.guja</groupId>
             <artifactId>guja-core</artifactId>
-            <version>0.8.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.mardao</groupId>
+            <artifactId>mardao-core</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

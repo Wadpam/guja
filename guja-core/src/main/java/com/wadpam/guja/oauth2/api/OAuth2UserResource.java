@@ -25,11 +25,13 @@ package com.wadpam.guja.oauth2.api;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.wadpam.guja.crud.CrudResource;
+import com.wadpam.guja.dao.DaoBuilder;
+import com.wadpam.guja.dao.DaoBuilderFactory;
 import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.oauth2.dao.DOAuth2UserDaoBean;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
-import com.wadpam.guja.web.JsonCharacterEncodingResponseFilter;
 import com.wadpam.guja.oauth2.web.OAuth2Filter;
+import com.wadpam.guja.web.JsonCharacterEncodingResponseFilter;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +42,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Collection;
 
@@ -53,7 +56,7 @@ import java.util.Collection;
 @Path("api/oauth2user")
 @Produces(JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8)
 @RolesAllowed({"ROLE_ADMIN"})
-public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, DOAuth2UserDaoBean> {
+public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, String, DaoBuilder<DOAuth2User, Long, String>> {
 
   public static final String ROLE_USER = "ROLE_USER";
   public static final String ROLE_ADMIN = "ROLE_ADMIN";
@@ -64,8 +67,8 @@ public class OAuth2UserResource extends CrudResource<DOAuth2User, Long, DOAuth2U
 
 
   @Inject
-  public OAuth2UserResource(DOAuth2UserDaoBean dao) {
-    super(dao);
+  public OAuth2UserResource(DOAuth2UserDaoBean dao, DaoBuilderFactory builderFactory) {
+    super(builderFactory.<DOAuth2User, Long, String, Void, Serializable>create(dao, null));
   }
 
   @GET
