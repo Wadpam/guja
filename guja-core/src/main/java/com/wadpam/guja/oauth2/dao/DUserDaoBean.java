@@ -24,6 +24,7 @@ package com.wadpam.guja.oauth2.dao;
 
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.wadpam.guja.oauth2.domain.DUser;
 import net.sf.mardao.core.CursorPage;
 import net.sf.mardao.core.filter.Filter;
@@ -48,7 +49,6 @@ public class DUserDaoBean extends GeneratedDUserDaoImpl {
     super(supplier);
   }
 
-  // TODO Consider caching on username
 
   public CursorPage<DUser> queryFriends(Long id, int pageSize, String cursorKey) {
     return queryPage(false, pageSize, null,
@@ -60,7 +60,7 @@ public class DUserDaoBean extends GeneratedDUserDaoImpl {
 
   public CursorPage<DUser> queryByMatchingEmail(String email, int pageSize, String cursorKey) {
     // GAE workaround for LIKE queries
-    // Search for emails that are equal or bigger than [email] AND smaller than [email+\uFFFD
+    // Search for emails that are equal or bigger than [email] AND smaller than email+\uFFFD
     return queryPage(false, pageSize, null,
         DUserMapper.Field.EMAIL.getFieldName(), false,
         null, false,

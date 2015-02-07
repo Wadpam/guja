@@ -64,7 +64,6 @@ public class DConnectionDaoBean extends GeneratedDConnectionDaoImpl {
   @CacheResult
   @Override
   public DConnection findByAccessToken(@CacheKey String accessToken) {
-    //checkNotNull(accessToken); // Fail quick
     return super.findByAccessToken(accessToken);
   }
 

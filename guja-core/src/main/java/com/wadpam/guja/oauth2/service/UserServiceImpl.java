@@ -28,10 +28,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.wadpam.guja.environment.ServerEnvironment;
-import com.wadpam.guja.exceptions.ConflictRestException;
-import com.wadpam.guja.exceptions.InternalServerErrorRestException;
-import com.wadpam.guja.exceptions.NotFoundRestException;
-import com.wadpam.guja.exceptions.UnauthorizedRestException;
+import com.wadpam.guja.exceptions.*;
 import com.wadpam.guja.i18n.Localization;
 import com.wadpam.guja.i18n.PropertyFileLocalizationBuilder;
 import com.wadpam.guja.oauth2.api.OAuth2UserResource;
@@ -51,7 +48,6 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -72,6 +68,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   private DUserDaoBean userDao;
 
   private boolean shouldVerifyAccountCreation = true;
+  private boolean shouldUseEmailAsUsername = false;
 
   private String verifyAccountTemplate = VELOCITY_TEMPLATE_VERIFY_ACCOUNT;
   private String changeEmailTemplate = VELOCITY_TEMPLATE_CHANGE_EMAIL;
@@ -113,17 +110,21 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Override
   public DUser signup(DUser user) {
 
-    // Check if username already exists
-    DUser existingUser = userDao.findByUsername(user.getUsername()); // Would be good if we can change to async request
-    if (null != existingUser && existingUser.getState() == DUser.UNVERIFIED_STATE) {
-      user.setId(existingUser.getId());
-    } else if (null != existingUser) {
-      LOGGER.info("Username already taken {}", user.getUsername());
-      throw new ConflictRestException("Username already taken");
+    DUser existingUser;
+
+    if (!shouldUseEmailAsUsername) {
+      // Check if username already exists
+      existingUser = userDao.findByUsername(user.getUsername()); // TODO Change to asynch request
+      if (null != existingUser && existingUser.getState() == DUser.UNVERIFIED_STATE) {
+        user.setId(existingUser.getId());
+      } else if (null != existingUser) {
+        LOGGER.info("Username already taken {}", user.getUsername());
+        throw new ConflictRestException("Username already taken");
+      }
     }
 
     // Check if email already exists
-    existingUser = userDao.findByEmail(user.getEmail()); // Would be good if we can change to async request
+    existingUser = userDao.findByEmail(user.getEmail()); // TODO Change to asynch request
     if (null != existingUser && existingUser.getState() == DUser.UNVERIFIED_STATE &&
         (null == user.getId() || user.getId().equals(existingUser.getId()))) {
       // Either no match when finding by username or make sure the email belong to the same user as found when finding by username
@@ -142,16 +143,12 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     }
     user.setPassword(encodedPassword);
 
-    // Lowercase email to enable search
-    user.setEmail(user.getEmail().toLowerCase());
-
     user.setRoles(OAuth2UserResource.DEFAULT_ROLES_USER);
 
     // Is email validation enforced?
     user.setState((!shouldVerifyAccountCreation || severEnvironment.isDevEnvironment())
         ? DUser.ACTIVE_STATE : DUser.UNVERIFIED_STATE);
 
-    // Save
     put(user);
 
     if (shouldVerifyAccountCreation) {
@@ -215,7 +212,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     DUser user = getById(userId); // Will throw 404 if not found
     if (user.getState() == DUser.ACTIVE_STATE) {
       // User is already activated.
-      // Probably clicked on an old link, do nothing
+      // Probably clicked on an old link, just remove the token
       tokenCache.removeToken(tokenKey(userId, TokenType.ACCOUNT));
       return true;
     } else if (tokenCache.validateToken(tokenKey(userId, TokenType.ACCOUNT), token)) {
@@ -272,9 +269,28 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   public boolean confirmEmailAddressChangeUsingToken(Long userId, String token) {
     Optional<Object> newEmailAddress = tokenCache.getContextForToken(tokenKey(userId, TokenType.EMAIL), token);
     if (newEmailAddress.isPresent()) {
-      DUser user = getById(userId);
-      user.setEmail((String)newEmailAddress.get());
+
+      Future<DUser> futureUser = getAsyncById(userId); // Non blocking
+
+      // Check that email is unique
+      // Might be someone else that registered the email since the confirmation email was sent out
+      String newEmail = (String)newEmailAddress.get();
+      DUser user = userDao.findByEmail(newEmail); // Blocking
+      if (null != user) {
+        LOGGER.info("Email already taken {}", user.getEmail());
+        throw new ConflictRestException("Email already taken");
+      }
+
+      try {
+        user = futureUser.get(); // Blocking
+      } catch (Exception e) {
+        LOGGER.error("Failed to read async from datastore {}", e);
+        throw new InternalServerErrorRestException("Failed to read async from datastore");
+      }
+
+      user.setEmail(newEmail);
       put(user);
+
       return true;
     } else {
       LOGGER.debug("No new email was found in cache or link expired");
@@ -321,9 +337,14 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Override
   public void changeUsername(Long userId, String newUsername) {
 
+    if (shouldUseEmailAsUsername) {
+      LOGGER.info("Using email as username, not allowed to change username");
+      throw new BadRequestRestException("Using email as username, not allowed to change username");
+    }
+
     Future<DUser> futureUser = getAsyncById(userId); // Non blocking
 
-    // Check that email is unique
+    // Check that username is unique
     DUser user = userDao.findByUsername(newUsername); // Blocking
     if (null != user) {
       LOGGER.info("Username already taken {}", user.getEmail());
@@ -360,9 +381,13 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     return admin;
   }
 
-  private Long put(DUser dUser) {
+  private Long put(DUser user) {
     try {
-      return userDao.put(dUser);
+      if (shouldUseEmailAsUsername) {
+        // Keep username and email in synch
+        user.setUsername(user.getEmail());
+      }
+      return userDao.put(user);
     } catch (IOException e) {
       LOGGER.error("Failed to save entity {}", e);
       throw new InternalServerErrorRestException("Failed to save user entity");
@@ -425,7 +450,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   @Override
   public CursorPage<DUser> findMatchingUsersByEmail(String email, int pageSize, String cursorKey) {
-    return userDao.queryByMatchingEmail(email.toLowerCase(), pageSize, cursorKey);
+    return userDao.queryByMatchingEmail(email, pageSize, cursorKey);
   }
 
   @Override
@@ -445,7 +470,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     existingUser.setCity(user.getCity());
     existingUser.setCountry(user.getCountry());
     existingUser.setDisplayName(user.getDisplayName());
-    existingUser.setEmail(user.getEmail().toLowerCase());
+    existingUser.setEmail(user.getEmail());
     existingUser.setFirstName(user.getFirstName());
     existingUser.setLastName(user.getLastName());
     existingUser.setPhoneNumber1(user.getPhoneNumber1());
@@ -482,6 +507,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
     DUser user = userDao.findByUsername(username);
     if (null == user || user.getState() != DUser.ACTIVE_STATE) {
+      LOGGER.debug("Username not found");
       return null;
     }
 
@@ -511,6 +537,11 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   }
 
   @Inject(optional = true)
+  public void setUseEmailAsUsername(@Named("app.email.useAsUsername") boolean useEmailAsUsername) {
+    this.shouldUseEmailAsUsername = useEmailAsUsername;
+  }
+
+  @Inject(optional = true)
   public void setVerifyAccountTemplate(@Named("app.template.verifyAccount") String verifyAccountTemplate) {
     this.verifyAccountTemplate = verifyAccountTemplate;
   }
@@ -524,4 +555,5 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   public void setVerifyEmaildTemplate(@Named("app.template.changeEmail") String changeEmailTemplate) {
     this.changeEmailTemplate = changeEmailTemplate;
   }
+
 }

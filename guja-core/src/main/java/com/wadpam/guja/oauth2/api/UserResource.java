@@ -23,6 +23,7 @@ package com.wadpam.guja.oauth2.api;
  */
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.wadpam.guja.exceptions.BadRequestRestException;
 import com.wadpam.guja.oauth2.domain.DUser;
 import com.wadpam.guja.oauth2.service.UserService;
@@ -64,6 +65,8 @@ public class UserResource {
 
   private UserService userService;
 
+  private boolean shouldUseEmailAsUsername;
+
 
   @Inject
   public UserResource(UserService userService) {
@@ -83,15 +86,11 @@ public class UserResource {
   @PermitAll
   public Response signup(DUser user, @Context UriInfo uriInfo) {
 
-    LOGGER.debug("Signup user {}", user.getUsername());
+    LOGGER.debug("Sign up user {}", user.getUsername());
 
-    if (null == user.getUsername() ||
-        null == user.getPassword() ||
-        null == user.getEmail()) {
-      throw new BadRequestRestException("Missing mandatory parameters");
+    if (!shouldUseEmailAsUsername) {
+      checkUsernameFormat(user.getUsername());
     }
-
-    checkUsernameFormat(user.getUsername());
     checkPasswordFormat(user.getPassword());
     checkEmailFormat(user.getEmail());
 
@@ -104,25 +103,24 @@ public class UserResource {
     return Response.created(uriBuilder.build())
         .entity(user.getId())
         .build();
-
   }
 
   private static void checkUsernameFormat(String username) {
-    if (!USERNAME_PATTERN.matcher(username).matches()) {
+    if (null == username || !USERNAME_PATTERN.matcher(username).matches()) {
       LOGGER.info("Invalid username format {}", username);
       throw new BadRequestRestException(String.format("Invalid username format %s", username));
     }
   }
 
   private static void checkPasswordFormat(String password) {
-    if (!PASSWORD_PATTERN.matcher(password).matches()) {
+    if (null == password || !PASSWORD_PATTERN.matcher(password).matches()) {
       LOGGER.info("Invalid password format {}", password);
       throw new BadRequestRestException(String.format("Invalid password format %s", password));
     }
   }
 
   private static void checkEmailFormat(String email) {
-    if (!EMAIL_PATTERN.matcher(email).matches()) {
+    if (null == email || !EMAIL_PATTERN.matcher(email).matches()) {
       LOGGER.info("Invalid email format {}", email);
       throw new BadRequestRestException(String.format("Invalid email format %s", email));
     }
@@ -182,7 +180,6 @@ public class UserResource {
     }
 
     return Response.ok(page).build();
-
   }
 
   /**
@@ -201,7 +198,6 @@ public class UserResource {
 
     return Response.ok(page).build();
   }
-
 
   /**
    * Allow a user to delete their own account.
@@ -247,7 +243,7 @@ public class UserResource {
                          @Context SecurityContext securityContext,
                          DUser user) {
     checkNotNull(id);
-    checkEmailFormat(user.getEmail());
+    // Username and email will never be updated, no need to check format
 
     user = userService.update(id, user, securityContext.isUserInRole(OAuth2UserResource.ROLE_ADMIN));
 
@@ -346,7 +342,7 @@ public class UserResource {
   @Path("{id}/username")
   @RolesAllowed({"ROLE_ADMIN"})
   public Response changeUsername(@PathParam("id") Long id, UsernameRequest usernameRequest) {
-    checkNotNull(usernameRequest.getUsername());
+    checkUsernameFormat(usernameRequest.username);
 
     userService.changeUsername(id, usernameRequest.getUsername());
 
@@ -493,6 +489,11 @@ public class UserResource {
 
     boolean isSuccess = userService.confirmEmailAddressChangeUsingToken(userId, request.getToken());
     return isSuccess ? Response.noContent().build() : Response.status(Response.Status.BAD_REQUEST).build();
+  }
+
+  @Inject(optional = true)
+  public void setUseEmailAsUsername(@Named("app.email.useAsUsername") boolean useEmailAsUsername) {
+    this.shouldUseEmailAsUsername = useEmailAsUsername;
   }
 
   public static class UsernameRequest {
