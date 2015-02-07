@@ -40,16 +40,16 @@ public class PropertyFileLocalization extends AbstractLocalization {
   private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFileLocalization.class);
 
   private ResourceBundle resourceBundle;
+  private final Locale locale;
 
   public PropertyFileLocalization(String bundleName, Locale locale) {
-
+    this.locale = locale;
     try {
-      resourceBundle = ResourceBundle.getBundle(checkNotNull(bundleName), locale);
+      this.resourceBundle = ResourceBundle.getBundle(checkNotNull(bundleName), locale);
     } catch (MissingResourceException e) {
       LOGGER.warn("Resource bundle {} not found", bundleName);
       resourceBundle = null;
     }
-
   }
 
   @Override
@@ -75,7 +75,7 @@ public class PropertyFileLocalization extends AbstractLocalization {
 
   @Override
   public Locale getLocale() {
-    return null != resourceBundle ? resourceBundle.getLocale() : Locale.getDefault();
+    return locale;
   }
 
 }
