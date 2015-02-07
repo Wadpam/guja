@@ -9,7 +9,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>guja-be-war</artifactId>
+    <artifactId>guja-appengine-war</artifactId>
     <packaging>war</packaging>
 
 

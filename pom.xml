@@ -16,8 +16,8 @@
         <module>guja-core</module>
         <module>guja-base</module>
         <module>guja-gae</module>
-        <module>guja-be-war</module>
-        <module>guja-be-ear</module>
+        <module>guja-appengine-war</module>
+        <module>guja-appengine-ear</module>
     </modules>
 
     <properties>
@@ -37,8 +37,8 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>guja-be-war</artifactId>
-                <version>0.8.2-SNAPSHOT</version>
+                <artifactId>guja-appengine-war</artifactId>
+                <version>${project.version}</version>
                 <type>war</type>
             </dependency>
 
