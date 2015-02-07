@@ -319,6 +319,30 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   }
 
   @Override
+  public void changeUsername(Long userId, String newUsername) {
+
+    Future<DUser> futureUser = getAsyncById(userId); // Non blocking
+
+    // Check that email is unique
+    DUser user = userDao.findByUsername(newUsername); // Blocking
+    if (null != user) {
+      LOGGER.info("Username already taken {}", user.getEmail());
+      throw new ConflictRestException("Username already taken");
+    }
+
+    try {
+      user = futureUser.get(); // Blocking
+    } catch (Exception e) {
+      LOGGER.error("Failed to read async from datastore {}", e);
+      throw new InternalServerErrorRestException("Failed to read async from datastore");
+    }
+
+    user.setUsername(newUsername);
+    put(user);
+
+  }
+
+  @Override
   public DUser createDefaultAdmin() {
 
     DUser admin = userDao.findByUsername(DEFAULT_ADMIN_USERNAME);

@@ -153,8 +153,8 @@ public class UserResource {
   @Path("me")
   @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
   public Response readMe(@Context HttpServletRequest request) throws IOException {
-    Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
-    return read(id);
+    Long userId = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
+    return read(userId);
   }
 
   /**
@@ -174,7 +174,7 @@ public class UserResource {
 
     final CursorPage<DUser> page;
     if (null != email) {
-       page = userService.findMatchingUsersByEmail(email, pageSize, cursorKey);
+      page = userService.findMatchingUsersByEmail(email, pageSize, cursorKey);
     } else if (null != username) {
       page = userService.findMatchingUsersByUserName(username, pageSize, cursorKey);
     } else {
@@ -212,8 +212,8 @@ public class UserResource {
   @Path("me")
   @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
   public Response delete(@Context HttpServletRequest request) {
-    Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
-    return delete(id);
+    Long userId = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
+    return delete(userId);
   }
 
   /**
@@ -278,14 +278,14 @@ public class UserResource {
                            @Context SecurityContext securityContext,
                            DUser user) {
 
-    Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
+    Long userId = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
     if (null == user.getId()) {
-      user.setId(id);
-    } else if (!user.getId().equals(id)) {
+      user.setId(userId);
+    } else if (!user.getId().equals(userId)) {
       throw new BadRequestRestException("User ids does not match");
     }
 
-    return update(id, uriInfo, securityContext, user);
+    return update(userId, uriInfo, securityContext, user);
   }
 
   /**
@@ -302,8 +302,8 @@ public class UserResource {
                               @QueryParam("pageSize") @DefaultValue("10") int pageSize,
                               @QueryParam("cursorKey") String cursorKey) {
 
-    Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
-    CursorPage<DUser> page = userService.getFriendsWith(id, pageSize, cursorKey);
+    Long userId = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
+    CursorPage<DUser> page = userService.getFriendsWith(userId, pageSize, cursorKey);
 
     // Only return basic user information about your friends
     Collection<DUser> users = new ArrayList<>();
@@ -319,6 +319,41 @@ public class UserResource {
   }
 
   /**
+   * Change current users username.
+   * The username must be unique
+   *
+   * @param usernameRequest new username
+   * @return 200 if success
+   *         409 if username is not unique
+   */
+  @POST
+  @Path("me/username")
+  @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
+  public Response changeUsername(@Context HttpServletRequest request, UsernameRequest usernameRequest) {
+    Long userId = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
+    return changeUsername(userId, usernameRequest);
+  }
+
+  /**
+   * Change a users username.
+   * The username must be unique
+   *
+   * @param usernameRequest new username
+   * @return 200 if success
+   *         409 if username is not unique
+   */
+  @POST
+  @Path("{id}/username")
+  @RolesAllowed({"ROLE_ADMIN"})
+  public Response changeUsername(@PathParam("id") Long id, UsernameRequest usernameRequest) {
+    checkNotNull(usernameRequest.getUsername());
+
+    userService.changeUsername(id, usernameRequest.getUsername());
+
+    return Response.ok(id).build();
+  }
+
+  /**
    * Change my password. Both the old and new password must be provided.
    *
    * @param passwordRequest old and new password
@@ -328,16 +363,14 @@ public class UserResource {
   @Path("me/password")
   @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
   public Response changePassword(@Context HttpServletRequest request, PasswordRequest passwordRequest) {
-
     checkPasswordFormat(passwordRequest.getNewPassword());
     checkNotNull(passwordRequest.getOldPassword());
 
     // Only allow changing your own password
-    Long id = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
-    userService.changePassword(id, passwordRequest.oldPassword, passwordRequest.getNewPassword());
+    Long userId = (Long) request.getAttribute(OAuth2Filter.NAME_USER_ID);
+    userService.changePassword(userId, passwordRequest.oldPassword, passwordRequest.getNewPassword());
 
     return Response.noContent().build();
-
   }
 
   /**
@@ -462,6 +495,21 @@ public class UserResource {
     return isSuccess ? Response.noContent().build() : Response.status(Response.Status.BAD_REQUEST).build();
   }
 
+  public static class UsernameRequest {
+
+    public UsernameRequest() {
+    }
+
+    private String username;
+
+    public String getUsername() {
+      return username;
+    }
+
+    public void setUsername(String username) {
+      this.username = username;
+    }
+  }
 
   public static class EmailRequest {
 

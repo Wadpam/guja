@@ -174,4 +174,13 @@ public interface UserService {
    * @return page of users
    */
   CursorPage<DUser> getFriendsWith(Long id, int pageSize, String cursorKey);
+
+  /**
+   * Change a users username.
+   * The username must be unique
+   * @param userId unique user id
+   * @param newUsername new unique user name
+   */
+  void changeUsername(Long userId, String newUsername);
+
 }
