@@ -25,8 +25,8 @@
   <display-name>appengine-modules-ear</display-name>
   <module>
     <web>
-      <web-uri>guja-be-war-0.0.6-SNAPSHOT.war</web-uri>
-      <context-root>/guja-be-wajar</context-root>
+      <web-uri>guja-appengine-war-${project.version}.war</web-uri>
+      <context-root>/guja-appengine-war</context-root>
     </web>
   </module>
   <library-directory>lib</library-directory>

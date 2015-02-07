@@ -8,7 +8,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>guja-be-ear</artifactId>
+    <artifactId>guja-appengine-ear</artifactId>
     <packaging>ear</packaging>
 
     <build>
@@ -18,6 +18,7 @@
                 <artifactId>maven-ear-plugin</artifactId>
                 <version>2.8</version>
                 <configuration>
+                    <filtering>true</filtering>
                     <version>5</version>
                     <defaultLibBundleDir>lib</defaultLibBundleDir>
                     <unpackTypes>war</unpackTypes>
@@ -41,7 +42,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>guja-be-war</artifactId>
+            <artifactId>guja-appengine-war</artifactId>
             <type>war</type>
         </dependency>
     </dependencies>
