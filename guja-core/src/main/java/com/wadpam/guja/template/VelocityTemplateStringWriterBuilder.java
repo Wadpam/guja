@@ -15,7 +15,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Generate localised string writers based on velocity templates, locale and velocity contexts.
  *
- * @mattiaslevin
+ * @author mattiaslevin
  */
 public class VelocityTemplateStringWriterBuilder {
 
