@@ -27,7 +27,7 @@ import java.util.Objects;
 
 
 /**
- * Triplet tuple implementation
+ * Triplet tuple implementation.
  *
  * @author mattiaslevin
  * @author osandstrom
