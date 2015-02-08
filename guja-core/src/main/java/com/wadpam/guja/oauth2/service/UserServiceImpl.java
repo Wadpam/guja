@@ -110,8 +110,9 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Override
   public DUser signup(DUser user) {
 
-    DUser existingUser;
+    lowercaseEmail(user);
 
+    DUser existingUser;
     if (!shouldUseEmailAsUsername) {
       // Check if username already exists
       existingUser = userDao.findByUsername(user.getUsername()); // TODO Change to asynch request
@@ -157,6 +158,12 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     }
 
     return user;
+  }
+
+  private static void lowercaseEmail(DUser user) {
+    if (null != user && null != user.getEmail()) {
+      user.setEmail(user.getEmail().toLowerCase());
+    }
   }
 
   private enum TokenType {
@@ -230,6 +237,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Override
   public boolean changeEmailAddress(Long userId, String newEmailAddress) {
 
+    newEmailAddress = newEmailAddress.toLowerCase();
+
     Future<DUser> futureUser = getAsyncById(userId); // Non blocking
 
     // Check that email is unique
@@ -301,7 +310,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Override
   public void resetPassword(String email) {
 
-    DUser user = getByEmail(email); // Throw 404 if not found
+    DUser user = getByEmail(email.toLowerCase()); // Throw 404 if not found
 
     Localization localization = localizationBuilderProvider.get().build();
     String subject = localization.getMessage("restPassword", "Reset password", user.getUsername());
@@ -410,7 +419,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   }
 
-  public Future<DUser> getAsyncById(Long id) {
+  private Future<DUser> getAsyncById(Long id) {
     try {
       return userDao.getAsync(null, id);
     } catch (IOException e) {
@@ -450,7 +459,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   @Override
   public CursorPage<DUser> findMatchingUsersByEmail(String email, int pageSize, String cursorKey) {
-    return userDao.queryByMatchingEmail(email, pageSize, cursorKey);
+    return userDao.queryByMatchingEmail(email.toLowerCase(), pageSize, cursorKey);
   }
 
   @Override
@@ -470,7 +479,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     existingUser.setCity(user.getCity());
     existingUser.setCountry(user.getCountry());
     existingUser.setDisplayName(user.getDisplayName());
-    existingUser.setEmail(user.getEmail());
+    existingUser.setEmail(user.getEmail().toLowerCase());
     existingUser.setFirstName(user.getFirstName());
     existingUser.setLastName(user.getLastName());
     existingUser.setPhoneNumber1(user.getPhoneNumber1());
@@ -522,6 +531,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   @Override
   public DOAuth2User putUser(DOAuth2User user) {
+    lowercaseEmail((DUser) user);
     put((DUser) user);
     return user;
   }
