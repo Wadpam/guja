@@ -147,7 +147,7 @@ $('#reset-password-button').on('click', function () {
     var idFromQS = $.getQueryString("id");
     var tokenFromQS = $.getQueryString("token");
     var languageFromQS = $.getQueryString("language");
-    var newPassword =  $("#new-password").val();
+    var newPassword =  $("#newPassword").val();
 
     localizeValidationMessages(languageFromQS);
 
