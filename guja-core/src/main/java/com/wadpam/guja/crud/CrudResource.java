@@ -23,9 +23,9 @@ package com.wadpam.guja.crud;
  */
 
 import com.google.inject.persist.Transactional;
+import com.wadpam.guja.dao.DaoBuilder;
+import com.wadpam.guja.dao.QueryPage;
 import com.wadpam.guja.web.JsonCharacterEncodingResponseFilter;
-import net.sf.mardao.core.CursorPage;
-import net.sf.mardao.dao.CrudDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,26 +47,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8)
-public class CrudResource<T, ID extends Serializable, D extends CrudDao<T, ID>> {
+public class CrudResource<T, ID extends Serializable, C extends Serializable, B extends DaoBuilder<T, ID, C>> {
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(CrudResource.class);
 
-  protected final D dao;
+  protected final B builder;
 
-  public CrudResource(D dao) {
-    this.dao = dao;
+  public CrudResource(B builder) {
+    this.builder = builder;
   }
 
   @GET
   @Path("count")
-  public int count() {
-    return dao.count(null);
+  public int count() throws IOException {
+    return builder.count(null);
   }
 
   @POST
   @Transactional
   public Response create(T entity) throws URISyntaxException, IOException {
-    final ID id = dao.put(null, null, entity);
+    final ID id = builder.put(null, null, entity);
     URI uri = new URI(id.toString());
     return Response.created(uri).entity(id).build();
   }
@@ -75,7 +75,7 @@ public class CrudResource<T, ID extends Serializable, D extends CrudDao<T, ID>> 
   @Path("{id}")
   public Response delete(@PathParam("id") ID id) throws IOException {
     checkNotNull(id);
-    dao.delete(null, id);
+    builder.delete(null, id);
     return Response.noContent().build();
   }
 
@@ -83,21 +83,21 @@ public class CrudResource<T, ID extends Serializable, D extends CrudDao<T, ID>> 
   @Path("{id}")
   public Response read(@PathParam("id") ID id) throws IOException {
     checkNotNull(id);
-    final T entity = dao.get(null, id);
+    final T entity = builder.get(null, id);
     return null != entity ? Response.ok(entity).build() : Response.status(Response.Status.NOT_FOUND).build();
   }
 
   @GET
   public Response readPage(@QueryParam("pageSize") @DefaultValue("10") int pageSize,
-                           @QueryParam("cursorKey") String cursorKey) {
-    final CursorPage<T> page = dao.queryPage(null, pageSize, cursorKey);
+                           @QueryParam("cursorKey") C cursorKey) {
+    final QueryPage<T, C> page = builder.query().pageSize(pageSize).asPage(cursorKey);
     return Response.ok(page).build();
   }
 
   @POST
   @Path("{id}")
   public Response update(@PathParam("id") ID id, T entity) throws URISyntaxException, IOException {
-    dao.put(null, id, entity);
+    builder.put(null, id, entity);
     URI uri = new URI(id.toString());
     return Response.ok().contentLocation(uri).build();
   }

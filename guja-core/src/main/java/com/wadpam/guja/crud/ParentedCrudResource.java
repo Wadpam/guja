@@ -23,9 +23,10 @@ package com.wadpam.guja.crud;
  */
 
 import com.google.inject.persist.Transactional;
+import com.wadpam.guja.dao.DaoBuilder;
+import com.wadpam.guja.dao.ParentDaoBuilder;
+import com.wadpam.guja.dao.QueryPage;
 import com.wadpam.guja.web.JsonCharacterEncodingResponseFilter;
-import net.sf.mardao.core.CursorPage;
-import net.sf.mardao.dao.AbstractDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,16 +48,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8)
-public class ParentedCrudResource<PT, PID extends Serializable, P extends AbstractDao<PT, PID>, T, ID extends Serializable,
-    D extends AbstractDao<T, ID>> {
+public class ParentedCrudResource<C extends Serializable, PT, PID extends Serializable, P extends ParentDaoBuilder<Void, Serializable, C, PT, PID>,
+        T, ID extends Serializable, B extends DaoBuilder<T, ID, C>> {
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(CrudResource.class);
-  protected final D dao;
-  protected final P parentDao;
+  protected final B builder;
+  protected final P parentBuilder;
 
-  public ParentedCrudResource(P parentDao, D dao) {
-    this.parentDao = parentDao;
-    this.dao = dao;
+  public ParentedCrudResource(P parentBuilder, B builder) {
+    this.parentBuilder = parentBuilder;
+    this.builder = builder;
   }
 
   @POST
@@ -65,10 +66,10 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
     checkNotNull(parentId);
 
     // Objects such as parentKey cannot be properly JSONed:
-    final Object parentKey = parentDao.getKey(parentId);
-    dao.setParentKey(entity, parentKey);
+    final Object parentKey = parentBuilder.getKey(parentId);
+    builder.setParentKey(entity, parentKey);
 
-    final ID id = dao.put(entity);
+    final ID id = builder.put(parentKey, null, entity);
     URI uri = new URI(id.toString());
     return Response.created(uri).entity(id).build();
   }
@@ -80,8 +81,8 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
     checkNotNull(parentId);
     checkNotNull(id);
 
-    final Object parentKey = parentDao.getKey(null, parentId);
-    dao.delete(parentKey, id);
+    final Object parentKey = parentBuilder.getKey(parentId);
+    builder.delete(parentKey, id);
 
     return Response.noContent().build();
   }
@@ -93,8 +94,8 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
     checkNotNull(parentId);
     checkNotNull(id);
 
-    final Object parentKey = parentDao.getKey(null, parentId);
-    final T entity = dao.get(parentKey, id);
+    final Object parentKey = parentBuilder.getKey(parentId);
+    final T entity = builder.get(parentKey, id);
     if (null == entity) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
@@ -104,11 +105,11 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
   @GET
   public Response readPage(@PathParam("parentId") PID parentId,
                            @QueryParam("pageSize") @DefaultValue("10") int pageSize,
-                           @QueryParam("cursorKey") String cursorKey) {
+                           @QueryParam("cursorKey") C cursorKey) {
     checkNotNull(parentId);
 
-    final Object parentKey = parentDao.getKey(null, parentId);
-    final CursorPage<T> page = dao.queryPage(parentKey, pageSize, cursorKey);
+    final Object parentKey = parentBuilder.getKey(parentId);
+    final QueryPage<T, C> page = builder.query().parent(parentKey).pageSize(pageSize).asPage(cursorKey);
     return Response.ok(page).build();
   }
 
@@ -120,14 +121,10 @@ public class ParentedCrudResource<PT, PID extends Serializable, P extends Abstra
     checkNotNull(id);
 
     // Objects such as parentKey cannot be properly JSONed:
-    final Object parentKey = parentDao.getKey(null, parentId);
-    dao.setParentKey(entity, parentKey);
+    final Object parentKey = parentBuilder.getKey(parentId);
+    builder.setParentKey(entity, parentKey);
 
-    final ID eId = (ID) dao.getId(entity);
-    if (!id.equals(eId)) {
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    }
-    dao.put(entity);
+    builder.put(parentKey, id, entity);
     URI uri = new URI(id.toString());
     return Response.ok().contentLocation(uri).build();
   }

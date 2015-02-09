@@ -24,13 +24,14 @@ package com.wadpam.guja.oauth2.api;
 
 import com.google.inject.Inject;
 import com.wadpam.guja.crud.CrudResource;
+import com.wadpam.guja.dao.DaoBuilder;
+import com.wadpam.guja.dao.DaoBuilderFactory;
 import com.wadpam.guja.oauth2.dao.DConnectionDaoBean;
 import com.wadpam.guja.oauth2.domain.DConnection;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import java.io.Serializable;
 
 
 /**
@@ -41,11 +42,11 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("_adm/connection")
 @PermitAll // This resource is protected in web.xml. Must be GAE app developer to access this resource.
-public class ConnectionResource extends CrudResource<DConnection, Long, DConnectionDaoBean> {
+public class ConnectionResource extends CrudResource<DConnection, Long, String, DaoBuilder<DConnection, Long, String>> {
 
   @Inject
-  public ConnectionResource(DConnectionDaoBean dao) {
-    super(dao);
+  public ConnectionResource(DConnectionDaoBean dao, DaoBuilderFactory builderFactory) {
+    super(builderFactory.<DConnection, Long, String, Void, Serializable>create(dao, null));
   }
 
 }

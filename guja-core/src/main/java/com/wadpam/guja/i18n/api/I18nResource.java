@@ -22,13 +22,17 @@ package com.wadpam.guja.i18n.api;
  * #L%
  */
 
+import com.google.inject.Inject;
 import com.wadpam.guja.crud.CrudResource;
+import com.wadpam.guja.dao.DaoBuilder;
+import com.wadpam.guja.dao.DaoBuilderFactory;
 import com.wadpam.guja.i18n.dao.Di18nDaoBean;
 import com.wadpam.guja.i18n.domain.Di18n;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Singleton;
 import javax.ws.rs.Path;
+import java.io.Serializable;
 
 
 /**
@@ -39,10 +43,11 @@ import javax.ws.rs.Path;
 @Path("api/i18n")
 @Singleton
 @RolesAllowed({"ROLE_ADMIN"})
-public class I18nResource extends CrudResource<Di18n, Long, Di18nDaoBean> {
+public class I18nResource extends CrudResource<Di18n, Long, String, DaoBuilder<Di18n, Long, String>> {
 
-  public I18nResource(Di18nDaoBean dao) {
-    super(dao);
+  @Inject
+  public I18nResource(Di18nDaoBean dao, DaoBuilderFactory builderFactory) {
+    super(builderFactory.<Di18n, Long, String, Void, Serializable>create(dao, null));
   }
 
 }

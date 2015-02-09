@@ -42,7 +42,7 @@ public class DefaultCacheResolver implements CacheResolver {
     final String cacheName = cacheInvocationContext.getCacheName();
     Cache<GeneratedCacheKey, Optional<?>> cache = namespaces.get(cacheName);
     if (null == cache) {
-      LOGGER.debug("Build new dao cache for name {}", cacheName);
+      LOGGER.debug("Build new builder cache for name {}", cacheName);
 
       CacheBuilder<GeneratedCacheKey, Optional<?>> cacheBuilder = cacheBuilderProvider.get().name(cacheName);
       if (cacheConfig.isPresent()) {

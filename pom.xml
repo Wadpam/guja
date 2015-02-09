@@ -33,7 +33,16 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>guja-core</artifactId>
                 <version>${project.version}</version>
-                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.wadpam.guja</groupId>
+                <artifactId>guja-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wadpam.guja</groupId>
+                <artifactId>guja-gae</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -41,6 +50,19 @@
                 <version>${project.version}</version>
                 <type>war</type>
             </dependency>
+
+            <dependency>
+                <groupId>net.sf.mardao</groupId>
+                <artifactId>mardao-core</artifactId>
+                <version>${mardao.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.mardao</groupId>
+                <artifactId>mardao-gae</artifactId>
+                <version>${mardao.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>org.slf4j</groupId>

@@ -8,7 +8,7 @@ import javax.cache.annotation.CacheDefaults;
 import javax.cache.annotation.CacheResult;
 
 /**
- * A page caching mock dao.
+ * A page caching mock builder.
  * @author mattiaslevin
  */
 @CacheDefaults(cacheName = "PagedCachedMockCrudDao")
