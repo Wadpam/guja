@@ -62,6 +62,7 @@ public class GujaGuiceServletContextListener extends GuiceServletContextListener
         new GujaCoreModule(true, true),
         new GujaBaseModule(),
         new GujaGaeModule(),
+        new GujaContactModule(),
         new MardaoDatastoreModule(),
         new CacheAnnotationsModule(),
         new JerseyServletModule() {

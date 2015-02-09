@@ -47,8 +47,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8)
-public class ParentedCrudResource<PT, PID extends Serializable, P extends AbstractDao<PT, PID>, T, ID extends Serializable,
-    D extends AbstractDao<T, ID>> {
+public class ParentedCrudResource<PT, PID extends Serializable, P extends AbstractDao<PT, PID>,
+    T, ID extends Serializable, D extends AbstractDao<T, ID>> {
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(CrudResource.class);
   protected final D dao;

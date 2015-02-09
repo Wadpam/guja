@@ -28,15 +28,16 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
 import com.google.inject.servlet.RequestScoped;
+import com.wadpam.guja.filter.ProtoWrapperResponseFilter;
+import com.wadpam.guja.filter.SkipProtoWrapper;
 import com.wadpam.guja.i18n.PropertyFileLocalizationBuilder;
+import com.wadpam.guja.web.JsonCharacterEncodingResponseFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 
@@ -50,6 +51,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Path("api/version")
 @RequestScoped
 @PermitAll
+@Consumes({ProtoWrapperResponseFilter.APPLICATION_X_PROTOBUF, MediaType.APPLICATION_JSON})
+@Produces({ProtoWrapperResponseFilter.APPLICATION_X_PROTOBUF, JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8})
 public class VersionCheckResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(VersionCheckResource.class);
 
@@ -66,7 +69,6 @@ public class VersionCheckResource {
     this.predicate = predicate;
     this.localizationBuilderProvider = localizationBuilderProvider;
     this.upgradeUrls = parsePropertyMap(upgradeUrls);
-
   }
 
   private static Map<String, String> parsePropertyMap(String formattedMap) {
@@ -102,6 +104,7 @@ public class VersionCheckResource {
 
   }
 
+  @SkipProtoWrapper
   public static class VersionCheckResponse {
     private String localizedMessage;
     private String url;

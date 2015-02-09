@@ -31,7 +31,9 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
+import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Collections;
 
 
 /**
@@ -55,11 +57,8 @@ public class ProtoWrapperResponseFilter implements ContainerResponseFilter {
     Collection<Object> contentTypes = response.getHttpHeaders().get("Content-Type");
     //LOGGER.debug("content types {}", contentTypes);
     if (null != contentTypes) {
-
       for (Object contentType : contentTypes) {
-        if (contentType.equals(APPLICATION_X_PROTOBUF_TYPE) &&
-            // Response entity might be null
-            (null == response.getEntity() || !response.getEntity().getClass().isAnnotationPresent(SkipProtoWrapper.class))) {
+        if (contentType.equals(APPLICATION_X_PROTOBUF_TYPE) && !shouldSkipWrapping(response.getEntity())) {
           LOGGER.debug("Content type is x-protobuf, wrap response entity");
           ResponseCodeEntityWrapper<Object> wrapper = new ResponseCodeEntityWrapper<>(response.getStatus(), response.getEntity());
           response.setEntity(wrapper, response.getEntityType());
@@ -70,7 +69,31 @@ public class ProtoWrapperResponseFilter implements ContainerResponseFilter {
     }
 
     return response;
+  }
 
+  private static boolean shouldSkipWrapping(Object entity) {
+
+    if (null == entity) {
+      return true;
+    }
+
+    Class<?> clazz = entity.getClass();
+    LOGGER.debug("class {}", clazz);
+    if (clazz.isAnnotationPresent(SkipProtoWrapper.class)) {
+      return true;
+    } else if (Collection.class.isAssignableFrom(clazz)) {
+      // Check the elements in the collection
+      Collection collection = (Collection) entity;
+      if (!collection.isEmpty()) {
+        Object element = collection.iterator().next();
+        LOGGER.debug("elements class {}", element.getClass());
+        if (element.getClass().isAnnotationPresent(SkipProtoWrapper.class)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
 }

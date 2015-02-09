@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>guja</artifactId>
+        <groupId>com.wadpam.guja</groupId>
+        <version>0.8.2-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>guja-contact</artifactId>
+    <packaging>jar</packaging>
+
+    <name>guja-contact</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.wadpam.guja</groupId>
+            <artifactId>guja-core</artifactId>
+            <version>0.8.2-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- From parent -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>mardao</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <!-- extra compile step of com.wadpam.guja.domain classes before mardao generator processing -->
+                            <execution>
+                                <id>compile-entities</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <configuration>
+                                    <verbose>true</verbose>
+                                    <includes>
+                                        <include>**/com.wadpam.guja.domain/*.java</include>
+                                    </includes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>net.sf.mardao</groupId>
+                        <artifactId>mardao-maven-plugin</artifactId>
+                        <version>${mardao.version}</version>
+                        <executions>
+                            <execution>
+                                <id>generate-daos</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>process-classes</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <basePackage>com.wadpam.guja</basePackage>
+                            <targetFolder>${project.basedir}/src/main/java</targetFolder>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

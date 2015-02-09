@@ -18,6 +18,7 @@
         <module>guja-gae</module>
         <module>guja-appengine-war</module>
         <module>guja-appengine-ear</module>
+        <module>guja-contact</module>
     </modules>
 
     <properties>
