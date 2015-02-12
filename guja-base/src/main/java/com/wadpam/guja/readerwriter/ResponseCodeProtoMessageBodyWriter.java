@@ -24,7 +24,7 @@ package com.wadpam.guja.readerwriter;
 
 import com.wadpam.guja.filter.ProtoWrapperResponseFilter;
 import com.wadpam.guja.filter.ResponseCodeEntityWrapper;
-import com.wadpam.guja.proto.ResponseCodeProtos;
+import com.wadpam.guja.proto.Protos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,7 @@ public class ResponseCodeProtoMessageBodyWriter implements MessageBodyWriter<Res
   public void writeTo(ResponseCodeEntityWrapper responseCodeEntityWrapper, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     LOGGER.debug("Serialize to protocol buffer");
 
-    ResponseCodeProtos.ResponseCode.Builder builder = ResponseCodeProtos.ResponseCode.newBuilder();
+    Protos.ResponseCode.Builder builder = Protos.ResponseCode.newBuilder();
 
     builder.setResponseCode(responseCodeEntityWrapper.getResponseCode())
         .build()

@@ -24,7 +24,9 @@ package com.wadpam.guja.config;
 
 import com.google.inject.AbstractModule;
 import com.wadpam.guja.api.*;
+import com.wadpam.guja.readerwriter.DiagnosticsProtoMessageBodyReader;
 import com.wadpam.guja.readerwriter.ResponseCodeProtoMessageBodyWriter;
+import com.wadpam.guja.readerwriter.VersionCheckProtoMessageBodyWriter;
 
 
 /**
@@ -47,6 +49,8 @@ public class GujaBaseModule extends AbstractModule {
     bind(VersionCheckResource.VersionCheckPredicate.class).to(SemanticVersionCheckPredicate.class);
 
     bind(ResponseCodeProtoMessageBodyWriter.class);
+    bind(VersionCheckProtoMessageBodyWriter.class);
+    bind(DiagnosticsProtoMessageBodyReader.class);
 
   }
 

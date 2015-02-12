@@ -24,7 +24,7 @@ package com.wadpam.guja.readerwriter;
 
 import com.wadpam.guja.api.DiagnosticsResource;
 import com.wadpam.guja.filter.ProtoWrapperResponseFilter;
-import com.wadpam.guja.proto.DiagnosticsProtos;
+import com.wadpam.guja.proto.Protos;
 
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -56,7 +56,7 @@ public class DiagnosticsProtoMessageBodyReader implements MessageBodyReader<Diag
   @Override
   public DiagnosticsResource.Diagnostics readFrom(Class<DiagnosticsResource.Diagnostics> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
 
-    DiagnosticsProtos.Diagnostics diagnosticsProto = DiagnosticsProtos.Diagnostics.parseFrom(entityStream);
+    Protos.Diagnostics diagnosticsProto = Protos.Diagnostics.parseFrom(entityStream);
 
     DiagnosticsResource.Diagnostics entity = new DiagnosticsResource.Diagnostics();
     entity.setId(diagnosticsProto.getId());
