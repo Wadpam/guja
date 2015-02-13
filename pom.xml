@@ -25,7 +25,7 @@
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
         <gae.version>1.9.10</gae.version>
         <appengine.target.version>1.9.10</appengine.target.version>
-        <mardao.version>3.0.13-SNAPSHOT</mardao.version>
+        <mardao.version>3.0.13</mardao.version>
     </properties>
         
     <dependencyManagement>
