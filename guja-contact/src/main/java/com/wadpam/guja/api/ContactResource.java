@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author mattiaslevin
  */
 @Path("api/contact")
-@PermitAll
 @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
 public class ContactResource extends CrudResource<DContact, Long, DContactDaoBean> {
   protected static final Logger LOGGER = LoggerFactory.getLogger(ContactResource.class);
@@ -42,6 +41,7 @@ public class ContactResource extends CrudResource<DContact, Long, DContactDaoBea
    * @return a contact entity
    */
   @GET
+  @PermitAll
   @Path("uniquetag/{uniqueTag}")
   public Response findByUniqueTag(@PathParam("uniqueTag") String uniqueTag) {
     checkNotNull(uniqueTag);
