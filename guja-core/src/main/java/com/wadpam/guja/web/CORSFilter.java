@@ -13,8 +13,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Convert box requests and responses Content-Type and Accept headers from octet/stream to application/x-protobuf
- * The box modem is not able to set a custom Content-Type or Accept header.
+ * Lightweight CORS filter.
+ *
+ * For a more extensive implementation when this CORS implementation is not enough please
+ * look at https://bitbucket.org/thetransactioncompany/cors-filter.
  *
  * @author mattiaslevin
  */
@@ -23,8 +25,8 @@ public class CORSFilter implements Filter {
   private static final Logger LOGGER = LoggerFactory.getLogger(CORSFilter.class);
 
   private final static String DEFAULT_ALLOWED_ORIGINS = "*";
-  private final static String DEFAULT_ALLOWED_METHODS = "*";
-  private static final String DEFAULT_ALLOWED_HEADERS = "origin, content-type, accept, authorization";
+  private final static String DEFAULT_ALLOWED_METHODS = "GET, POST, DELETE, OPTIONS";
+  private static final String DEFAULT_ALLOWED_HEADERS = "Origin, Content-Type, Accept, Authorization";
 
   private final Provider<ServerEnvironment> environmentProvider;
 
@@ -56,6 +58,8 @@ public class CORSFilter implements Filter {
       response.addHeader("Access-Control-Allow-Origin", DEFAULT_ALLOWED_ORIGINS);
       response.addHeader("Access-Control-Allow-Methods", DEFAULT_ALLOWED_METHODS);
       response.addHeader("Access-Control-Allow-Headers", DEFAULT_ALLOWED_HEADERS);
+      response.addHeader("Access-Control-Allow-Credentials", "true");
+      response.setHeader("Access-Control-Max-Age", "10");
     }
 
     chain.doFilter(request, response);
