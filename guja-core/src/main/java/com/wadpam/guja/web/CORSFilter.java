@@ -23,7 +23,8 @@ public class CORSFilter implements Filter {
   private static final Logger LOGGER = LoggerFactory.getLogger(CORSFilter.class);
 
   private final static String DEFAULT_ALLOWED_ORIGINS = "*";
-  private final static String DEFAULT_ALLOWED_METHODS = "GET, POST, DELETE";
+  private final static String DEFAULT_ALLOWED_METHODS = "*";
+  private static final String DEFAULT_ALLOWED_HEADERS = "origin, content-type, accept, authorization";
 
   private final Provider<ServerEnvironment> environmentProvider;
 
@@ -51,9 +52,10 @@ public class CORSFilter implements Filter {
     HttpServletResponse response = (HttpServletResponse)res;
 
     if (shouldEnableCORS()) {
-      //LOGGER.debug("Set CORS headers");
+      LOGGER.debug("Set CORS headers");
       response.addHeader("Access-Control-Allow-Origin", DEFAULT_ALLOWED_ORIGINS);
       response.addHeader("Access-Control-Allow-Methods", DEFAULT_ALLOWED_METHODS);
+      response.addHeader("Access-Control-Allow-Headers", DEFAULT_ALLOWED_HEADERS);
     }
 
     chain.doFilter(request, response);
