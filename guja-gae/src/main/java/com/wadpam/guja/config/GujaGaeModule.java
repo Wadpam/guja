@@ -25,7 +25,6 @@ package com.wadpam.guja.config;
 import com.google.inject.AbstractModule;
 import com.wadpam.guja.admintask.AdminTaskQueue;
 import com.wadpam.guja.admintask.GAEAdminTaskQueue;
-import com.wadpam.guja.api.GAEBlobResource;
 import com.wadpam.guja.cache.CacheBuilder;
 import com.wadpam.guja.cache.CacheBuilderProvider;
 import com.wadpam.guja.cache.MemCacheBuilderProvider;
@@ -48,8 +47,6 @@ public class GujaGaeModule extends AbstractModule {
     bind(CacheBuilder.class).toProvider(MemCacheBuilderProvider.class);
 
     bind(ServerEnvironment.class).to(GAEServerEnvironment.class);
-
-    bind(GAEBlobResource.class);
 
     bind(AdminTaskQueue.class).to(GAEAdminTaskQueue.class);
 
