@@ -25,12 +25,15 @@ package com.wadpam.guja.i18n;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 
 import static org.junit.Assert.assertTrue;
 
 public class PropertyFileLocalizationTest {
+  private static final Logger LOGGER = LoggerFactory.getLogger(PropertyFileLocalization.class);
 
   private Localization localization;
 
@@ -42,7 +45,7 @@ public class PropertyFileLocalizationTest {
         new Locale.Builder()
             .setLanguage("en")
             .setRegion("US")
-            .build());
+            .build(), new UTF8Control());
 
   }
 
@@ -58,7 +61,7 @@ public class PropertyFileLocalizationTest {
         new Locale.Builder()
             .setLanguage("en")
             .setRegion("US")
-            .build());
+            .build(), new UTF8Control());
 
     assertTrue("default message".equals(localization.getMessage("key1", "default message")));
 
@@ -94,10 +97,24 @@ public class PropertyFileLocalizationTest {
         "i18n.TestBundle",
         new Locale.Builder()
             .setLanguage("sv")
-            .build());
+            .build(), new UTF8Control());
 
     assertTrue("SV value1".equals(localization.getMessage("key1", "default message")));
 
   }
 
+  @Test
+  public void testUTF8PropertyFiles() throws Exception {
+
+    localization = new PropertyFileLocalization(
+        "i18n.TestBundle",
+        new Locale.Builder()
+            .setLanguage("sv")
+            .build(), new UTF8Control());
+
+    String localizedMessage = localization.getMessage("specialChars", "failed");
+    LOGGER.info("åäö", localizedMessage);
+    assertTrue("åäö".equals(localizedMessage));
+
+  }
 }

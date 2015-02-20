@@ -6,6 +6,7 @@ import com.google.inject.name.Named;
 import com.wadpam.guja.oauth2.provider.RequestScopedLocale;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -14,10 +15,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class PropertyFileLocalizationBuilder {
 
+  private static final ResourceBundle.Control DEFAULT_CONTROL = new UTF8Control();
+
   final private Provider<RequestScopedLocale> localeProvider;
 
   private String bundleName;
   private Locale locale;
+  private ResourceBundle.Control control = DEFAULT_CONTROL;
 
   @Inject
   public PropertyFileLocalizationBuilder(Provider<RequestScopedLocale> localeProvider) {
@@ -36,7 +40,7 @@ public class PropertyFileLocalizationBuilder {
 
   public PropertyFileLocalization build() {
     checkNotNull(bundleName);
-    return new PropertyFileLocalization(bundleName, null != locale ? locale : localeProvider.get().getLocale());
+    return new PropertyFileLocalization(bundleName, null != locale ? locale : localeProvider.get().getLocale(), control);
   }
 
   @Inject(optional = true)
