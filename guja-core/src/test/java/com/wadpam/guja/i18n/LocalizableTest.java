@@ -20,7 +20,8 @@ public class LocalizableTest {
         new Locale.Builder()
             .setLanguage("en")
             .setRegion("US")
-            .build(), new UTF8Control());
+            .build()
+    );
   }
 
   @After

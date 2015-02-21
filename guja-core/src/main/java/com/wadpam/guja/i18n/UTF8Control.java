@@ -17,6 +17,8 @@ import java.util.ResourceBundle;
  *
  * I Take not credit. The code is copied from the original implementation and only the stream reading modified.
  *
+ * Please note that ResourceBundle.Control is not allowed by GAE. User the Utf8ResourceBundle instead.
+ *
  * @author mattias
  */
 public class UTF8Control extends ResourceBundle.Control {

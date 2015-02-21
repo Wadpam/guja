@@ -42,10 +42,10 @@ public class PropertyFileLocalization extends AbstractLocalization {
   private ResourceBundle resourceBundle;
   private final Locale locale;
 
-  public PropertyFileLocalization(String bundleName, Locale locale, ResourceBundle.Control control) {
+  public PropertyFileLocalization(String bundleName, Locale locale) {
     this.locale = locale;
     try {
-      this.resourceBundle = ResourceBundle.getBundle(checkNotNull(bundleName), locale, control);
+      this.resourceBundle = Utf8ResourceBundle.getBundle(checkNotNull(bundleName), locale);
     } catch (MissingResourceException e) {
       LOGGER.warn("Resource bundle {} not found", bundleName);
       resourceBundle = null;

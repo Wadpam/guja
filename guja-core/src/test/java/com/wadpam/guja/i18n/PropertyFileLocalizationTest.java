@@ -45,7 +45,9 @@ public class PropertyFileLocalizationTest {
         new Locale.Builder()
             .setLanguage("en")
             .setRegion("US")
-            .build(), new UTF8Control());
+            .build()
+//        new UTF8Control()
+    );
 
   }
 
@@ -61,7 +63,8 @@ public class PropertyFileLocalizationTest {
         new Locale.Builder()
             .setLanguage("en")
             .setRegion("US")
-            .build(), new UTF8Control());
+            .build()
+    );
 
     assertTrue("default message".equals(localization.getMessage("key1", "default message")));
 
@@ -97,7 +100,8 @@ public class PropertyFileLocalizationTest {
         "i18n.TestBundle",
         new Locale.Builder()
             .setLanguage("sv")
-            .build(), new UTF8Control());
+            .build()
+    );
 
     assertTrue("SV value1".equals(localization.getMessage("key1", "default message")));
 
@@ -110,7 +114,8 @@ public class PropertyFileLocalizationTest {
         "i18n.TestBundle",
         new Locale.Builder()
             .setLanguage("sv")
-            .build(), new UTF8Control());
+            .build()
+    );
 
     String localizedMessage = localization.getMessage("specialChars", "failed");
     LOGGER.info("åäö", localizedMessage);
