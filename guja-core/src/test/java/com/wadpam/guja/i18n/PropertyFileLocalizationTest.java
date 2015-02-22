@@ -46,7 +46,6 @@ public class PropertyFileLocalizationTest {
             .setLanguage("en")
             .setRegion("US")
             .build()
-//        new UTF8Control()
     );
 
   }
