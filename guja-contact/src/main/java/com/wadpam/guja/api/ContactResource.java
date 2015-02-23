@@ -4,15 +4,18 @@ import com.google.inject.Inject;
 import com.wadpam.guja.crud.CrudResource;
 import com.wadpam.guja.dao.DContactDaoBean;
 import com.wadpam.guja.domain.DContact;
+import com.wadpam.guja.exceptions.BadRequestRestException;
+import com.wadpam.guja.web.JsonCharacterEncodingResponseFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -25,6 +28,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Path("api/contact")
 @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
+@Produces(JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8)
+@Consumes(JsonCharacterEncodingResponseFilter.APPLICATION_JSON_UTF8)
 public class ContactResource extends CrudResource<DContact, Long, DContactDaoBean> {
   protected static final Logger LOGGER = LoggerFactory.getLogger(ContactResource.class);
 
@@ -32,6 +37,28 @@ public class ContactResource extends CrudResource<DContact, Long, DContactDaoBea
   @Inject
   public ContactResource(DContactDaoBean dao) {
     super(dao);
+  }
+
+  @POST
+  @Override
+  public Response create(DContact contact) throws URISyntaxException, IOException {
+    if (null != contact.getUniqueTag() && null != dao.findByUniqueTag(null, contact.getUniqueTag())) {
+      throw new BadRequestRestException(String.format("Unique tag is already taken %s", contact.getUniqueTag()));
+    }
+    return super.create(contact);
+  }
+
+  @POST
+  @Path("{id}")
+  @Override
+  public Response update(@PathParam("id") Long id, DContact contact) throws URISyntaxException, IOException {
+    if (null != contact.getUniqueTag()) {
+      DContact existingContact = dao.findByUniqueTag(null, contact.getUniqueTag());
+      if (!existingContact.getId().equals(id) || null == contact.getId() || !existingContact.getId().equals(contact.getId())) {
+        throw new BadRequestRestException(String.format("Unique tag is already taken %s", contact.getUniqueTag()));
+      }
+    }
+    return super.update(id, contact);
   }
 
   /**
