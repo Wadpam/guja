@@ -180,6 +180,18 @@ public class DContact extends AbstractLongEntity {
   @Basic
   private String country;
 
+  /**
+   * Latitude
+   */
+  @Basic
+  private Float latitude;
+
+  /**
+   * Longitude
+   */
+  @Basic
+  private Float longitude;
+
 
   /* Setters and getters */
 
@@ -381,5 +393,21 @@ public class DContact extends AbstractLongEntity {
 
   public void setCountry(String country) {
     this.country = country;
+  }
+
+  public Float getLatitude() {
+    return latitude;
+  }
+
+  public void setLatitude(Float latitude) {
+    this.latitude = latitude;
+  }
+
+  public Float getLongitude() {
+    return longitude;
+  }
+
+  public void setLongitude(Float longitude) {
+    this.longitude = longitude;
   }
 }

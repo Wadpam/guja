@@ -22,7 +22,11 @@ package com.wadpam.guja.util;
  * #L%
  */
 
+import com.google.common.collect.Lists;
+
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Holds a Pair of objects.
@@ -36,6 +40,30 @@ public class Pair<M, N> implements Serializable, Comparable<Pair<M, N>> {
   public Pair(M first, N second) {
     this.first = first;
     this.second = second;
+  }
+
+  public static <K, V> Collection<Pair<K, V>> zip(Collection<K> firsts, Collection<V> seconds) {
+    final Collection<Pair<K, V>> zipped = Lists.newArrayList();
+    if (null != firsts && null != seconds) {
+      Iterator<K> firstIterator = firsts.iterator();
+      Iterator<V> secondIterator = seconds.iterator();
+      while (firstIterator.hasNext() && secondIterator.hasNext()) {
+        zipped.add(Pair.of(firstIterator.next(), secondIterator.next()));
+      }
+    }
+    return zipped;
+  }
+
+  public static <K, V> Pair<Collection<K>, Collection<V>> unzip(Collection<Pair<K, V>> pairs) {
+    final Collection<K> firsts = Lists.newArrayList();
+    final Collection<V> seconds = Lists.newArrayList();
+    if (null != pairs) {
+      for (Pair<K, V> pair : pairs) {
+        firsts.add(pair.first());
+        seconds.add(pair.second);
+      }
+    }
+    return Pair.of(firsts, seconds);
   }
 
   public static <K, V> Pair<K, V> of(K first, V second) {

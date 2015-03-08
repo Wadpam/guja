@@ -12,7 +12,7 @@ import com.wadpam.guja.domain.DContact;
 /**
  * The DContact domain-object specific mapping methods go here.
  *
- * Generated on 2015-02-10T00:27:00.783+0100.
+ * Generated on 2015-03-08T21:44:48.699+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DContactMapper
@@ -37,10 +37,14 @@ public class DContactMapper
     FIRSTNAME("firstName"),
     HOMEPHONE("homePhone"),
     LASTNAME("lastName"),
+    LATITUDE("latitude"),
     LINKEDIN("linkedIn"),
+    LONGITUDE("longitude"),
     MOBILEPHONE("mobilePhone"),
     OTHEREMAIL("otherEmail"),
     OTHERPHONE("otherPhone"),
+    PRIMARYCUSTOMINDEX("primaryCustomIndex"),
+    SECONDARYCUSTOMINDEX("secondaryCustomIndex"),
     TAGS("tags"),
     TWITTER("twitter"),
     UNIQUETAG("uniqueTag"),
@@ -96,10 +100,14 @@ public class DContactMapper
     entity.setFirstName(supplier.getString(value, Field.FIRSTNAME.getFieldName()));
     entity.setHomePhone(supplier.getString(value, Field.HOMEPHONE.getFieldName()));
     entity.setLastName(supplier.getString(value, Field.LASTNAME.getFieldName()));
+    entity.setLatitude(supplier.getFloat(value, Field.LATITUDE.getFieldName()));
     entity.setLinkedIn(supplier.getString(value, Field.LINKEDIN.getFieldName()));
+    entity.setLongitude(supplier.getFloat(value, Field.LONGITUDE.getFieldName()));
     entity.setMobilePhone(supplier.getString(value, Field.MOBILEPHONE.getFieldName()));
     entity.setOtherEmail(supplier.getString(value, Field.OTHEREMAIL.getFieldName()));
     entity.setOtherPhone(supplier.getString(value, Field.OTHERPHONE.getFieldName()));
+    entity.setPrimaryCustomIndex(supplier.getString(value, Field.PRIMARYCUSTOMINDEX.getFieldName()));
+    entity.setSecondaryCustomIndex(supplier.getString(value, Field.SECONDARYCUSTOMINDEX.getFieldName()));
     entity.setTags(supplier.getCollection(value, Field.TAGS.getFieldName()));
     entity.setTwitter(supplier.getString(value, Field.TWITTER.getFieldName()));
     entity.setUniqueTag(supplier.getString(value, Field.UNIQUETAG.getFieldName()));
@@ -186,10 +194,14 @@ public class DContactMapper
     supplier.setString(value, Field.FIRSTNAME.getFieldName(), entity.getFirstName());
     supplier.setString(value, Field.HOMEPHONE.getFieldName(), entity.getHomePhone());
     supplier.setString(value, Field.LASTNAME.getFieldName(), entity.getLastName());
+    supplier.setFloat(value, Field.LATITUDE.getFieldName(), entity.getLatitude());
     supplier.setString(value, Field.LINKEDIN.getFieldName(), entity.getLinkedIn());
+    supplier.setFloat(value, Field.LONGITUDE.getFieldName(), entity.getLongitude());
     supplier.setString(value, Field.MOBILEPHONE.getFieldName(), entity.getMobilePhone());
     supplier.setString(value, Field.OTHEREMAIL.getFieldName(), entity.getOtherEmail());
     supplier.setString(value, Field.OTHERPHONE.getFieldName(), entity.getOtherPhone());
+    supplier.setString(value, Field.PRIMARYCUSTOMINDEX.getFieldName(), entity.getPrimaryCustomIndex());
+    supplier.setString(value, Field.SECONDARYCUSTOMINDEX.getFieldName(), entity.getSecondaryCustomIndex());
     supplier.setCollection(value, Field.TAGS.getFieldName(), entity.getTags());
     supplier.setString(value, Field.TWITTER.getFieldName(), entity.getTwitter());
     supplier.setString(value, Field.UNIQUETAG.getFieldName(), entity.getUniqueTag());
@@ -291,8 +303,18 @@ public class DContactMapper
       return this;
     }
 
+    public Builder latitude(Float latitude) {
+      entity.setLatitude(latitude);
+      return this;
+    }
+
     public Builder linkedIn(String linkedIn) {
       entity.setLinkedIn(linkedIn);
+      return this;
+    }
+
+    public Builder longitude(Float longitude) {
+      entity.setLongitude(longitude);
       return this;
     }
 
@@ -308,6 +330,16 @@ public class DContactMapper
 
     public Builder otherPhone(String otherPhone) {
       entity.setOtherPhone(otherPhone);
+      return this;
+    }
+
+    public Builder primaryCustomIndex(String primaryCustomIndex) {
+      entity.setPrimaryCustomIndex(primaryCustomIndex);
+      return this;
+    }
+
+    public Builder secondaryCustomIndex(String secondaryCustomIndex) {
+      entity.setSecondaryCustomIndex(secondaryCustomIndex);
       return this;
     }
 

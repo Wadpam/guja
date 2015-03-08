@@ -29,13 +29,13 @@ import javax.cache.annotation.CacheValue;
 /**
  * The DContact domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-02-10T00:27:00.783+0100.
+ * Generated on 2015-03-08T21:44:48.699+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDContactDaoImpl
   extends AbstractDao<DContact, java.lang.Long> {
 
-  public GeneratedDContactDaoImpl(Supplier supplier) {
+  public GeneratedDContactDaoImpl(Supplier<Object, Object, Object, Object> supplier) {
     super(new DContactMapper(supplier), supplier);
   }
 
@@ -189,12 +189,30 @@ public class GeneratedDContactDaoImpl
   }
 
   /**
+   * query-by method for field latitude
+   * @param latitude the specified attribute
+   * @return an Iterable of DContacts for the specified latitude
+   */
+  public Iterable<DContact> queryByLatitude(Object parent, java.lang.Float latitude) {
+    return queryByField(parent, DContactMapper.Field.LATITUDE.getFieldName(), latitude);
+  }
+
+  /**
    * query-by method for field linkedIn
    * @param linkedIn the specified attribute
    * @return an Iterable of DContacts for the specified linkedIn
    */
   public Iterable<DContact> queryByLinkedIn(Object parent, java.lang.String linkedIn) {
     return queryByField(parent, DContactMapper.Field.LINKEDIN.getFieldName(), linkedIn);
+  }
+
+  /**
+   * query-by method for field longitude
+   * @param longitude the specified attribute
+   * @return an Iterable of DContacts for the specified longitude
+   */
+  public Iterable<DContact> queryByLongitude(Object parent, java.lang.Float longitude) {
+    return queryByField(parent, DContactMapper.Field.LONGITUDE.getFieldName(), longitude);
   }
 
   /**
@@ -222,6 +240,24 @@ public class GeneratedDContactDaoImpl
    */
   public Iterable<DContact> queryByOtherPhone(Object parent, java.lang.String otherPhone) {
     return queryByField(parent, DContactMapper.Field.OTHERPHONE.getFieldName(), otherPhone);
+  }
+
+  /**
+   * query-by method for field primaryCustomIndex
+   * @param primaryCustomIndex the specified attribute
+   * @return an Iterable of DContacts for the specified primaryCustomIndex
+   */
+  public Iterable<DContact> queryByPrimaryCustomIndex(Object parent, java.lang.String primaryCustomIndex) {
+    return queryByField(parent, DContactMapper.Field.PRIMARYCUSTOMINDEX.getFieldName(), primaryCustomIndex);
+  }
+
+  /**
+   * query-by method for field secondaryCustomIndex
+   * @param secondaryCustomIndex the specified attribute
+   * @return an Iterable of DContacts for the specified secondaryCustomIndex
+   */
+  public Iterable<DContact> queryBySecondaryCustomIndex(Object parent, java.lang.String secondaryCustomIndex) {
+    return queryByField(parent, DContactMapper.Field.SECONDARYCUSTOMINDEX.getFieldName(), secondaryCustomIndex);
   }
 
   /**
