@@ -24,6 +24,7 @@ package com.wadpam.guja.jackson;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -48,6 +49,8 @@ public class NonNullObjectMapperProvider extends AbstractObjectMapperProvider {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     // Do not serialize null values
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    // Ignore setterless properties
+    mapper.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
 
   }
 

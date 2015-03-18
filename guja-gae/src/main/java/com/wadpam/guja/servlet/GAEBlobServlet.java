@@ -94,6 +94,13 @@ public class GAEBlobServlet extends HttpServlet {
     }
   }
 
+  /**
+   * Get and upload URL
+   * @param req
+   * @param resp
+   * @throws ServletException
+   * @throws IOException
+   */
   private void getUploadUrl(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     LOGGER.debug("Get blobstore upload url");
 
