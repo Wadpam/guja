@@ -50,6 +50,17 @@ public class VelocityTemplateStringWriterBuilderTest {
 
   }
 
-  // TODO More tests
+  @Test
+  public void testUTF8() throws Exception {
+
+    StringWriter writer = VelocityTemplateStringWriterBuilder.withTemplate("utf8.vm")
+        .locale(Locale.forLanguageTag("sv"))
+        .build();
+
+    LOGGER.info("{}", writer.toString());
+    assertTrue("ÅÄÖ".equals(writer.toString()));
+
+  }
+
 
 }

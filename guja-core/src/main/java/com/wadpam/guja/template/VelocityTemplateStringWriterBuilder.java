@@ -25,6 +25,8 @@ public class VelocityTemplateStringWriterBuilder {
     p.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
     p.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
     p.setProperty("resource.loader", "class");
+    p.setProperty("input.encoding", "UTF-8");
+    p.setProperty("output.encoding", "UTF-8");
     Velocity.init(p);
   }
 

@@ -95,7 +95,7 @@ public class GAEBlobServlet extends HttpServlet {
   }
 
   /**
-   * Get and upload URL
+   * Get an upload URL
    * @param req
    * @param resp
    * @throws ServletException
