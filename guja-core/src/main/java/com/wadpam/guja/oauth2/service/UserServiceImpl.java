@@ -487,8 +487,12 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     existingUser.setZipCode(user.getZipCode());
 
     if (isAdmin) {
-      existingUser.setState(user.getState());
-      existingUser.setRoles(user.getRoles());
+      if (null != user.getState()) {
+        existingUser.setState(user.getState());
+      }
+      if (null != user.getRoles()) {
+        existingUser.setRoles(user.getRoles());
+      }
     }
 
     put(existingUser);
