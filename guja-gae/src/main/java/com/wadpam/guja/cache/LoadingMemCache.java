@@ -57,7 +57,7 @@ public class LoadingMemCache<K, V> extends AbstractLoadingCache<K, V> {
           put(key, value);
         }
       } catch (Exception e) {
-        LOGGER.warn("Failed to load value for the cache {}", e);
+        LOGGER.error("Failed to load value from the cache {}", e);
       }
     }
 
@@ -73,7 +73,11 @@ public class LoadingMemCache<K, V> extends AbstractLoadingCache<K, V> {
   @Override
   public void put(K key, V value) {
     //LOGGER.debug("put {} = {}", key, value);
-    syncCache.put(key, value, expiration);
+    try {
+      syncCache.put(key, value, expiration);
+    } catch (Exception e) {
+      LOGGER.error("Failed to put value in the cache {}", e);
+    }
   }
 
   @Override
