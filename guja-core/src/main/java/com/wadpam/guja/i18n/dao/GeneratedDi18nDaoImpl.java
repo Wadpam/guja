@@ -21,13 +21,13 @@ import com.wadpam.guja.i18n.domain.Di18n;
 /**
  * The Di18n domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-01-20T22:12:36.443+0100.
+ * Generated on 2015-03-27T15:57:01.040+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDi18nDaoImpl
   extends AbstractDao<Di18n, java.lang.Long> {
 
-  public GeneratedDi18nDaoImpl(Supplier supplier) {
+  public GeneratedDi18nDaoImpl(Supplier<Object, Object, Object, Object> supplier) {
     super(new Di18nMapper(supplier), supplier);
   }
 

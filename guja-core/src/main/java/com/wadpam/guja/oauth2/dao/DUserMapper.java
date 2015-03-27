@@ -12,7 +12,7 @@ import com.wadpam.guja.oauth2.domain.DUser;
 /**
  * The DUser domain-object specific mapping methods go here.
  *
- * Generated on 2015-01-20T22:12:36.907+0100.
+ * Generated on 2015-03-27T15:57:01.534+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DUserMapper
@@ -41,6 +41,7 @@ public class DUserMapper
     ROLES("roles"),
     STATE("state"),
     THUMBNAILURL("thumbnailUrl"),
+    TIMEZONECANONICALID("timeZoneCanonicalId"),
     UPDATEDBY("updatedBy"),
     UPDATEDDATE("updatedDate"),
     USERNAME("username"),
@@ -94,6 +95,7 @@ public class DUserMapper
     entity.setRoles(supplier.getCollection(value, Field.ROLES.getFieldName()));
     entity.setState(supplier.getInteger(value, Field.STATE.getFieldName()));
     entity.setThumbnailUrl(supplier.getString(value, Field.THUMBNAILURL.getFieldName()));
+    entity.setTimeZoneCanonicalId(supplier.getString(value, Field.TIMEZONECANONICALID.getFieldName()));
     entity.setUpdatedBy(supplier.getString(value, Field.UPDATEDBY.getFieldName()));
     entity.setUpdatedDate(supplier.getDate(value, Field.UPDATEDDATE.getFieldName()));
     entity.setUsername(supplier.getString(value, Field.USERNAME.getFieldName()));
@@ -181,6 +183,7 @@ public class DUserMapper
     supplier.setCollection(value, Field.ROLES.getFieldName(), entity.getRoles());
     supplier.setInteger(value, Field.STATE.getFieldName(), entity.getState());
     supplier.setString(value, Field.THUMBNAILURL.getFieldName(), entity.getThumbnailUrl());
+    supplier.setString(value, Field.TIMEZONECANONICALID.getFieldName(), entity.getTimeZoneCanonicalId());
     supplier.setString(value, Field.UPDATEDBY.getFieldName(), entity.getUpdatedBy());
     supplier.setDate(value, Field.UPDATEDDATE.getFieldName(), entity.getUpdatedDate());
     supplier.setString(value, Field.USERNAME.getFieldName(), entity.getUsername());
@@ -295,6 +298,11 @@ public class DUserMapper
 
     public Builder thumbnailUrl(String thumbnailUrl) {
       entity.setThumbnailUrl(thumbnailUrl);
+      return this;
+    }
+
+    public Builder timeZoneCanonicalId(String timeZoneCanonicalId) {
+      entity.setTimeZoneCanonicalId(timeZoneCanonicalId);
       return this;
     }
 

@@ -29,13 +29,13 @@ import javax.cache.annotation.CacheValue;
 /**
  * The DOAuth2User domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-01-20T22:12:36.907+0100.
+ * Generated on 2015-03-27T15:57:01.534+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDOAuth2UserDaoImpl
   extends AbstractDao<DOAuth2User, java.lang.Long> {
 
-  public GeneratedDOAuth2UserDaoImpl(Supplier supplier) {
+  public GeneratedDOAuth2UserDaoImpl(Supplier<Object, Object, Object, Object> supplier) {
     super(new DOAuth2UserMapper(supplier), supplier);
   }
 

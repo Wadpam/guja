@@ -29,13 +29,13 @@ import javax.cache.annotation.CacheValue;
 /**
  * The DUser domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-01-20T22:12:36.907+0100.
+ * Generated on 2015-03-27T15:57:01.534+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDUserDaoImpl
   extends AbstractDao<DUser, java.lang.Long> {
 
-  public GeneratedDUserDaoImpl(Supplier supplier) {
+  public GeneratedDUserDaoImpl(Supplier<Object, Object, Object, Object> supplier) {
     super(new DUserMapper(supplier), supplier);
   }
 
@@ -231,6 +231,15 @@ public class GeneratedDUserDaoImpl
    */
   public Iterable<DUser> queryByThumbnailUrl(java.lang.String thumbnailUrl) {
     return queryByField(null, DUserMapper.Field.THUMBNAILURL.getFieldName(), thumbnailUrl);
+  }
+
+  /**
+   * query-by method for field timeZoneCanonicalId
+   * @param timeZoneCanonicalId the specified attribute
+   * @return an Iterable of DUsers for the specified timeZoneCanonicalId
+   */
+  public Iterable<DUser> queryByTimeZoneCanonicalId(java.lang.String timeZoneCanonicalId) {
+    return queryByField(null, DUserMapper.Field.TIMEZONECANONICALID.getFieldName(), timeZoneCanonicalId);
   }
 
   /**

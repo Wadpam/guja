@@ -24,6 +24,7 @@ package com.wadpam.guja.oauth2.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import net.sf.mardao.core.Cached;
 
 import javax.persistence.Basic;
@@ -125,6 +126,14 @@ public class DUser extends DOAuth2User {
    */
   @Basic
   private String birthInfo;
+
+  /**
+   * Users canonical timezone ID, e.g. "Europe/Stockholm".
+   * Use this value when need to take DTS into account.
+   * http://joda-time.sourceforge.net/timezones.html
+   */
+  @Basic
+  private String timeZoneCanonicalId;
 
   public String getUsername() {
     return username;
@@ -230,5 +239,13 @@ public class DUser extends DOAuth2User {
 
   public void setBirthInfo(String birthInfo) {
     this.birthInfo = birthInfo;
+  }
+
+  public String getTimeZoneCanonicalId() {
+    return timeZoneCanonicalId;
+  }
+
+  public void setTimeZoneCanonicalId(String timeZoneCanonicalId) {
+    this.timeZoneCanonicalId = timeZoneCanonicalId;
   }
 }

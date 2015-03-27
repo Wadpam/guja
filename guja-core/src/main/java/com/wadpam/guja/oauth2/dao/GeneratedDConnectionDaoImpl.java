@@ -21,13 +21,13 @@ import com.wadpam.guja.oauth2.domain.DConnection;
 /**
  * The DConnection domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-01-20T22:12:36.907+0100.
+ * Generated on 2015-03-27T15:57:01.534+0100.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDConnectionDaoImpl
   extends AbstractDao<DConnection, java.lang.Long> {
 
-  public GeneratedDConnectionDaoImpl(Supplier supplier) {
+  public GeneratedDConnectionDaoImpl(Supplier<Object, Object, Object, Object> supplier) {
     super(new DConnectionMapper(supplier), supplier);
   }
 
