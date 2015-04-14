@@ -39,4 +39,6 @@ public class LocalizableTest {
     assertTrue(localized.missing().equals("missing"));
 
   }
+
+
 }

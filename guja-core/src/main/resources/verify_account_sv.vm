@@ -10,9 +10,9 @@
 
         <article>
             <p>Hej ${user.username}</p>
-            <p>Klicka <a href="${confirmationUrl}" target="_blank">här</a> eller klistra in länken nedan i din webläsare för att aktivera ditt XXX konto.</p>
+            <p>Klicka <a href="${confirmationUrl}" target="_blank">här</a> eller klistra in länken nedan i din webbläsare för att aktivera ditt XXX konto.</p>
             <p><a href="${confirmationUrl}" target="_blank">${confirmationUrl}</a></p>
-            <p>Länken är giltig i 24 timmar så använden den omgående.</p>
+            <p>Länken är giltig i 24 timmar så använd den omgående.</p>
             <p>Tack för att du använder XXX!<br>
             XXX teamet</p>
         </article>

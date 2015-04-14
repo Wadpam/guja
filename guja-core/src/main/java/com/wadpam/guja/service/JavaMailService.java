@@ -84,31 +84,31 @@ public class JavaMailService implements EmailService {
 
         final Session session = Session.getDefaultInstance(new Properties(), null);
         try {
-            Message msg = new MimeMessage(session);
+          MimeMessage msg = new MimeMessage(session);
 
-            InternetAddress address = new InternetAddress(fromEmail, fromName);
-            msg.setFrom(address);
+          InternetAddress address = new InternetAddress(fromEmail, fromName);
+          msg.setFrom(address);
 
-            address = new InternetAddress(toEmail, toName);
-            msg.addRecipient(Message.RecipientType.TO, address);
+          address = new InternetAddress(toEmail, toName);
+          msg.addRecipient(Message.RecipientType.TO, address);
+          
+          msg.setSubject(subject, "UTF-8");
 
-            msg.setSubject(subject);
+          // Check if plain text or multi-part message
+          if (!asHtml) {
+            // Plain text
+            msg.setText(body);
+          } else {
+            // Add body as html
+            final Multipart mp = new MimeMultipart();
+            final MimeBodyPart htmlPart = new MimeBodyPart();
+            htmlPart.setContent(body, "text/html");
+            mp.addBodyPart(htmlPart);
+            msg.setContent(mp);
+          }
 
-            // Check if plain text or multi-part message
-            if (!asHtml) {
-                // Plain text
-                msg.setText(body);
-            } else {
-                // Add body as html
-                final Multipart mp = new MimeMultipart();
-                final MimeBodyPart htmlPart = new MimeBodyPart();
-                htmlPart.setContent(body, "text/html");
-                mp.addBodyPart(htmlPart);
-                msg.setContent(mp);
-            }
-
-            Transport.send(msg);
-            return true;
+          Transport.send(msg);
+          return true;
 
         } catch (Exception e) {
             // Catch all exceptions and just log an error, do not interrupt flow
@@ -138,7 +138,7 @@ public class JavaMailService implements EmailService {
         final Session session = Session.getDefaultInstance(new Properties(), null);
         try {
             // Build message
-            final Message msg = new MimeMessage(session);
+            final MimeMessage msg = new MimeMessage(session);
 
             msg.setFrom(new InternetAddress(fromAddress, fromName));
 
@@ -167,7 +167,7 @@ public class JavaMailService implements EmailService {
             }
 
             // Subject
-            msg.setSubject(subject);
+            msg.setSubject(subject, "UTF-8");
 
             // Check if plain text or multi-part message
             if (!asHtml) {

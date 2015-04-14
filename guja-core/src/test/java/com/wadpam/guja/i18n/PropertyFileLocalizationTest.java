@@ -117,8 +117,12 @@ public class PropertyFileLocalizationTest {
     );
 
     String localizedMessage = localization.getMessage("specialChars", "failed");
-    LOGGER.info("åäö", localizedMessage);
+    LOGGER.info("åäö : {}", localizedMessage);
     assertTrue("åäö".equals(localizedMessage));
+
+    localizedMessage = localization.getMessage("specialChars2", "", "test");
+    LOGGER.info("test, åäö : {}", localizedMessage);
+    assertTrue("test, åäö".equals(localizedMessage));
 
   }
 }

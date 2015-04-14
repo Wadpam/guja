@@ -219,7 +219,7 @@ public class Oauth2ClientAuthenticationFilter implements Filter, AdminTask {
 
     } else {
       // No client authentication included (401, "invalid_client")
-      LOGGER.info("Unauthorized - no client credentials found)");
+      LOGGER.info("Unauthorized - no client credentials found");
       errorMessage(response, HttpServletResponse.SC_UNAUTHORIZED, ERROR_INVALID_CLIENT);
       return;
     }
