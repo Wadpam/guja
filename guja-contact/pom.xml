@@ -3,7 +3,7 @@
     <parent>
         <artifactId>guja</artifactId>
         <groupId>com.wadpam.guja</groupId>
-        <version>0.8.10</version>
+        <version>0.8.11-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>com.wadpam.guja</groupId>
             <artifactId>guja-core</artifactId>
-            <version>0.8.10</version>
+            <version>0.8.11-SNAPSHOT</version>
         </dependency>
 
         <dependency>
