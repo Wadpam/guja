@@ -486,6 +486,9 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     existingUser.setPhoneNumber2(user.getPhoneNumber2());
     existingUser.setZipCode(user.getZipCode());
     existingUser.setTimeZoneCanonicalId(user.getTimeZoneCanonicalId());
+    if (null != user.getPreferredLanguage()) {
+      existingUser.setPreferredLanguage(user.getPreferredLanguage());
+    }
 
     if (isAdmin) {
       if (null != user.getState()) {
