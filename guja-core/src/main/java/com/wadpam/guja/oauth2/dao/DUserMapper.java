@@ -12,7 +12,7 @@ import com.wadpam.guja.oauth2.domain.DUser;
 /**
  * The DUser domain-object specific mapping methods go here.
  *
- * Generated on 2015-03-27T15:57:01.534+0100.
+ * Generated on 2015-04-28T15:20:08.928+0200.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class DUserMapper
@@ -37,6 +37,7 @@ public class DUserMapper
     PASSWORD("password"),
     PHONENUMBER1("phoneNumber1"),
     PHONENUMBER2("phoneNumber2"),
+    PREFERREDLANGUAGE("preferredLanguage"),
     PROFILELINK("profileLink"),
     ROLES("roles"),
     STATE("state"),
@@ -91,6 +92,7 @@ public class DUserMapper
     entity.setPassword(supplier.getString(value, Field.PASSWORD.getFieldName()));
     entity.setPhoneNumber1(supplier.getString(value, Field.PHONENUMBER1.getFieldName()));
     entity.setPhoneNumber2(supplier.getString(value, Field.PHONENUMBER2.getFieldName()));
+    entity.setPreferredLanguage(supplier.getString(value, Field.PREFERREDLANGUAGE.getFieldName()));
     entity.setProfileLink(supplier.getString(value, Field.PROFILELINK.getFieldName()));
     entity.setRoles(supplier.getCollection(value, Field.ROLES.getFieldName()));
     entity.setState(supplier.getInteger(value, Field.STATE.getFieldName()));
@@ -179,6 +181,7 @@ public class DUserMapper
     supplier.setString(value, Field.PASSWORD.getFieldName(), entity.getPassword());
     supplier.setString(value, Field.PHONENUMBER1.getFieldName(), entity.getPhoneNumber1());
     supplier.setString(value, Field.PHONENUMBER2.getFieldName(), entity.getPhoneNumber2());
+    supplier.setString(value, Field.PREFERREDLANGUAGE.getFieldName(), entity.getPreferredLanguage());
     supplier.setString(value, Field.PROFILELINK.getFieldName(), entity.getProfileLink());
     supplier.setCollection(value, Field.ROLES.getFieldName(), entity.getRoles());
     supplier.setInteger(value, Field.STATE.getFieldName(), entity.getState());
@@ -278,6 +281,11 @@ public class DUserMapper
 
     public Builder phoneNumber2(String phoneNumber2) {
       entity.setPhoneNumber2(phoneNumber2);
+      return this;
+    }
+
+    public Builder preferredLanguage(String preferredLanguage) {
+      entity.setPreferredLanguage(preferredLanguage);
       return this;
     }
 

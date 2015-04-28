@@ -29,7 +29,7 @@ import javax.cache.annotation.CacheValue;
 /**
  * The DUser domain-object specific finders and methods go in this POJO.
  * 
- * Generated on 2015-03-27T15:57:01.534+0100.
+ * Generated on 2015-04-28T15:20:08.928+0200.
  * @author mardao DAO generator (net.sf.mardao.plugin.ProcessDomainMojo)
  */
 public class GeneratedDUserDaoImpl
@@ -195,6 +195,15 @@ public class GeneratedDUserDaoImpl
    */
   public Iterable<DUser> queryByPhoneNumber2(java.lang.String phoneNumber2) {
     return queryByField(null, DUserMapper.Field.PHONENUMBER2.getFieldName(), phoneNumber2);
+  }
+
+  /**
+   * query-by method for field preferredLanguage
+   * @param preferredLanguage the specified attribute
+   * @return an Iterable of DUsers for the specified preferredLanguage
+   */
+  public Iterable<DUser> queryByPreferredLanguage(java.lang.String preferredLanguage) {
+    return queryByField(null, DUserMapper.Field.PREFERREDLANGUAGE.getFieldName(), preferredLanguage);
   }
 
   /**

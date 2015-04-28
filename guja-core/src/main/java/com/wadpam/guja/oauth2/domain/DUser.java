@@ -135,6 +135,18 @@ public class DUser extends DOAuth2User {
   @Basic
   private String timeZoneCanonicalId;
 
+  /**
+   * The language preferred by the user.
+   * When to use this and what value to use is project specific.
+   * Possibly let the user select a value during registration or using the locale of the registration request.
+   * Suggest to use ISO 639-1 Codes (http://www.loc.gov/standards/iso639-2/php/code_list.php)
+   * One recommendation is to use this value when the locale of the request
+   * can not be used to determine what language to use, e.g. when sending an email/push notification
+   * based on an internal trigger event.
+   */
+  @Basic
+  private String preferredLanguage;
+
   public String getUsername() {
     return username;
   }
@@ -247,5 +259,13 @@ public class DUser extends DOAuth2User {
 
   public void setTimeZoneCanonicalId(String timeZoneCanonicalId) {
     this.timeZoneCanonicalId = timeZoneCanonicalId;
+  }
+
+  public String getPreferredLanguage() {
+    return preferredLanguage;
+  }
+
+  public void setPreferredLanguage(String preferredLanguage) {
+    this.preferredLanguage = preferredLanguage;
   }
 }
