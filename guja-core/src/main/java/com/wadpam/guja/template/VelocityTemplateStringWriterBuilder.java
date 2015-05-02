@@ -1,5 +1,6 @@
 package com.wadpam.guja.template;
 
+import com.google.inject.Inject;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -35,14 +36,18 @@ public class VelocityTemplateStringWriterBuilder {
   private VelocityContext vc;
 
 
-  public static VelocityTemplateStringWriterBuilder withTemplate(String templateName) {
-    return new VelocityTemplateStringWriterBuilder(templateName, null, new VelocityContext());
+  @Inject
+  public VelocityTemplateStringWriterBuilder() {
+    this(null, null, new VelocityContext());
   }
-
   public VelocityTemplateStringWriterBuilder(String templateName, Locale locale, VelocityContext vc) {
     this.templateName = templateName;
     this.locale = locale;
     this.vc = vc;
+  }
+
+  public static VelocityTemplateStringWriterBuilder withTemplate(String templateName) {
+    return new VelocityTemplateStringWriterBuilder(templateName, null, new VelocityContext());
   }
 
   public VelocityTemplateStringWriterBuilder templateName(String name) {

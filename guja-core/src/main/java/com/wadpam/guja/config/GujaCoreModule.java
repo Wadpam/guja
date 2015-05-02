@@ -43,6 +43,7 @@ import com.wadpam.guja.oauth2.web.Oauth2ClientAuthenticationFilter;
 import com.wadpam.guja.service.EmailService;
 import com.wadpam.guja.service.JavaMailService;
 import com.wadpam.guja.template.RequestScopedVelocityTemplateStringWriterBuilder;
+import com.wadpam.guja.template.VelocityTemplateStringWriterBuilder;
 import net.sf.mardao.dao.Supplier;
 
 /**
@@ -93,6 +94,7 @@ public class GujaCoreModule extends AbstractModule {
     bind(DFactoryDaoBean.class);
 
     bind(RequestScopedVelocityTemplateStringWriterBuilder.class);
+    bind(VelocityTemplateStringWriterBuilder.class);
 
     bind(EmailService.class).to(JavaMailService.class);
 

@@ -35,10 +35,7 @@ import com.wadpam.guja.oauth2.api.OAuth2UserResource;
 import com.wadpam.guja.oauth2.dao.DUserDaoBean;
 import com.wadpam.guja.oauth2.domain.DOAuth2User;
 import com.wadpam.guja.oauth2.domain.DUser;
-import com.wadpam.guja.oauth2.provider.Oauth2UserProvider;
-import com.wadpam.guja.oauth2.provider.PasswordEncoder;
-import com.wadpam.guja.oauth2.provider.TemporaryTokenCache;
-import com.wadpam.guja.oauth2.provider.UserAuthenticationProvider;
+import com.wadpam.guja.oauth2.provider.*;
 import com.wadpam.guja.service.EmailService;
 import com.wadpam.guja.template.RequestScopedVelocityTemplateStringWriterBuilder;
 import net.sf.mardao.core.CursorPage;
@@ -69,6 +66,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
 
   private boolean shouldVerifyAccountCreation = true;
   private boolean shouldUseEmailAsUsername = false;
+  private boolean shouldSetPreferredLocaleAutomatic = false;
 
   private String verifyAccountTemplate = VELOCITY_TEMPLATE_VERIFY_ACCOUNT;
   private String changeEmailTemplate = VELOCITY_TEMPLATE_CHANGE_EMAIL;
@@ -81,6 +79,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   private final Provider<PropertyFileLocalizationBuilder> localizationBuilderProvider;
   private final TemporaryTokenCache tokenCache;
   private final Provider<UriInfo> uriInfoProvider;
+  private final Provider<RequestScopedLocale> requestLocaleProvider;
 
   @Inject
   public UserServiceImpl(DUserDaoBean userDao,
@@ -90,7 +89,8 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
                          Provider<PropertyFileLocalizationBuilder> localizationBuilderProvider,
                          ServerEnvironment severEnvironment,
                          TemporaryTokenCache tokenCache,
-                         Provider<UriInfo> uriInfoProvider) {
+                         Provider<UriInfo> uriInfoProvider,
+                         Provider<RequestScopedLocale> requestLocaleProvider) {
 
     this.userDao = userDao;
     this.passwordEncoder = passwordEncoder;
@@ -100,6 +100,7 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     this.severEnvironment = severEnvironment;
     this.tokenCache = tokenCache;
     this.uriInfoProvider = uriInfoProvider;
+    this.requestLocaleProvider = requestLocaleProvider;
 
     if (severEnvironment.isDevEnvironment()) {
       createDefaultAdmin();
@@ -150,6 +151,10 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     user.setState((!shouldVerifyAccountCreation || severEnvironment.isDevEnvironment())
         ? DUser.ACTIVE_STATE : DUser.UNVERIFIED_STATE);
 
+    if (null == user.getPreferredLanguage() && shouldSetPreferredLocaleAutomatic) {
+      setPreferredLanguage(user);
+    }
+
     put(user);
 
     if (shouldVerifyAccountCreation) {
@@ -158,6 +163,14 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     }
 
     return user;
+  }
+
+  private void setPreferredLanguage(DUser user) {
+    String language = requestLocaleProvider.get().getLocale().getLanguage();
+    if (null == language) {
+      language = requestLocaleProvider.get().getDefaultLocale().getLanguage();
+    }
+    user.setPreferredLanguage(language);
   }
 
   private static void lowercaseEmail(DUser user) {
@@ -486,8 +499,11 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
     existingUser.setPhoneNumber2(user.getPhoneNumber2());
     existingUser.setZipCode(user.getZipCode());
     existingUser.setTimeZoneCanonicalId(user.getTimeZoneCanonicalId());
+
     if (null != user.getPreferredLanguage()) {
       existingUser.setPreferredLanguage(user.getPreferredLanguage());
+    } else if (shouldSetPreferredLocaleAutomatic) {
+      setPreferredLanguage(existingUser);
     }
 
     if (isAdmin) {
@@ -557,6 +573,11 @@ public class UserServiceImpl implements UserService, UserAuthenticationProvider,
   @Inject(optional = true)
   public void setUseEmailAsUsername(@Named("app.email.useAsUsername") boolean useEmailAsUsername) {
     this.shouldUseEmailAsUsername = useEmailAsUsername;
+  }
+
+  @Inject(optional = true)
+  public void setPreferredLocaleAutomatic(@Named("app.user.setPreferredLocaleAutomatic") boolean shouldSetPreferredLocaleAutomatic) {
+    this.shouldSetPreferredLocaleAutomatic = shouldSetPreferredLocaleAutomatic;
   }
 
   @Inject(optional = true)
