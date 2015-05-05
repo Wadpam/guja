@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>Home :: Guja Demo</title>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="js/kickstart.js"></script> <!-- KICKSTART -->
+        <link rel="stylesheet" href="css/kickstart.css" media="all" /> <!-- KICKSTART -->
+        <link rel="stylesheet" href="css/style.css" media="all" /> <!-- KICKSTART -->
+    </head>
+    <body >
+        <div class='grid'>
+            <div class="align-right">
+            </div>
+                
+            <h3>Header goes here</h3>
+            <ul class="tabs"></ul>
+            <div id='tabr1' class='tab-content'>
+                <div class='col_3'>
+                    <button class="align-right" onclick="location.href='/oauth/federated/logout'"><i class="icon-eject"></i>&nbsp;Logout</button>
+                    
+                </div>
+                <div class='col_6'>
+                </div>
+                <div class='col_3'></div>
+            </div>
+        </div>
+            
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="/js/crud_api.js"></script>
+        <script type="text/javascript">
+
+$(function() {
+  crud_Read("api/user", "me")
+  .success(function(data) {
+      var beginIndex = data.displayName.lastIndexOf(' ');
+      var firstName = data.displayName.substr(0, beginIndex);
+      var lastName = data.displayName.substr(beginIndex+1);
+  })
+          .fail(function(jqXHR, statusText, errorThrown) {
+              window.location.href='/index.html?error=access';
+  });
+});
+        </script>
+<!--<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-50020970-1', 'broker-web.appspot.com');
+  ga('send', 'pageview');
+
+</script>-->
+    </body>
+</html>
