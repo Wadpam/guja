@@ -43,7 +43,7 @@ public class HttpBodyRequestWrapper extends HttpServletRequestWrapper {
     try {
       InputStream inputStream = request.getInputStream();
       if (inputStream != null) {
-        bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
         char[] charBuffer = new char[128];
         int bytesRead = -1;
         while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
@@ -68,7 +68,7 @@ public class HttpBodyRequestWrapper extends HttpServletRequestWrapper {
 
   @Override
   public ServletInputStream getInputStream() throws IOException {
-    final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes());
+    final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes("UTF-8"));
     ServletInputStream servletInputStream = new ServletInputStream() {
       public int read() throws IOException {
         return byteArrayInputStream.read();
@@ -79,7 +79,7 @@ public class HttpBodyRequestWrapper extends HttpServletRequestWrapper {
 
   @Override
   public BufferedReader getReader() throws IOException {
-    return new BufferedReader(new InputStreamReader(this.getInputStream()));
+    return new BufferedReader(new InputStreamReader(this.getInputStream(), "UTF-8"));
   }
 
   public String getBody() {
