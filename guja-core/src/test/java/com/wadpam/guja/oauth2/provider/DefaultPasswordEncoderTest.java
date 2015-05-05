@@ -22,8 +22,12 @@ package com.wadpam.guja.oauth2.provider;
  * #L%
  */
 
+import com.sun.org.apache.xml.internal.utils.LocaleUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.util.locale.LocaleExtensions;
+
+import java.util.Locale;
 
 import static org.junit.Assert.assertTrue;
 
@@ -47,6 +51,15 @@ public class DefaultPasswordEncoderTest {
 
     String encodedPassword = encoder.encode("Password01");
     assertTrue(encoder.matches("Password01", encodedPassword));
+
+  }
+
+  @org.junit.Test
+  public void testEncodeUnicode() throws Exception {
+    Locale.setDefault(Locale.CHINESE);
+
+    String encodedPassword = encoder.encode("æøåäö");
+    assertTrue(encoder.matches("æøåäö", encodedPassword));
 
   }
 
