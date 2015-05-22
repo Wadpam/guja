@@ -19,6 +19,7 @@
         <module>guja-appengine-war</module>
         <module>guja-appengine-ear</module>
         <module>guja-contact</module>
+        <module>guja-jetty</module>
     </modules>
 
     <properties>
