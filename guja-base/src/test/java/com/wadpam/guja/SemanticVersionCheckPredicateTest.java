@@ -38,10 +38,7 @@ public class SemanticVersionCheckPredicateTest {
   @Before
   public void setUp() throws Exception {
 
-    predicate = new SemanticVersionCheckPredicate(ImmutableMap.<String, String>builder()
-        .put("ios", "1.0.0")
-        .put("android", ">=1.5")
-        .build());
+    predicate = new SemanticVersionCheckPredicate("ios:1.0.0,android:>=1.5");
 
   }
 
