@@ -57,7 +57,7 @@ public class SemanticVersionCheckPredicate implements VersionCheckResource.Versi
   }
 
   private static Map<String, String> parsePropertyMap(String formattedMap) {
-    return Splitter.on(",").withKeyValueSeparator("=").split(formattedMap);
+    return Splitter.on(",").withKeyValueSeparator(":").split(formattedMap);
   }
 
   @Override
