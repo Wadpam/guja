@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+import java.util.Properties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -86,26 +87,29 @@ public class OAuth2FederatedResource {
                                  Oauth2UserProvider userProvider,
                                  ServerEnvironment serverEnvironment,
                                  DConnectionDaoBean connectionDao,
-                                 DFactoryDaoBean factoryDao) {
+                                 DFactoryDaoBean factoryDao,
+                                 Properties configProperties) {
 
     this.connectionDao = connectionDao;
     this.factoryDao = factoryDao;
     this.accessTokenGenerator = accessTokenGenerator;
     this.userProvider = userProvider;
 
-    if (serverEnvironment.isDevEnvironment()) {
-      try {
+    if (serverEnvironment.isDevEnvironment() && configProperties.containsKey("oauth2.providerIds")) {
+      for (String providerId : configProperties.getProperty("oauth2.providerIds").split(",")) {
+        try {
 
-        // TODO Move values to a property file
-        factoryDao.put(DFactoryMapper.newBuilder()
-            .id(FactoryResource.PROVIDER_ID_FACEBOOK)
-            .baseUrl("https://graph.facebook.com")
-            .clientId("255653361131262")
-            .clientSecret("43801e00b5f2e540b672b19943e164ba")
-            .build());
+          // TODO Move values to a property file
+          factoryDao.put(DFactoryMapper.newBuilder()
+                  .id(providerId)
+                  .baseUrl(configProperties.getProperty("oauth2." + providerId + ".baseUrl"))
+                  .clientId(configProperties.getProperty("oauth2." + providerId + ".clientId"))
+                  .clientSecret(configProperties.getProperty("oauth2." + providerId + ".clientSecret"))
+                  .build());
 
-      } catch (IOException e) {
-        LOGGER.error("populating factory", e);
+        } catch (IOException e) {
+          LOGGER.error("populating factory for " + providerId, e);
+        }
       }
     }
   }
